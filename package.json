@@ -1,0 +1,14 @@
+{
+  "name": "jam-game",
+  "version": "1.0.0",
+  "description": "N64Brew jam",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ali Naci Erdem",
+  "license": "MIT",
+  "devDependencies": {
+    "ed64": "^2.0.3"
+  }
+}
