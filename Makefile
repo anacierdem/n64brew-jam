@@ -9,6 +9,10 @@ SRC = main.c rdl.c
 OBJS = $(SRC:%.c=$(BUILD_DIR)/%.o)
 DEPS = $(SRC:%.c=$(BUILD_DIR)/%.d)
 
+libdragon:
+	$(MAKE) -C ./libdragon install
+
+jam.z64: libdragon
 jam.z64: N64_ROM_TITLE="Jam"
 $(BUILD_DIR)/jam.elf: $(OBJS)
 
@@ -17,4 +21,4 @@ clean:
 
 -include $(DEPS)
 
-.PHONY: all clean
+.PHONY: all clean libdragon
