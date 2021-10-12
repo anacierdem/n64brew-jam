@@ -21,7 +21,7 @@
 #define cast64(x) (x)
 #else
 #include <stdint.h>
-#define cast64(x) (uint64_t)(x)
+#define cast64(x) (uint64_t)(uint32_t)(x)
 #endif
 
 #define RdpSetClippingFX(x0,y0,x1,y1) \
@@ -85,6 +85,9 @@
 
 #define RdpSetFillColor(color) \
     (((cast64(0x37))<<56) | (color))
+
+#define RdpSetPrimColor(color) \
+    (((cast64(0x3a))<<56) | (color))
 
 #define RdpSetBlendColor(color) \
     (((cast64(0x39))<<56) | (color))
