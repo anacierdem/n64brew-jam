@@ -12,8 +12,8 @@
 #define RDP_TILE_SIZE_16BIT 2
 #define RDP_TILE_SIZE_32BIT 3
 
-#define RDP_COLOR16(r,g,b,a) (((r)<<11)|((g)<<6)|((b)<<1)|(a))
-#define RDP_COLOR32(r,g,b,a) (((r)<<24)|((g)<<16)|((b)<<8)|(a))
+#define RDP_COLOR16(r,g,b,a) (uint32_t)(((r)<<11)|((g)<<6)|((b)<<1)|(a))
+#define RDP_COLOR32(r,g,b,a) (uint32_t)(((r)<<24)|((g)<<16)|((b)<<8)|(a))
 
 // When compiling C/C++ code, 64-bit immediate operands require explicit
 // casting to a 64-bit type
@@ -84,16 +84,16 @@
     (((cast64(0x37))<<56) | (cast64(color)<<16) | (color))
 
 #define RdpSetFillColor(color) \
-    (((cast64(0x37))<<56) | cast64(color))
+    (((cast64(0x37))<<56) | (color))
 
 #define RdpSetPrimColor(color) \
-    (((cast64(0x3a))<<56) | cast64(color))
+    (((cast64(0x3a))<<56) | (color))
 
 #define RdpSetBlendColor(color) \
-    (((cast64(0x39))<<56) | cast64(color))
+    (((cast64(0x39))<<56) | (color))
 
 #define RdpSetFogColor(color) \
-    (((cast64(0x38))<<56) | cast64(color))
+    (((cast64(0x38))<<56) | (color))
 
 #define _NUM_ARGS2(X,X64,X63,X62,X61,X60,X59,X58,X57,X56,X55,X54,X53,X52,X51,X50,X49,X48,X47,X46,X45,X44,X43,X42,X41,X40,X39,X38,X37,X36,X35,X34,X33,X32,X31,X30,X29,X28,X27,X26,X25,X24,X23,X22,X21,X20,X19,X18,X17,X16,X15,X14,X13,X12,X11,X10,X9,X8,X7,X6,X5,X4,X3,X2,X1,N,...) N
 #define NUM_ARGS(...) _NUM_ARGS2(0, __VA_ARGS__ ,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
