@@ -58,9 +58,9 @@ static void render_tri(RdpDisplayList* rdl, int32_t x1, int32_t y1, int32_t x2, 
 
     #ifdef MICRO_ADJUSTMENTS
         int32_t subpixel_height = make_16d16(0, 0.25);
-        XL += mult_16d16(DxLDy, subpixel_height - (v2y && subpixel_height) );
-        XH -= mult_16d16(DxHDy, frac_16d16(v1y));
-        XM -= mult_16d16(DxMDy, frac_16d16(v1y));
+        XL += mult_16d16(DxLDy, subpixel_height - (y2 && subpixel_height) );
+        XH -= mult_16d16(DxHDy, frac_16d16(y1));
+        XM -= mult_16d16(DxMDy, frac_16d16(y1));
     #endif
 
     uint64_t dir = (
