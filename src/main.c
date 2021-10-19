@@ -55,6 +55,7 @@ static void render_tri(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int32_t v2
 #define SWAP(X, Y) ({ int32_t t = X; X = Y; Y = t; })
 
 static int32_t last_DxDy, last_v1x, last_v1y, last_v2x, last_v2y;
+static int32_t is_even = 1;
 // Start from top left
 static void render_tri_strip(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int32_t v2x, int32_t v2y, int32_t v3x, int32_t v3y) {
     int32_t YL = v3y,
@@ -72,6 +73,7 @@ static void render_tri_strip(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int3
     last_v1y = v1y;
     last_v2x = v3x;
     last_v2y = v3y;
+    is_even = 0;
 
     if (v3y < v2y) {
         SWAP(YL, YM);
@@ -108,8 +110,15 @@ static void render_tri_strip_next(RdpDisplayList* rdl, int32_t v1x, int32_t v1y)
             DxMDy = last_DxDy;
 
     last_DxDy = DxHDy;
-    last_v1x = v1x;
-    last_v1y = v1y;
+    is_even = is_even ^ 1;
+
+    if (is_even) {
+        last_v1x = v1x;
+        last_v1y = v1y;
+    } else {
+        last_v2x = v1x;
+        last_v2y = v1y;
+    }
 
     if (v1y < last_v2y) {
         SWAP(YL, YM);
@@ -208,10 +217,17 @@ int main(void)
         render_tri_strip(rdl,
             make_16d16(50),   make_16d16(0),
             make_16d16(50),   make_16d16(50),
-            make_16d16(150),  left + make_16d16(0)
+            make_16d16(150),  make_16d16(50)
         );
-
-        render_tri_strip_next(rdl, make_16d16(150),   left/2 + make_16d16(0));
+        render_tri_strip_next(rdl, make_16d16(150), make_16d16(0));
+    
+        render_tri_strip_next(rdl, make_16d16(250), make_16d16(50));
+        render_tri_strip_next(rdl, make_16d16(250), make_16d16(0));
+    
+        render_tri_strip_next(rdl, make_16d16(300), make_16d16(50));
+        render_tri_strip_next(rdl, make_16d16(300), make_16d16(0));
+    
+        // render_tri_strip_next(rdl, make_16d16(350), make_16d16(0));
 
 
         // rdl_push(rdl,RdpSetFogColor(cast64(RDP_COLOR32(255,0,255,50))));
