@@ -159,6 +159,8 @@ int main(void)
 
     RdpDisplayList *rdl = rdl_heap_alloc(100);
 
+    test_func();
+
     while(1) {
 
         while( !(disp = display_lock()) );
