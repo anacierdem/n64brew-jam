@@ -21,18 +21,40 @@
 #define STR(x) STR_HELPER(x)
 
 // #define MICRO_ADJUSTMENTS
+#define SWAP(X, Y) ({ int32_t t = X; X = Y; Y = t; })
+
 
 // Given vertices should be in correct order
-static void render_tri(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int32_t v2x, int32_t v2y, int32_t v3x, int32_t v3y) {
-    int32_t YL = v3y,
-            YM = v2y,
-            YH = v1y,
-            XL = v2x,
-            XH = v1x,
-            XM = v1x,
-            DxLDy = (v3y - v2y) == 0 ? 0 : div_16d16(v3x - v2x, v3y - v2y),
-            DxHDy = (v3y - v1y) == 0 ? 0 : div_16d16(v3x - v1x, v3y - v1y),
-            DxMDy = (v2y - v1y) == 0 ? 0 : div_16d16(v2x - v1x, v2y - v1y);
+static void render_tri(RdpDisplayList* rdl, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3) {
+    if (y1 > y2) {
+        SWAP(y1, y2);
+        SWAP(x1, x2);
+    }
+
+    if (y2 > y3) {
+        SWAP(y2, y3);
+        SWAP(x2, x3);
+    }
+
+    if (y1 > y2) {
+        SWAP(y1, y2);
+        SWAP(x1, x2);
+    }
+
+
+    int32_t YL = y3,
+            YM = y2,
+            YH = y1,
+            XL = x2,
+            XH = x1,
+            XM = x1;
+
+    assert(YH <= YM);
+    assert(YM <= YL);
+
+    int32_t DxLDy = (y3 - y2) == 0 ? 0 : div_16d16(x3 - x2, y3 - y2),
+            DxHDy = (y3 - y1) == 0 ? 0 : div_16d16(x3 - x1, y3 - y1),
+            DxMDy = (y2 - y1) == 0 ? 0 : div_16d16(x2 - x1, y2 - y1);
 
     #ifdef MICRO_ADJUSTMENTS
         int32_t subpixel_height = make_16d16(0, 0.25);
@@ -41,7 +63,12 @@ static void render_tri(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int32_t v2
         XM -= mult_16d16(DxMDy, frac_16d16(v1y));
     #endif
 
-    rdl_push(rdl, (cast64(0xC8) << 56) | (cast64(1) << 55) |
+    uint64_t dir = (
+        (int64_t)(x3 - x1) * (int64_t)(y2 - y1) -
+        (int64_t)(y3 - y1) * (int64_t)(x2 - x1)
+    ) > 0 ? 0 : 1;
+
+    rdl_push(rdl, (cast64(0xC8) << 56) | (cast64(dir) << 55) |
         (cast64(from_16d16_to_11d2(YL)) << 32) |
         (cast64(from_16d16_to_11d2(YM)) << 16) |
         (cast64(from_16d16_to_11d2(YH)) << 0)
@@ -52,8 +79,6 @@ static void render_tri(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int32_t v2
 }
 
 
-#define SWAP(X, Y) ({ int32_t t = X; X = Y; Y = t; })
-
 static int32_t last_DxDy, last_v1x, last_v1y, last_v2x, last_v2y;
 static int32_t is_even = 1;
 // Start from top left
@@ -61,24 +86,29 @@ static void render_tri_strip(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int3
     int32_t YL = v3y,
             YM = v2y,
             YH = v1y,
-            XL = (v3y < v2y) ? v3x : v2x,
+            XL = v2x,
             XH = v1x,
-            XM = v1x,
-            DxLDy = (v3y - v2y) == 0 ? 0 : div_16d16(v3x - v2x, v3y - v2y),
+            XM = v1x;
+
+    // last_DxDy = DxHDy;
+    // last_v1x = v1x;
+    // last_v1y = v1y;
+    // last_v2x = v3x;
+    // last_v2y = v3y;
+    // is_even = 0;
+
+    if (YH > YM) {
+        SWAP(YH, YM);
+    }
+
+    if (YM > YL) {
+        SWAP(YM, YL);
+    }
+
+    int32_t DxLDy = (v3y - v2y) == 0 ? 0 : div_16d16(v3x - v2x, v3y - v2y),
             DxHDy = (v3y - v1y) == 0 ? 0 : div_16d16(v3x - v1x, v3y - v1y),
             DxMDy = (v2y - v1y) == 0 ? 0 : div_16d16(v2x - v1x, v2y - v1y);
 
-    last_DxDy = DxHDy;
-    last_v1x = v1x;
-    last_v1y = v1y;
-    last_v2x = v3x;
-    last_v2y = v3y;
-    is_even = 0;
-
-    if (v3y < v2y) {
-        SWAP(YL, YM);
-        SWAP(DxHDy, DxMDy);
-    }
 
     #ifdef MICRO_ADJUSTMENTS
         int32_t subpixel_height = make_16d16(0, 0.25);
@@ -194,7 +224,7 @@ int main(void)
             RdpSetCombine(
                 // We need to enable same flags for both cycles in 1 cycle mode.
                 Comb0_Rgb(ZERO, ZERO, ZERO , PRIM) | Comb0_Alpha(ZERO, ZERO, ZERO , PRIM) |
-                Comb1_Rgb(ZERO, ZERO, ZERO , PRIM) | Comb1_Alpha(ZERO, ZERO, ZERO , PRIM) 
+                Comb1_Rgb(ZERO, ZERO, ZERO , PRIM) | Comb1_Alpha(ZERO, ZERO, ZERO , PRIM)
             )
         );
 
@@ -213,22 +243,28 @@ int main(void)
         // in the case above P=3=FOG_RGB, A=1=FOG_A, M=1=MEM_RGB, B=0=1-A
         rdl_push(rdl, RdpSetOtherModes( BLEND_ENABLE | AA_ENABLE | READ_ENABLE |
             (cast64(0x0) << 30) | (cast64(0x3) << 28) | (cast64(0x0) << 26) | (cast64(0x1) << 24) |
-            (cast64(0x1) << 22) | (cast64(0x1) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) ); // | (cast64(0x80000000)) 
+            (cast64(0x1) << 22) | (cast64(0x1) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) ); // | (cast64(0x80000000))
 
 
-        render_tri_strip(rdl,
-            make_16d16(50),   make_16d16(0),
+        render_tri(rdl,
             make_16d16(50),   make_16d16(50),
-            make_16d16(150),  make_16d16(50)
+            make_16d16(50),   make_16d16(0),
+            make_16d16(0),  make_16d16(30)
         );
-        render_tri_strip_next(rdl, make_16d16(150), make_16d16(0));
-    
-        render_tri_strip_next(rdl, make_16d16(250), make_16d16(50));
-        render_tri_strip_next(rdl, make_16d16(250), make_16d16(0));
-    
-        render_tri_strip_next(rdl, make_16d16(300), make_16d16(50));
-        render_tri_strip_next(rdl, make_16d16(300), make_16d16(0));
-    
+
+        // render_tri_strip(rdl,
+        //     make_16d16(50),   make_16d16(0),
+        //     make_16d16(50),   make_16d16(50),
+        //     make_16d16(150),  make_16d16(50)
+        // );
+        // render_tri_strip_next(rdl, make_16d16(150), make_16d16(0));
+
+        // render_tri_strip_next(rdl, make_16d16(250), make_16d16(50));
+        // render_tri_strip_next(rdl, make_16d16(250), make_16d16(0));
+
+        // render_tri_strip_next(rdl, make_16d16(300), make_16d16(50));
+        // render_tri_strip_next(rdl, make_16d16(300), make_16d16(0));
+
         // render_tri_strip_next(rdl, make_16d16(350), make_16d16(0));
 
 
