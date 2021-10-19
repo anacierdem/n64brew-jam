@@ -24,8 +24,7 @@
 
 // Given vertices should be in correct order
 static void render_tri(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int32_t v2x, int32_t v2y, int32_t v3x, int32_t v3y) {
-    int32_t subpixel_height = make_16d16(0, 0.25),
-            YL = v3y,
+    int32_t YL = v3y,
             YM = v2y,
             YH = v1y,
             XL = v2x,
@@ -36,9 +35,10 @@ static void render_tri(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int32_t v2
             DxMDy = (v2y - v1y) == 0 ? 0 : div_16d16(v2x - v1x, v2y - v1y);
 
     #ifdef MICRO_ADJUSTMENTS
-            XL += mult_16d16(DxLDy, subpixel_height - (v2y && subpixel_height) );
-            XH -= mult_16d16(DxHDy, frac_16d16(v1y));
-            XM -= mult_16d16(DxMDy, frac_16d16(v1y));
+        int32_t subpixel_height = make_16d16(0, 0.25);
+        XL += mult_16d16(DxLDy, subpixel_height - (v2y && subpixel_height) );
+        XH -= mult_16d16(DxHDy, frac_16d16(v1y));
+        XM -= mult_16d16(DxMDy, frac_16d16(v1y));
     #endif
 
     rdl_push(rdl, (cast64(0xC8) << 56) | (cast64(1) << 55) |
@@ -53,8 +53,6 @@ static void render_tri(RdpDisplayList* rdl, int32_t v1x, int32_t v1y, int32_t v2
 
 int main(void)
 {
-    init_interrupts();
-
     // effective height: 240 * 4 = 960
     // int32_t height = 240 * 4;
     // effective width: 640 * 65535 = 41942400
@@ -153,7 +151,7 @@ int main(void)
         // Present
         rdp_detach_display();
         display_show(disp);
-        wait_ms(1000);
+        wait_ms(17);
 
         left += make_16d16(0, 0.25);
 
