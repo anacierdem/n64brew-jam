@@ -4,6 +4,7 @@
 #ifdef __cplusplus
 
 #include "box2d/box2d.h"
+#include "rdl.h"
 
 class Physics
 {
@@ -17,10 +18,13 @@ class Physics
         b2FixtureDef fixtureDef;
         int32 velocityIterations = 6;
         int32 positionIterations = 2;
+        float timeStep = 1.0f / 60.0f;
+
+        RdpDisplayList* rdl;
 
     public:
-        Physics();
-        int update(float delta);
+        Physics(RdpDisplayList* rdlParam);
+        int update();
 };
 
 #else
@@ -35,10 +39,9 @@ typedef struct Physics Physics;
     #define EXPORT_C
 #endif
 
-// EXPORT_C Physics
-EXPORT_C Physics* new_Physics(void);
+EXPORT_C Physics* new_Physics(RdpDisplayList*);
 EXPORT_C void delete_Physics(Physics*);
-EXPORT_C int update_Physics(Physics*, float delta);
+EXPORT_C int update_Physics(Physics*);
 
 #endif /* __B2D_H */
 

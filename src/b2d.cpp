@@ -1,14 +1,20 @@
 #include "b2d.hpp"
 
-#include <libdragon.h>
 #include "box2d/box2d.h"
+
+extern "C" {
+    #include <libdragon.h>
+    #include "geometry.h"
+}
 
 extern "C" {
     b2Vec2 gravity(0.0f, -10.0f);
     b2World world(gravity);
 
-    Physics::Physics()
+    Physics::Physics(RdpDisplayList* rdlParam)
     {
+        rdl = rdlParam;
+
         groundBodyDef.position.Set(0.0f, -10.0f);
         groundBody = world.CreateBody(&groundBodyDef);
         groundBox.SetAsBox(50.0f, 10.0f);
@@ -25,28 +31,38 @@ extern "C" {
         body->CreateFixture(&fixtureDef);
     };
 
-    int Physics::update(float delta) {
-        world.Step(delta, velocityIterations, positionIterations);
+    int Physics::update() {
+        world.Step(timeStep, velocityIterations, positionIterations);
         b2Vec2 position = body->GetPosition();
         float angle = body->GetAngle();
         debugf("%4.2f %4.2f %4.2f\n", position.x, position.y, angle);
+
+        float to16_16 = 65536.f;
+
+        float x = position.x;
+        float y = (4. - position.y) * 60.;
+        render_tri(rdl,
+            (50. + x) * to16_16,    (50. + y) * to16_16,
+            (250. + x) * to16_16,   (50. + y) * to16_16,
+            (150. + x) * to16_16,   (0. + y) * to16_16
+        );
+
         return 0;
     }
 
-    // Physics testPhysics;
-}
+    Physics* new_Physics(RdpDisplayList* rdl)
+    {
+        return new Physics(rdl);
+    }
 
-EXPORT_C Physics* new_Physics(void)
-{
-    return new Physics();
-}
+    void delete_Physics(Physics* self)
+    {
+        delete self;
+    }
 
-EXPORT_C void delete_Physics(Physics* self)
-{
-    delete self;
-}
+    int update_Physics(Physics* self)
+    {
+        return self->update();
+    }
 
-EXPORT_C int update_Physics(Physics* self, float delta)
-{
-    return self->update(delta);
 }

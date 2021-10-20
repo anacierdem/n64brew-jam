@@ -6,7 +6,6 @@
 #include "geometry.h"
 #include "b2d.hpp"
 
-
 int main(void)
 {
     // effective height: 240 * 4 = 960
@@ -29,8 +28,7 @@ int main(void)
 
     RdpDisplayList *rdl = rdl_heap_alloc(100);
 
-    // testPhysics;
-    Physics* testPhysics = new_Physics();
+    Physics* testPhysics = new_Physics(rdl);
     long long last_update = timer_ticks();
 
     while(1) {
@@ -123,6 +121,8 @@ int main(void)
         float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
         last_update = timer_ticks();
 
+        update_Physics(testPhysics);
+
         rdl_flush(rdl);
         rdl_exec(rdl);
 
@@ -133,7 +133,5 @@ int main(void)
         left += make_16d16(0, 0.25);
 
         debugf("delta time: %f.2\n", delta);
-
-        update_Physics(testPhysics, delta);
     }
 }
