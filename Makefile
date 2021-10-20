@@ -35,13 +35,13 @@ libdragon:
 
 jam.z64: libdragon
 jam.z64: N64_ROM_TITLE="Jam"
-jam.z64: CFLAGS=-Wno-error
+jam.z64: CFLAGS=-Wno-error -Iinclude
 jam.z64: CXXFLAGS=-Wno-error -Ibox2d/include -Ibox2d/src
 
 $(BUILD_DIR)/jam.elf: $(OBJS)
 
 clean:
-	rm -f $(BUILD_DIR)/* jam.z64
+	rm -rf $(BUILD_DIR)/* jam.z64
 
 -include $(DEPS)
 
