@@ -49,7 +49,6 @@ int main(void)
 
         rdl_push(rdl,RdpSyncPipe());
 
-
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 0, 128)));
 
         #define BLEND_ENABLE            (1 << 14)
@@ -96,6 +95,18 @@ int main(void)
 
         render_tri_strip_next(rdl, make_16d16(250), make_16d16(45));
         render_tri_strip_next(rdl, make_16d16(300), make_16d16(10));
+
+
+
+        rdl_push(rdl,RdpSyncPipe());
+
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(0, 0, 255, 128)));
+
+        render_tri(rdl,
+            make_16d16(50),   make_16d16(150),
+            make_16d16(50),   make_16d16(100),
+            make_16d16(100),  make_16d16(130)
+        );
 
         // rdl_push(rdl,RdpSetFogColor(cast64(RDP_COLOR32(255,0,255,50))));
 
