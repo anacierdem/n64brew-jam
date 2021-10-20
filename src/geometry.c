@@ -27,14 +27,13 @@ static inline void __render_tri(RdpDisplayList* rdl, int32_t x1, int32_t y1, int
             YH = y1,
             XL = x2,
             XH = x1,
-            XM = x1;
+            XM = x1,
+            DxHDy = DxDy3_1,
+            DxMDy = DxDy2_1,
+            DxLDy = DxDy3_2;
 
     assert(YH <= YM);
     assert(YM <= YL);
-
-    int32_t DxHDy = DxDy3_1,
-            DxMDy = DxDy2_1,
-            DxLDy = DxDy3_2;
 
     #ifdef MICRO_ADJUSTMENTS
         int32_t subpixel_height = make_16d16(0, 0.25);

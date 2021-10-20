@@ -265,7 +265,6 @@ typedef uint32_t RdpColor32;
 
 #define _rdl_push_1(rdl, prim)   *rdl->__cur++ = prim;
 #define _rdl_push_multi(rdl, ...) ({ \
-	if (rdl->__cur + _count_varargs(__VA_ARGS__) > rdl->__end) assertf(0, "display list is full"); \
 	_call_multi(__VA_ARGS__)(_rdl_push_1, rdl, ##__VA_ARGS__); \
 })
 

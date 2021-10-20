@@ -4,6 +4,7 @@
 
 #include "rdl.h"
 #include "geometry.h"
+#include "b2d.hpp"
 
 
 int main(void)
@@ -20,6 +21,7 @@ int main(void)
     debugf("Hello world!\n");
 
     rdp_init();
+    timer_init();
 
     static display_context_t disp = 0;
 
@@ -27,7 +29,9 @@ int main(void)
 
     RdpDisplayList *rdl = rdl_heap_alloc(100);
 
-    test_func();
+    // testPhysics;
+    Physics* testPhysics = new_Physics();
+    long long last_update = timer_ticks();
 
     while(1) {
 
@@ -116,6 +120,8 @@ int main(void)
         //     make_16d16(150),   make_16d16(25)
         // );
 
+        float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
+        last_update = timer_ticks();
 
         rdl_flush(rdl);
         rdl_exec(rdl);
@@ -123,10 +129,11 @@ int main(void)
         // Present
         rdp_detach_display();
         display_show(disp);
-        wait_ms(50);
 
         left += make_16d16(0, 0.25);
 
-        // while(1) {};
+        debugf("delta time: %f.2\n", delta);
+
+        update_Physics(testPhysics, delta);
     }
 }
