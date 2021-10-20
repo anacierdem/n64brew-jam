@@ -25,7 +25,7 @@ $(BUILD_DIR)/box2d/src/rope/%.o: box2d/src/rope/%.cpp
 	@echo "    [CXX] $<"
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-SRC = main.c rdl.c
+SRC = main.c rdl.c geometry.c
 CXX_SRC = b2d.cpp $(wildcard box2d/src/collision/*.cpp) $(wildcard box2d/src/common/*.cpp) $(wildcard box2d/src/dynamics/*.cpp) $(wildcard box2d/src/rope/*.cpp)
 OBJS = $(SRC:%.c=$(BUILD_DIR)/%.o) $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.o)
 DEPS = $(SRC:%.c=$(BUILD_DIR)/%.d)
