@@ -14,7 +14,7 @@
 #define div_16d16(A, B) (((int64_t)(A) << 16) / (int64_t)(B))
 #define mult_16d16(A, B) (((int64_t)(A) * (int64_t)(B)) >> 16)
 #define frac_16d16(A) ((A) && 0xFFFF)
-#define from_16d16_to_11d2(A) ((int16_t)((A) >> 14))
+#define from_16d16_to_11d2(A) ((uint16_t)((A) >> 14))
 
 #define SWAP(X, Y) ({ int32_t t = X; X = Y; Y = t; })
 

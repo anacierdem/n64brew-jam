@@ -40,7 +40,7 @@ void render_tri(RdpDisplayList* rdl, int32_t x1, int32_t y1, int32_t x2, int32_t
         XM -= mult_16d16(DxMDy, frac_16d16(y1));
     #endif
 
-    uint64_t dir = (
+    uint8_t dir = (
         (int64_t)(x3 - x1) * (int64_t)(y2 - y1) -
         (int64_t)(y3 - y1) * (int64_t)(x2 - x1)
     ) > 0 ? 0 : 1;
@@ -107,7 +107,7 @@ void render_tri_strip(RdpDisplayList* rdl, int32_t x1, int32_t y1, int32_t x2, i
         XM -= mult_16d16(DxMDy, frac_16d16(y1));
     #endif
 
-    uint64_t dir = (
+    uint8_t dir = (
         (int64_t)(x3 - x1) * (int64_t)(y2 - y1) -
         (int64_t)(y3 - y1) * (int64_t)(x2 - x1)
     ) > 0 ? 0 : 1;
@@ -176,7 +176,7 @@ void render_tri_strip_next(RdpDisplayList* rdl, int32_t x3, int32_t y3) {
         XM -= mult_16d16(DxMDy, frac_16d16(y1));
     #endif
 
-    uint64_t dir = (
+    uint8_t dir = (
         (int64_t)(x3 - x1) * (int64_t)(y2 - y1) -
         (int64_t)(y3 - y1) * (int64_t)(x2 - x1)
     ) > 0 ? 0 : 1;
