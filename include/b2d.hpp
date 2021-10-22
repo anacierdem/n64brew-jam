@@ -24,7 +24,8 @@ class Game
 
     public:
         Game(RdpDisplayList* rdlParam);
-        int update();
+        int update(controller_data keys);
+        void reset();
 };
 
 #else
@@ -39,9 +40,11 @@ typedef struct Game Game;
     #define EXPORT_C
 #endif
 
+
+#include <libdragon.h>
 EXPORT_C Game* new_Game(RdpDisplayList*);
 EXPORT_C void delete_Game(Game*);
-EXPORT_C int update_Game(Game*);
+EXPORT_C int update_Game(Game*, struct controller_data keys);
 
 #endif /* __B2D_H */
 

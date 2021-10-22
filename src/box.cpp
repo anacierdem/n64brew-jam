@@ -10,15 +10,15 @@ class Box
 {
     private:
         b2BodyDef bodyDef;
-        b2Body* body;
         b2PolygonShape dynamicBox;
         b2FixtureDef fixtureDef;
 
     public:
+        b2Body* body;
         Box(b2World* world) {
             bodyDef.type = b2_dynamicBody;
-            bodyDef.position.Set(1.0f, 0.0f);
-            bodyDef.angle = 1.0f;
+            // bodyDef.position = position;
+            // bodyDef.angle = angle;
             body = world->CreateBody(&bodyDef);
             dynamicBox.SetAsBox(0.5f, 0.5f);
 

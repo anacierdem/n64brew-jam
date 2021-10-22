@@ -7,7 +7,12 @@ float to16_16 = 65536.f;
 
 b2Vec2 gravity(0.0f, 10.0f);
 b2World world(gravity);
-Box box(&world);
+
+b2Transform box1Transform;
+b2Transform box2Transform;
+
+Box box1(&world);
+Box box2(&world);
 
 extern "C" {
     #include <libdragon.h>
@@ -17,16 +22,35 @@ extern "C" {
     {
         rdl = rdlParam;
 
+        box1Transform.Set(b2Vec2(2.0f, 0.0f), 1.0f);
+        box2Transform.Set(b2Vec2(6.0f, 0.0f), -1.2f);
+
         groundBodyDef.position.Set(0.0f, 16.0f);
         groundBody = world.CreateBody(&groundBodyDef);
         groundBox.SetAsBox(50.0f, 10.0f);
         groundBody->CreateFixture(&groundBox, 0.0f);
     };
 
-    int Game::update() {
+    void Game::reset() {
+        box1.body->SetTransform(box1Transform.p, box1Transform.q.GetAngle());
+        box1.body->SetAwake(true);
+        box2.body->SetTransform(box2Transform.p, box2Transform.q.GetAngle());
+        box2.body->SetAwake(true);
+    }
+
+    int Game::update(controller_data keys) {
+        for( int i = 0; i < 4; i++ )
+        {
+            if( keys.c[i].A )
+            {
+                this->reset();
+            }
+        }
+
         world.Step(timeStep, velocityIterations, positionIterations);
 
-        box.update(rdl);
+        box1.update(rdl);
+        box2.update(rdl);
         return 0;
     }
 
@@ -40,8 +64,8 @@ extern "C" {
         delete self;
     }
 
-    int update_Game(Game* self)
+    int update_Game(Game* self, controller_data keys)
     {
-        return self->update();
+        return self->update(keys);
     }
 }

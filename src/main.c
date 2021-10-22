@@ -21,6 +21,7 @@ int main(void)
 
     rdp_init();
     timer_init();
+    controller_init();
 
     static display_context_t disp = 0;
 
@@ -30,6 +31,9 @@ int main(void)
     long long last_update = timer_ticks();
 
     while(1) {
+        controller_scan();
+        struct controller_data keys = get_keys_down();
+
         while( !(disp = display_lock()) );
 
         rdp_attach_display( disp );
@@ -43,11 +47,7 @@ int main(void)
         rdl_push(rdl,RdpSetFillColor(RDP_COLOR16(0,0,0,1)));
         rdl_push(rdl,RdpFillRectangleI(0, 0, 640, 240));
 
-        // rdl_push(rdl,RdpSetFillColor(RDP_COLOR16(31,0,0,1)));
-        // rdl_push(rdl,RdpFillRectangleI(0, 0, 0 + 100, 0 + 50));
-
         rdl_push(rdl,RdpSyncPipe());
-
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 0, 128)));
 
         #define BLEND_ENABLE            (1 << 14)
@@ -64,8 +64,6 @@ int main(void)
             )
         );
 
-
-
         // 30, 26, 22, 18 are P, A, M, B cycle 0
 
         /* Configure (FOG_RGB * FOG_A) + (MEM_RGB * (1-FOG_A)). For some reason,
@@ -74,13 +72,11 @@ int main(void)
         // #define BLEND_ENABLE   (1<<14)
         // #define BLEND_MODE_FOG ((3<<30) | (1<<26) | (1<<22))
 
-
         // (P*A + M*B)
         // in the case above P=3=FOG_RGB, A=1=FOG_A, M=1=MEM_RGB, B=0=1-A
         rdl_push(rdl, RdpSetOtherModes( BLEND_ENABLE | AA_ENABLE | READ_ENABLE |
             (cast64(0x0) << 30) | (cast64(0x3) << 28) | (cast64(0x0) << 26) | (cast64(0x1) << 24) |
             (cast64(0x1) << 22) | (cast64(0x1) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) ); // | (cast64(0x80000000))
-
 
         // render_tri_strip(rdl,
         //     make_16d16(50),   make_16d16(50),
@@ -95,22 +91,13 @@ int main(void)
         // render_tri_strip_next(rdl, make_16d16(250), make_16d16(45));
         // render_tri_strip_next(rdl, make_16d16(300), make_16d16(10));
 
-
         rdl_push(rdl,RdpSyncPipe());
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(0, 0, 255, 128)));
-
-        // rdl_push(rdl,RdpSetFogColor(cast64(RDP_COLOR32(255,0,255,50))));
-
-        // render_tri(rdl,
-        //     make_16d16(50),    make_16d16(0),
-        //     make_16d16(250),   make_16d16(10),
-        //     make_16d16(150),   make_16d16(25)
-        // );
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 255)));
 
         float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
         last_update = timer_ticks();
 
-        update_Game(testGame);
+        update_Game(testGame, keys);
 
         rdl_flush(rdl);
         rdl_exec(rdl);
