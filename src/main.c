@@ -28,7 +28,7 @@ int main(void)
 
     RdpDisplayList *rdl = rdl_heap_alloc(100);
 
-    Physics* testPhysics = new_Physics(rdl);
+    Game* testGame = new_Game(rdl);
     long long last_update = timer_ticks();
 
     while(1) {
@@ -121,7 +121,7 @@ int main(void)
         float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
         last_update = timer_ticks();
 
-        update_Physics(testPhysics);
+        update_Game(testGame);
 
         rdl_flush(rdl);
         rdl_exec(rdl);

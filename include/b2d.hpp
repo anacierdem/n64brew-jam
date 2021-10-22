@@ -6,7 +6,7 @@
 #include "box2d/box2d.h"
 #include "rdl.h"
 
-class Physics
+class Game
 {
     private:
         b2BodyDef groundBodyDef;
@@ -23,13 +23,13 @@ class Physics
         RdpDisplayList* rdl;
 
     public:
-        Physics(RdpDisplayList* rdlParam);
+        Game(RdpDisplayList* rdlParam);
         int update();
 };
 
 #else
 
-typedef struct Physics Physics;
+typedef struct Game Game;
 
 #endif
 
@@ -39,9 +39,9 @@ typedef struct Physics Physics;
     #define EXPORT_C
 #endif
 
-EXPORT_C Physics* new_Physics(RdpDisplayList*);
-EXPORT_C void delete_Physics(Physics*);
-EXPORT_C int update_Physics(Physics*);
+EXPORT_C Game* new_Game(RdpDisplayList*);
+EXPORT_C void delete_Game(Game*);
+EXPORT_C int update_Game(Game*);
 
 #endif /* __B2D_H */
 

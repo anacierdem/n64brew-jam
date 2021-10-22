@@ -11,7 +11,7 @@ extern "C" {
     b2Vec2 gravity(0.0f, -10.0f);
     b2World world(gravity);
 
-    Physics::Physics(RdpDisplayList* rdlParam)
+    Game::Game(RdpDisplayList* rdlParam)
     {
         rdl = rdlParam;
 
@@ -31,7 +31,7 @@ extern "C" {
         body->CreateFixture(&fixtureDef);
     };
 
-    int Physics::update() {
+    int Game::update() {
         world.Step(timeStep, velocityIterations, positionIterations);
         b2Vec2 position = body->GetPosition();
         float angle = body->GetAngle();
@@ -50,17 +50,17 @@ extern "C" {
         return 0;
     }
 
-    Physics* new_Physics(RdpDisplayList* rdl)
+    Game* new_Game(RdpDisplayList* rdl)
     {
-        return new Physics(rdl);
+        return new Game(rdl);
     }
 
-    void delete_Physics(Physics* self)
+    void delete_Game(Game* self)
     {
         delete self;
     }
 
-    int update_Physics(Physics* self)
+    int update_Game(Game* self)
     {
         return self->update();
     }
