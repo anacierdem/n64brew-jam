@@ -24,15 +24,12 @@ int main(void)
 
     static display_context_t disp = 0;
 
-    int32_t left = 0;
-
     RdpDisplayList *rdl = rdl_heap_alloc(100);
 
     Game* testGame = new_Game(rdl);
     long long last_update = timer_ticks();
 
     while(1) {
-
         while( !(disp = display_lock()) );
 
         rdp_attach_display( disp );
@@ -43,7 +40,7 @@ int main(void)
         rdl_push(rdl,RdpSetClippingI(0, 0, 640, 240));
         rdl_push(rdl,RdpSetOtherModes(SOM_CYCLE_FILL));
 
-        rdl_push(rdl,RdpSetFillColor(RDP_COLOR16(31,31,31,1)));
+        rdl_push(rdl,RdpSetFillColor(RDP_COLOR16(0,0,0,1)));
         rdl_push(rdl,RdpFillRectangleI(0, 0, 640, 240));
 
         // rdl_push(rdl,RdpSetFillColor(RDP_COLOR16(31,0,0,1)));
@@ -85,30 +82,22 @@ int main(void)
             (cast64(0x1) << 22) | (cast64(0x1) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) ); // | (cast64(0x80000000))
 
 
-        render_tri_strip(rdl,
-            make_16d16(50),   make_16d16(50),
-            make_16d16(50),   make_16d16(0),
-            make_16d16(100),  make_16d16(30)
-        );
-        render_tri_strip_next(rdl, make_16d16(120), make_16d16(10));
+        // render_tri_strip(rdl,
+        //     make_16d16(50),   make_16d16(50),
+        //     make_16d16(50),   make_16d16(0),
+        //     make_16d16(100),  make_16d16(30)
+        // );
+        // render_tri_strip_next(rdl, make_16d16(120), make_16d16(10));
 
-        render_tri_strip_next(rdl, make_16d16(180), make_16d16(50));
-        render_tri_strip_next(rdl, make_16d16(200), make_16d16(0));
+        // render_tri_strip_next(rdl, make_16d16(180), make_16d16(50));
+        // render_tri_strip_next(rdl, make_16d16(200), make_16d16(0));
 
-        render_tri_strip_next(rdl, make_16d16(250), make_16d16(45));
-        render_tri_strip_next(rdl, make_16d16(300), make_16d16(10));
-
+        // render_tri_strip_next(rdl, make_16d16(250), make_16d16(45));
+        // render_tri_strip_next(rdl, make_16d16(300), make_16d16(10));
 
 
         rdl_push(rdl,RdpSyncPipe());
-
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(0, 0, 255, 128)));
-
-        render_tri(rdl,
-            make_16d16(50),   make_16d16(150),
-            make_16d16(50),   make_16d16(100),
-            make_16d16(100),  make_16d16(130)
-        );
 
         // rdl_push(rdl,RdpSetFogColor(cast64(RDP_COLOR32(255,0,255,50))));
 
@@ -129,9 +118,5 @@ int main(void)
         // Present
         rdp_detach_display();
         display_show(disp);
-
-        left += make_16d16(0, 0.25);
-
-        debugf("delta time: %f.2\n", delta);
     }
 }

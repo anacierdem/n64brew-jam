@@ -18,7 +18,7 @@
       },
       "problemMatcher": {
         "owner": "c",
-        "fileLocation": ["relative", "${workspaceFolder}/.."],
+        "fileLocation": ["relative", "${workspaceFolder}"],
         "pattern": {
           "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
           "file": 1,
