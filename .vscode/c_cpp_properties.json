@@ -1,0 +1,19 @@
+{
+    "env": {
+        "myDefaultIncludePath": ["C:\\newlib-4.1.0\\newlib\\libc\\include\\**"]
+    },
+    "configurations": [{
+        "name": "Mac",
+        "intelliSenseMode": "${default}",
+        "includePath": ["${myDefaultIncludePath}", "${workspaceFolder}/box2d/include",
+            "${workspaceFolder}/box2d/src",
+            "${workspaceFolder}/include",
+            "${workspaceFolder}/libdragon/include"
+        ],
+        "defines": ["N64"],
+        "cStandard": "c99",
+        "cppStandard": "c++11",
+        "compilerPath": ""
+    }],
+    "version": 4
+}
