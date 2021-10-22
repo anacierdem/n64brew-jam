@@ -89,7 +89,7 @@ void render_tri_strip_next(RdpDisplayList* rdl, int32_t x3, int32_t y3) {
             y2 = last_y2,
             DxDy3_1 = (y3 - y1) == 0 ? 0 : div_16d16(x3 - x1, y3 - y1),
             DxDy2_1 = last_DxDy,
-            DxDy3_2 = (y3 - x2) == 0 ? 0 : div_16d16(x3 - x2, y3 - y2);
+            DxDy3_2 = (y3 - y2) == 0 ? 0 : div_16d16(x3 - x2, y3 - y2);
 
     last_DxDy = DxDy3_2;
     last_x1 = x2;
