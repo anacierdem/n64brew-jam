@@ -222,6 +222,13 @@
 #define SOM_Z_COMPARE          (1<<4)
 #define SOM_ALPHA_COMPARE      (1<<0)
 
+#define BLEND_ENABLE            (1 << 14)
+#define READ_ENABLE             (1 << 6)
+#define AA_ENABLE               (1 << 3)
+#define COVERAGE_DEST_CLAMP     (0 << 8)
+#define COLOR_ONCOVERAGE        (1 << 7)
+
+
 #define RdpSetOtherModes(som_flags) \
     ((cast64(0x2f)<<56) | ((som_flags) ^ (cast64(6)<<41)))
 

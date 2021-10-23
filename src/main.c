@@ -44,17 +44,12 @@ int main(void)
         rdl_push(rdl,RdpSetClippingI(0, 0, 640, 240));
         rdl_push(rdl,RdpSetOtherModes(SOM_CYCLE_FILL));
 
-        rdl_push(rdl,RdpSetFillColor(RDP_COLOR16(0,0,0,1)));
+        rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(0,0,0,255)));
         rdl_push(rdl,RdpFillRectangleI(0, 0, 640, 240));
 
         rdl_push(rdl,RdpSyncPipe());
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 0, 128)));
 
-        #define BLEND_ENABLE            (1 << 14)
-        #define READ_ENABLE             (1 << 6)
-        #define AA_ENABLE               (1 << 3)
-        #define COVERAGE_DEST_CLAMP     (0 << 8)
-        #define COLOR_ONCOVERAGE        (1 << 7)
 
         rdl_push(rdl,
             RdpSetCombine(

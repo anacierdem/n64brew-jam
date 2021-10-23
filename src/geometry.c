@@ -35,12 +35,10 @@ static inline void __render_tri(RdpDisplayList* rdl, int32_t x1, int32_t y1, int
     assert(YH <= YM);
     assert(YM <= YL);
 
-    #ifdef MICRO_ADJUSTMENTS
-        int32_t subpixel_height = make_16d16(0, 0.25);
-        XL += mult_16d16(DxLDy, subpixel_height - (y2 && subpixel_height) );
-        XH -= mult_16d16(DxHDy, frac_16d16(y1));
-        XM -= mult_16d16(DxMDy, frac_16d16(y1));
-    #endif
+    // TODO: can reuse as well for some cases of tri strip
+    XL += mult_16d16(DxLDy, ceil_16d16(4 * y2) / 4 - y2 );
+    XM -= mult_16d16(DxMDy, y1 - floor_16d16(y1));
+    XH -= mult_16d16(DxHDy, y1 - floor_16d16(y1));
 
     uint8_t dir = (
         (int64_t)(x3 - x1) * (int64_t)(y2 - y1) -
