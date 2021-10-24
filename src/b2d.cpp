@@ -22,10 +22,10 @@ extern "C" {
     {
         rdl = rdlParam;
 
-        box1Transform.Set(b2Vec2(2.0f, 0.0f), 1.0f);
-        box2Transform.Set(b2Vec2(6.0f, 0.0f), -1.2f);
+        box1Transform.Set(b2Vec2(2.0f, 1.0f), 1.0f);
+        box2Transform.Set(b2Vec2(6.0f, 1.0f), -1.2f);
 
-        groundBodyDef.position.Set(0.0f, 16.0f);
+        groundBodyDef.position.Set(0.0f, 15.9f);
         groundBody = world.CreateBody(&groundBodyDef);
         groundBox.SetAsBox(50.0f, 10.0f);
         groundBody->CreateFixture(&groundBox, 0.0f);
@@ -45,6 +45,22 @@ extern "C" {
             {
                 this->reset();
             }
+
+            // if( keys.c[i].B )
+            // {
+            //     this->reset();
+            // }
+
+            // if( keys.c[i].left )
+            // {
+            //     box1Transform.Set(box1Transform.p,  box1Transform.q.GetAngle() + 0.01f);
+            //     this->reset();
+            // }
+            // if( keys.c[i].right )
+            // {
+            //     box1Transform.Set(box1Transform.p,  box1Transform.q.GetAngle() - 0.01f);
+            //     this->reset();
+            // }
         }
 
         world.Step(timeStep, velocityIterations, positionIterations);

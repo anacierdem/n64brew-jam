@@ -47,7 +47,6 @@ int main(void)
         rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(0,0,0,255)));
         rdl_push(rdl,RdpFillRectangleI(0, 0, 640, 240));
 
-        rdl_push(rdl,RdpSyncPipe());
         // rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 0, 128)));
 
         // 30, 26, 22, 18 are P, A, M, B cycle 0
@@ -61,20 +60,20 @@ int main(void)
         // (P*A + M*B)
         // in the case above P=3=FOG_RGB, A=1=FOG_A, M=1=MEM_RGB, B=0=1-A
         rdl_push(rdl, RdpSetOtherModes(
-            // BLEND_ENABLE |
+            BLEND_ENABLE |
             READ_ENABLE |
             AA_ENABLE |
             // (cast64(0x1) << 12) | // cvg times alpha
-            (cast64(0x1) << 13) | // use cvg for alpha
+            // (cast64(0x1) << 13) | // use cvg for alpha
             // (cast64(0x1) << 4) | // z compare
             // (cast64(0x1) << 1) | // z source prim
-            // (cast64(0x1) << 7) | // Color on coverage
-            // (cast64(0x1) << 8) | // CVG dest wrap
+            (cast64(0x1) << 7) | // Color on coverage
+            (cast64(0x1) << 8) | // CVG dest wrap
             // (cast64(0x3) << 8) | // CVG dest save
             // (cast64(0x0) << 8) | // CVG dest clamp
             // (cast64(0x1) << 1) | // Alpha compare
-            (cast64(0x2) << 30) | (cast64(0x0) << 28) | (cast64(0x0) << 26) | (cast64(0x0) << 24) |
-            (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x1) << 18) | (cast64(0x0) << 16) ) ); // | (cast64(0x80000000))
+            (cast64(0x3) << 30) | (cast64(0x0) << 28) | (cast64(0x1) << 26) | (cast64(0x0) << 24) |
+            (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) ); // | (cast64(0x80000000))
 
         rdl_push(rdl,
             RdpSetCombine(
@@ -84,23 +83,19 @@ int main(void)
             )
         );
 
-        // render_tri_strip(rdl,
-        //     make_16d16(50),   make_16d16(50),
-        //     make_16d16(50),   make_16d16(0),
-        //     make_16d16(100),  make_16d16(30)
-        // );
-        // render_tri_strip_next(rdl, make_16d16(120), make_16d16(10));
+        rdl_push(rdl,RdpSetFogColor(RDP_COLOR32(166, 0, 255, 100)));
 
-        // render_tri_strip_next(rdl, make_16d16(180), make_16d16(50));
-        // render_tri_strip_next(rdl, make_16d16(200), make_16d16(0));
+        render_tri_strip(rdl,
+            make_16d16(0),   make_16d16(180),
+            make_16d16(0),  make_16d16(240),
+            make_16d16(640),   make_16d16(180)
+        );
+        render_tri_strip_next(rdl, make_16d16(640), make_16d16(240));
 
-        // render_tri_strip_next(rdl, make_16d16(250), make_16d16(45));
-        // render_tri_strip_next(rdl, make_16d16(300), make_16d16(10));
+        rdl_push(rdl,RdpSyncPipe());
 
-        // rdl_push(rdl,RdpSyncPipe());
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(0, 0, 0, 0)));
-        rdl_push(rdl,RdpSetBlendColor(RDP_COLOR32(255, 255, 255, 255)));
-        
+        rdl_push(rdl,RdpSetFogColor(RDP_COLOR32(255, 255, 255, 128)));
 
         float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
         last_update = timer_ticks();
