@@ -13,7 +13,7 @@ int main(void)
     // effective width: 640 * 65535 = 41942400
     // int32_t width = 640 * 65535;
 
-    display_init(RESOLUTION_640x240, DEPTH_16_BPP, 2, GAMMA_NONE, ANTIALIAS_RESAMPLE);
+    display_init(RESOLUTION_640x240, DEPTH_32_BPP, 2, GAMMA_NONE, ANTIALIAS_OFF);
 
     debug_init_usblog();
 
@@ -48,16 +48,7 @@ int main(void)
         rdl_push(rdl,RdpFillRectangleI(0, 0, 640, 240));
 
         rdl_push(rdl,RdpSyncPipe());
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 0, 128)));
-
-
-        rdl_push(rdl,
-            RdpSetCombine(
-                // We need to enable same flags for both cycles in 1 cycle mode.
-                Comb0_Rgb(ZERO, ZERO, ZERO , PRIM) | Comb0_Alpha(ZERO, ZERO, ZERO , PRIM) |
-                Comb1_Rgb(ZERO, ZERO, ZERO , PRIM) | Comb1_Alpha(ZERO, ZERO, ZERO , PRIM)
-            )
-        );
+        // rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 0, 128)));
 
         // 30, 26, 22, 18 are P, A, M, B cycle 0
 
@@ -69,9 +60,29 @@ int main(void)
 
         // (P*A + M*B)
         // in the case above P=3=FOG_RGB, A=1=FOG_A, M=1=MEM_RGB, B=0=1-A
-        rdl_push(rdl, RdpSetOtherModes( BLEND_ENABLE | AA_ENABLE | READ_ENABLE |
-            (cast64(0x0) << 30) | (cast64(0x3) << 28) | (cast64(0x0) << 26) | (cast64(0x1) << 24) |
-            (cast64(0x1) << 22) | (cast64(0x1) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) ); // | (cast64(0x80000000))
+        rdl_push(rdl, RdpSetOtherModes(
+            // BLEND_ENABLE |
+            READ_ENABLE |
+            AA_ENABLE |
+            // (cast64(0x1) << 12) | // cvg times alpha
+            (cast64(0x1) << 13) | // use cvg for alpha
+            // (cast64(0x1) << 4) | // z compare
+            // (cast64(0x1) << 1) | // z source prim
+            // (cast64(0x1) << 7) | // Color on coverage
+            // (cast64(0x1) << 8) | // CVG dest wrap
+            // (cast64(0x3) << 8) | // CVG dest save
+            // (cast64(0x0) << 8) | // CVG dest clamp
+            // (cast64(0x1) << 1) | // Alpha compare
+            (cast64(0x2) << 30) | (cast64(0x0) << 28) | (cast64(0x0) << 26) | (cast64(0x0) << 24) |
+            (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x1) << 18) | (cast64(0x0) << 16) ) ); // | (cast64(0x80000000))
+
+        rdl_push(rdl,
+            RdpSetCombine(
+                // We need to enable same flags for both cycles in 1 cycle mode.
+                Comb0_Rgb(ZERO, ZERO, ZERO , ONE) | Comb0_Alpha(ZERO, ZERO, ZERO , ZERO) |
+                Comb1_Rgb(ZERO, ZERO, ZERO , ONE) | Comb1_Alpha(ZERO, ZERO, ZERO , ZERO)
+            )
+        );
 
         // render_tri_strip(rdl,
         //     make_16d16(50),   make_16d16(50),
@@ -86,8 +97,10 @@ int main(void)
         // render_tri_strip_next(rdl, make_16d16(250), make_16d16(45));
         // render_tri_strip_next(rdl, make_16d16(300), make_16d16(10));
 
-        rdl_push(rdl,RdpSyncPipe());
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 255)));
+        // rdl_push(rdl,RdpSyncPipe());
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(0, 0, 0, 0)));
+        rdl_push(rdl,RdpSetBlendColor(RDP_COLOR32(255, 255, 255, 255)));
+        
 
         float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
         last_update = timer_ticks();
