@@ -89,6 +89,9 @@
 #define RdpSetPrimColor(color) \
     (((cast64(0x3a))<<56) | (color))
 
+#define RdpSetEnvColor(color) \
+    (((cast64(0x3b))<<56) | (color))
+
 #define RdpSetBlendColor(color) \
     (((cast64(0x39))<<56) | (color))
 
@@ -222,11 +225,13 @@
 #define SOM_Z_COMPARE          (1<<4)
 #define SOM_ALPHA_COMPARE      (1<<0)
 
-#define BLEND_ENABLE            (1 << 14)
-#define READ_ENABLE             (1 << 6)
-#define AA_ENABLE               (1 << 3)
-#define COVERAGE_DEST_CLAMP     (0 << 8)
-#define COLOR_ONCOVERAGE        (1 << 7)
+#define SOM_READ_ENABLE                 (1 << 6)
+#define SOM_AA_ENABLE                   (1 << 3)
+#define SOM_COVERAGE_DEST_CLAMP         (0 << 8)
+#define SOM_COVERAGE_DEST_WRAP          (1 << 8)
+#define SOM_COVERAGE_DEST_ZAP           (2 << 8)
+#define SOM_COVERAGE_DEST_SAVE          (3 << 8)
+#define SOM_COLOR_ON_COVERAGE_WRAP      (1 << 7)
 
 
 #define RdpSetOtherModes(som_flags) \

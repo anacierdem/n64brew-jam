@@ -54,26 +54,19 @@ int main(void)
         /* Configure (FOG_RGB * FOG_A) + (MEM_RGB * (1-FOG_A)). For some reason,
         there seems to be no way to use the blend register's alpha, so we
         need to use the fog register for that. */
-        // #define BLEND_ENABLE   (1<<14)
+        // #define SOM_BLEND_ENABLE   (1<<14)
         // #define BLEND_MODE_FOG ((3<<30) | (1<<26) | (1<<22))
 
         // (P*A + M*B)
         // in the case above P=3=FOG_RGB, A=1=FOG_A, M=1=MEM_RGB, B=0=1-A
         rdl_push(rdl, RdpSetOtherModes(
-            BLEND_ENABLE |
-            READ_ENABLE |
-            AA_ENABLE |
-            // (cast64(0x1) << 12) | // cvg times alpha
-            // (cast64(0x1) << 13) | // use cvg for alpha
-            // (cast64(0x1) << 4) | // z compare
-            // (cast64(0x1) << 1) | // z source prim
-            (cast64(0x1) << 7) | // Color on coverage
-            (cast64(0x1) << 8) | // CVG dest wrap
-            // (cast64(0x3) << 8) | // CVG dest save
-            // (cast64(0x0) << 8) | // CVG dest clamp
-            // (cast64(0x1) << 1) | // Alpha compare
+            SOM_BLENDING |
+            SOM_READ_ENABLE |
+            SOM_AA_ENABLE |
+            SOM_COLOR_ON_COVERAGE_WRAP |
+            SOM_COVERAGE_DEST_WRAP |
             (cast64(0x3) << 30) | (cast64(0x0) << 28) | (cast64(0x1) << 26) | (cast64(0x0) << 24) |
-            (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) ); // | (cast64(0x80000000))
+            (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) );
 
         rdl_push(rdl,
             RdpSetCombine(
