@@ -4,6 +4,7 @@
 
 float to16_16 = 65536.f;
 #include "box.cpp"
+#include "rope.cpp"
 
 b2Vec2 gravity(0.0f, 10.0f);
 b2World world(gravity);
@@ -13,6 +14,8 @@ b2Transform box2Transform;
 
 Box box1(&world);
 Box box2(&world);
+Rope rope1(5, b2Vec2(4.0f, 0.5f));
+Rope rope2(10, b2Vec2(2.0f, 0.5f));
 
 extern "C" {
     #include <libdragon.h>
@@ -36,6 +39,9 @@ extern "C" {
         box1.body->SetAwake(true);
         box2.body->SetTransform(box2Transform.p, box2Transform.q.GetAngle());
         box2.body->SetAwake(true);
+
+        rope1.reset();
+        rope2.reset();
     }
 
     int Game::update(controller_data keys) {
@@ -67,6 +73,8 @@ extern "C" {
 
         box1.update(rdl);
         box2.update(rdl);
+        rope1.update(rdl);
+        rope2.update(rdl);
         return 0;
     }
 
