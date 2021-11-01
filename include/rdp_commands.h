@@ -21,7 +21,7 @@
 #define cast64(x) (x)
 #else
 #include <stdint.h>
-#define cast64(x) (uint64_t)(uint32_t)(x)
+#define cast64(x) (uint64_t)(x)
 #endif
 
 #define RdpSetClippingFX(x0,y0,x1,y1) \
@@ -175,13 +175,13 @@
 #define COMB_ALPHA_MUL_ZERO             7
 
 #define Comb0_Rgb(suba, subb, mul, add) \
-    cast64((cast64((COMB_RGB_SUBA_ ## suba))<<52) | ((COMB_RGB_SUBB_ ## subb)<<28) | (cast64(COMB_RGB_MUL_ ## mul)<<47) | ((COMB_RGB_ADD_ ## add)<<15))
+    cast64((cast64((uint32_t)(COMB_RGB_SUBA_ ## suba))<<52) | ((uint32_t)(COMB_RGB_SUBB_ ## subb)<<28) | (cast64((uint32_t)(COMB_RGB_MUL_ ## mul))<<47) | ((uint32_t)(COMB_RGB_ADD_ ## add)<<15))
 #define Comb1_Rgb(suba, subb, mul, add) \
-    cast64((cast64((COMB_RGB_SUBA_ ## suba))<<37) | ((COMB_RGB_SUBB_ ## subb)<<24) | (cast64(COMB_RGB_MUL_ ## mul)<<32) | ((COMB_RGB_ADD_ ## add)<<6))
+    cast64((cast64((uint32_t)(COMB_RGB_SUBA_ ## suba))<<37) | ((uint32_t)(COMB_RGB_SUBB_ ## subb)<<24) | (cast64((uint32_t)(COMB_RGB_MUL_ ## mul))<<32) | ((uint32_t)(COMB_RGB_ADD_ ## add)<<6))
 #define Comb0_Alpha(suba, subb, mul, add) \
-    cast64((cast64((COMB_ALPHA_ADDSUB_ ## suba))<<44) | ((COMB_ALPHA_ADDSUB_ ## subb)<<12) | (cast64(COMB_ALPHA_MUL_ ## mul)<<41) | ((COMB_ALPHA_ADDSUB_ ## add)<<9))
+    cast64((cast64((uint32_t)(COMB_ALPHA_ADDSUB_ ## suba))<<44) | ((uint32_t)(COMB_ALPHA_ADDSUB_ ## subb)<<12) | (cast64((uint32_t)(COMB_ALPHA_MUL_ ## mul))<<41) | ((uint32_t)(COMB_ALPHA_ADDSUB_ ## add)<<9))
 #define Comb1_Alpha(suba, subb, mul, add) \
-    cast64((cast64((COMB_ALPHA_ADDSUB_ ## suba))<<21) | ((COMB_ALPHA_ADDSUB_ ## subb)<<3) | ((COMB_ALPHA_MUL_ ## mul)<<18) | ((COMB_ALPHA_ADDSUB_ ## add)<<0))
+    cast64((cast64((uint32_t)(COMB_ALPHA_ADDSUB_ ## suba))<<21) | ((uint32_t)(COMB_ALPHA_ADDSUB_ ## subb)<<3) | ((uint32_t)(COMB_ALPHA_MUL_ ## mul)<<18) | ((uint32_t)(COMB_ALPHA_ADDSUB_ ## add)<<0))
 
 // RDP command to configure the color combiner. Pass to this macro
 // up to 4 Comb* macros as arguments. For instance:
@@ -231,7 +231,7 @@
 #define SOM_COVERAGE_DEST_WRAP          (1 << 8)
 #define SOM_COVERAGE_DEST_ZAP           (2 << 8)
 #define SOM_COVERAGE_DEST_SAVE          (3 << 8)
-#define SOM_COLOR_ON_COVERAGE_WRAP      (1 << 7)
+#define SOM_COLOR_ON_COVERAGE           (1 << 7)
 
 
 #define RdpSetOtherModes(som_flags) \

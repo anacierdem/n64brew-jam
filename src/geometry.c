@@ -45,14 +45,14 @@ static inline void __render_tri(RdpDisplayList* rdl, int32_t x1, int32_t y1, int
         (int64_t)(y3 - y1) * (int64_t)(x2 - x1)
     ) > 0 ? 0 : 1;
 
-    rdl_push(rdl, (cast64(0xC8) << 56) | (cast64(dir) << 55) |
-        (cast64(from_16d16_to_11d2(YL)) << 32) |
-        (cast64(from_16d16_to_11d2(YM)) << 16) |
-        (cast64(from_16d16_to_11d2(YH)) << 0)
+    rdl_push(rdl, (cast64(0xC8) << 56) | (cast64((uint32_t)dir) << 55) |
+        (cast64((uint32_t)from_16d16_to_11d2(YL)) << 32) |
+        (cast64((uint32_t)from_16d16_to_11d2(YM)) << 16) |
+        (cast64((uint32_t)from_16d16_to_11d2(YH)) << 0)
     );
-    rdl_push(rdl, (cast64(XL) << 32) | (cast64(DxLDy) << 0) );
-    rdl_push(rdl, (cast64(XH) << 32) | (cast64(DxHDy) << 0) );
-    rdl_push(rdl, (cast64(XM) << 32) | (cast64(DxMDy) << 0) );
+    rdl_push(rdl, (cast64((uint32_t)XL) << 32) | (cast64((uint32_t)DxLDy) << 0) );
+    rdl_push(rdl, (cast64((uint32_t)XH) << 32) | (cast64((uint32_t)DxHDy) << 0) );
+    rdl_push(rdl, (cast64((uint32_t)XM) << 32) | (cast64((uint32_t)DxMDy) << 0) );
 }
 
 

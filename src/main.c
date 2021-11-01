@@ -60,22 +60,24 @@ int main(void)
         // (P*A + M*B)
         // in the case above P=3=FOG_RGB, A=1=FOG_A, M=1=MEM_RGB, B=0=1-A
         rdl_push(rdl, RdpSetOtherModes(
+            SOM_CYCLE_1 |
             SOM_BLENDING |
             SOM_READ_ENABLE |
             SOM_AA_ENABLE |
-            SOM_COLOR_ON_COVERAGE_WRAP |
+            SOM_COLOR_ON_COVERAGE |
             SOM_COVERAGE_DEST_WRAP |
-            (cast64(0x3) << 30) | (cast64(0x0) << 28) | (cast64(0x1) << 26) | (cast64(0x0) << 24) |
+            (cast64(0x0) << 30) | (cast64(0x0) << 28) | (cast64(0x0) << 26) | (cast64(0x0) << 24) |
             (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) );
 
         rdl_push(rdl,
             RdpSetCombine(
                 // We need to enable same flags for both cycles in 1 cycle mode.
-                Comb0_Rgb(ZERO, ZERO, ZERO , ONE) | Comb0_Alpha(ZERO, ZERO, ZERO , ZERO) |
-                Comb1_Rgb(ZERO, ZERO, ZERO , ONE) | Comb1_Alpha(ZERO, ZERO, ZERO , ZERO)
+                Comb0_Rgb(ZERO, ZERO, ZERO , PRIM) | Comb0_Alpha(ZERO, ZERO, ZERO , PRIM) |
+                Comb1_Rgb(ZERO, ZERO, ZERO , PRIM) | Comb1_Alpha(ZERO, ZERO, ZERO , PRIM)
             )
         );
 
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(166, 0, 255, 100)));
         rdl_push(rdl,RdpSetFogColor(RDP_COLOR32(166, 0, 255, 100)));
 
         render_tri_strip(rdl,
@@ -87,7 +89,7 @@ int main(void)
 
         rdl_push(rdl,RdpSyncPipe());
 
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(0, 0, 0, 0)));
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
         rdl_push(rdl,RdpSetFogColor(RDP_COLOR32(255, 255, 255, 128)));
 
         float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
