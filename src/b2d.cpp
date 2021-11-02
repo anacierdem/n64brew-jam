@@ -39,35 +39,33 @@ extern "C" {
         box1.body->SetAwake(true);
         box2.body->SetTransform(box2Transform.p, box2Transform.q.GetAngle());
         box2.body->SetAwake(true);
+        box1.body->SetLinearVelocity(b2Vec2(0., 0.));
+        box1.body->SetAngularVelocity(0.);
+        box2.body->SetLinearVelocity(b2Vec2(0., 0.));
+        box2.body->SetAngularVelocity(0.);
 
         rope1.reset();
         rope2.reset();
     }
 
-    int Game::update(controller_data keys) {
-        for( int i = 0; i < 4; i++ )
-        {
-            if( keys.c[i].A )
+    int Game::update(int controllers, controller_data keys) {
+        if((controllers & CONTROLLER_1_INSERTED)) {
+            debugf("x: %d y: %d\n", keys.c[0].x, keys.c[0].y);
+            box1.body->ApplyForceToCenter(b2Vec2((float)keys.c[0].x / 2.0f, -(float)keys.c[0].y / 2.0f) , true);
+            if( keys.c[0].A )
             {
                 this->reset();
             }
-
-            // if( keys.c[i].B )
-            // {
-            //     this->reset();
-            // }
-
-            // if( keys.c[i].left )
-            // {
-            //     box1Transform.Set(box1Transform.p,  box1Transform.q.GetAngle() + 0.01f);
-            //     this->reset();
-            // }
-            // if( keys.c[i].right )
-            // {
-            //     box1Transform.Set(box1Transform.p,  box1Transform.q.GetAngle() - 0.01f);
-            //     this->reset();
-            // }
         }
+
+
+        if((controllers & CONTROLLER_2_INSERTED)) {
+            if( keys.c[1].A )
+            {
+                this->reset();
+            }
+        }
+
 
         world.Step(timeStep, velocityIterations, positionIterations);
 
@@ -88,8 +86,8 @@ extern "C" {
         delete self;
     }
 
-    int update_Game(Game* self, controller_data keys)
+    int update_Game(Game* self, int controllers, controller_data keys)
     {
-        return self->update(keys);
+        return self->update(controllers, keys);
     }
 }

@@ -32,7 +32,8 @@ int main(void)
 
     while(1) {
         controller_scan();
-        struct controller_data keys = get_keys_down();
+        int controllers = get_controllers_present();
+        struct controller_data keys = get_keys_pressed();
 
         while( !(disp = display_lock()) );
 
@@ -95,7 +96,7 @@ int main(void)
         float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
         last_update = timer_ticks();
 
-        update_Game(testGame, keys);
+        update_Game(testGame, controllers, keys);
 
         rdl_flush(rdl);
         rdl_exec(rdl);
