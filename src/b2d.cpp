@@ -30,8 +30,10 @@ extern "C" {
 
         groundBodyDef.position.Set(0.0f, 15.9f);
         groundBody = world.CreateBody(&groundBodyDef);
-        groundBox.SetAsBox(50.0f, 10.0f);
+        groundBox.SetAsBox(50.0f, 12.0f);
         groundBody->CreateFixture(&groundBox, 0.0f);
+
+         debugf("count: %d\n", groundBox.m_count);
     };
 
     void Game::reset() {
@@ -50,12 +52,14 @@ extern "C" {
 
     int Game::update(int controllers, controller_data keys) {
         if((controllers & CONTROLLER_1_INSERTED)) {
-            debugf("x: %d y: %d\n", keys.c[0].x, keys.c[0].y);
-            box1.body->ApplyForceToCenter(b2Vec2((float)keys.c[0].x / 2.0f, -(float)keys.c[0].y / 2.0f) , true);
+            // debugf("x: %d y: %d\n", keys.c[0].x, keys.c[0].y);
+            // box1.body->ApplyForceToCenter(b2Vec2((float)keys.c[0].x / 2.0f, -(float)keys.c[0].y / 2.0f) , true);
             if( keys.c[0].A )
             {
                 this->reset();
             }
+
+            cameraPos.Set(keys.c[0].x, -keys.c[0].y, 1.);
         }
 
 
@@ -66,13 +70,49 @@ extern "C" {
             }
         }
 
-
         world.Step(timeStep, velocityIterations, positionIterations);
 
-        box1.update(rdl);
-        box2.update(rdl);
+        // float scale = b2Abs((box1.body->GetPosition() - box2.body->GetPosition()).x) * 160.;
+        float scale = 80.;
+        box1.update(rdl, b2Vec2(cameraPos.x / scale, cameraPos.y /  (scale/2.)), scale);
+        box2.update(rdl, b2Vec2(cameraPos.x / scale, cameraPos.y / (scale/2.)), scale);
         rope1.update(rdl);
         rope2.update(rdl);
+
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(120, 100, 100, 255)));
+
+        b2Mat33 mainM(
+            b2Vec3(scale * to16_16, 0., 0.),
+            b2Vec3(0., (scale/2) * to16_16, 0.),
+            b2Vec3(-cameraPos.x * to16_16, -cameraPos.y * to16_16, 1.)
+        );
+
+        // TODO: use getTransform and include in matrix
+        b2Vec2 vertex1 = groundBody->GetWorldPoint(groundBox.m_vertices[0]);
+        b2Vec2 vertex2 = groundBody->GetWorldPoint(groundBox.m_vertices[1]);
+        b2Vec2 vertex3 = groundBody->GetWorldPoint(groundBox.m_vertices[3]);
+
+        b2Vec3 v1 = b2Mul(mainM, b2Vec3(vertex1.x, vertex1.y, 1.));
+        b2Vec3 v2 = b2Mul(mainM, b2Vec3(vertex2.x, vertex2.y, 1.));
+        b2Vec3 v3 = b2Mul(mainM, b2Vec3(vertex3.x, vertex3.y, 1.));
+
+        vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), b2Vec2(0., 0.), b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16));
+        vertex2 = b2Clamp(b2Vec2(v2.x, v2.y), b2Vec2(0., 0.), b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16));
+        vertex3 = b2Clamp(b2Vec2(v3.x, v3.y), b2Vec2(0., 0.), b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16));
+
+        render_tri_strip(rdl,
+            vertex1.x, vertex1.y,
+            vertex2.x, vertex2.y,
+            vertex3.x, vertex3.y
+        );
+
+        vertex1 = groundBody->GetWorldPoint(groundBox.m_vertices[2]);
+
+        v1 = b2Mul(mainM, b2Vec3(vertex1.x, vertex1.y, 1.));
+        vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), b2Vec2(0., 0.), b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16));
+
+
+        render_tri_strip_next(rdl, vertex1.x, vertex1.y);
         return 0;
     }
 

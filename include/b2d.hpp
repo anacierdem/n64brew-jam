@@ -22,6 +22,9 @@ class Game
 
         RdpDisplayList* rdl;
 
+        float scale = 1.0f;
+        b2Vec3 cameraPos = {0., 0., 1.};
+
     public:
         Game(RdpDisplayList* rdlParam);
         int update(int controllers, controller_data keys);

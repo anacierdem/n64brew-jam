@@ -25,7 +25,7 @@ int main(void)
 
     static display_context_t disp = 0;
 
-    RdpDisplayList *rdl = rdl_heap_alloc(100);
+    RdpDisplayList *rdl = rdl_heap_alloc(200);
 
     Game* testGame = new_Game(rdl);
     long long last_update = timer_ticks();
@@ -78,17 +78,17 @@ int main(void)
             )
         );
 
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(166, 0, 255, 100)));
-        rdl_push(rdl,RdpSetFogColor(RDP_COLOR32(166, 0, 255, 100)));
+        // rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(166, 0, 255, 100)));
+        // rdl_push(rdl,RdpSetFogColor(RDP_COLOR32(166, 0, 255, 100)));
 
-        render_tri_strip(rdl,
-            make_16d16(0),   make_16d16(180),
-            make_16d16(0),  make_16d16(240),
-            make_16d16(640),   make_16d16(180)
-        );
-        render_tri_strip_next(rdl, make_16d16(640), make_16d16(240));
+        // render_tri_strip(rdl,
+        //     make_16d16(0),   make_16d16(180),
+        //     make_16d16(0),  make_16d16(240),
+        //     make_16d16(640),   make_16d16(180)
+        // );
+        // render_tri_strip_next(rdl, make_16d16(640), make_16d16(240));
 
-        rdl_push(rdl,RdpSyncPipe());
+        // rdl_push(rdl,RdpSyncPipe());
 
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
         rdl_push(rdl,RdpSetFogColor(RDP_COLOR32(255, 255, 255, 128)));
