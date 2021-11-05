@@ -78,14 +78,6 @@ extern "C" {
         float scale = 80.;
 
         b2Vec2 cPos(cameraPos.x / scale, cameraPos.y / (scale/2.));
-        box1.update(rdl, cPos, scale);
-        box2.update(rdl, cPos, scale);
-
-        b2Vec2 pos1 = box1.body->GetPosition();
-        b2Vec2 pos2 = box2.body->GetPosition();
-        rope->update(rdl,pos1, pos2);
-
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(120, 100, 100, 255)));
 
         b2Mat33 mainM(
             b2Vec3(scale * to16_16, 0., 0.),
@@ -108,6 +100,7 @@ extern "C" {
         vertex2 = b2Clamp(b2Vec2(v2.x, v2.y), min, max);
         vertex3 = b2Clamp(b2Vec2(v3.x, v3.y), min, max);
 
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(120, 100, 100, 255)));
         render_tri_strip(rdl,
             vertex1.x, vertex1.y,
             vertex2.x, vertex2.y,
@@ -120,6 +113,15 @@ extern "C" {
         vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);
 
         render_tri_strip_next(rdl, vertex1.x, vertex1.y);
+
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
+
+        box1.update(rdl, cPos, scale);
+        box2.update(rdl, cPos, scale);
+
+        b2Vec2 pos1 = box1.body->GetPosition();
+        b2Vec2 pos2 = box2.body->GetPosition();
+        rope->update(rdl,pos1, pos2);
         return 0;
     }
 

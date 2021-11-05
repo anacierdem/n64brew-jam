@@ -78,21 +78,6 @@ int main(void)
             )
         );
 
-        // rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(166, 0, 255, 100)));
-        // rdl_push(rdl,RdpSetFogColor(RDP_COLOR32(166, 0, 255, 100)));
-
-        // render_tri_strip(rdl,
-        //     make_16d16(0),   make_16d16(180),
-        //     make_16d16(0),  make_16d16(240),
-        //     make_16d16(640),   make_16d16(180)
-        // );
-        // render_tri_strip_next(rdl, make_16d16(640), make_16d16(240));
-
-        // rdl_push(rdl,RdpSyncPipe());
-
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
-        rdl_push(rdl,RdpSetFogColor(RDP_COLOR32(255, 255, 255, 128)));
-
         float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
         last_update = timer_ticks();
 
