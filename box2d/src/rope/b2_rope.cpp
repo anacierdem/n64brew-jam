@@ -241,7 +241,7 @@ void b2Rope::SetTuning(const b2RopeTuning& tuning)
 	}
 }
 
-void b2Rope::Step(float dt, int32 iterations, const b2Vec2& position)
+void b2Rope::Step(float dt, int32 iterations, const b2Vec2& position_s, const b2Vec2& position_e)
 {
 	if (dt == 0.0)
 	{
@@ -261,7 +261,11 @@ void b2Rope::Step(float dt, int32 iterations, const b2Vec2& position)
 		}
 		else
 		{
-			m_vs[i] = inv_dt * (m_bindPositions[i] + position - m_p0s[i]);
+			if (i == m_count - 1) {
+				m_vs[i] = inv_dt * (position_e - m_p0s[i]);
+			} else {
+				m_vs[i] = inv_dt * (m_bindPositions[i] + position_s - m_p0s[i]);
+			}
 		}
 	}
 

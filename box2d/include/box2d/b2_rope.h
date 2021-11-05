@@ -101,6 +101,8 @@ struct B2_API b2RopeDef
 class B2_API b2Rope
 {
 public:
+	b2Vec2* m_ps;
+
 	b2Rope();
 	~b2Rope();
 
@@ -111,7 +113,7 @@ public:
 	void SetTuning(const b2RopeTuning& tuning);
 
 	///
-	void Step(float timeStep, int32 iterations, const b2Vec2& position);
+	void Step(float timeStep, int32 iterations, const b2Vec2& position1, const b2Vec2& position2);
 
 	///
 	void Reset(const b2Vec2& position);
@@ -140,7 +142,6 @@ private:
 	b2RopeBend* m_bendConstraints;
 
 	b2Vec2* m_bindPositions;
-	b2Vec2* m_ps;
 	b2Vec2* m_p0s;
 	b2Vec2* m_vs;
 
