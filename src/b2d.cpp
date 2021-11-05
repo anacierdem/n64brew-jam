@@ -87,7 +87,6 @@ extern "C" {
             b2Vec3(-cameraPos.x * to16_16, -cameraPos.y * to16_16, 1.)
         );
 
-        // TODO: use getTransform and include in matrix
         b2Vec2 vertex1 = groundBody->GetWorldPoint(groundBox.m_vertices[0]);
         b2Vec2 vertex2 = groundBody->GetWorldPoint(groundBox.m_vertices[1]);
         b2Vec2 vertex3 = groundBody->GetWorldPoint(groundBox.m_vertices[3]);
@@ -96,9 +95,12 @@ extern "C" {
         b2Vec3 v2 = b2Mul(mainM, b2Vec3(vertex2.x, vertex2.y, 1.));
         b2Vec3 v3 = b2Mul(mainM, b2Vec3(vertex3.x, vertex3.y, 1.));
 
-        vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), b2Vec2(0., 0.), b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16));
-        vertex2 = b2Clamp(b2Vec2(v2.x, v2.y), b2Vec2(0., 0.), b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16));
-        vertex3 = b2Clamp(b2Vec2(v3.x, v3.y), b2Vec2(0., 0.), b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16));
+        b2Vec2 min = b2Vec2(0., 0.);
+        b2Vec2 max = b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16);
+
+        vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);
+        vertex2 = b2Clamp(b2Vec2(v2.x, v2.y), min, max);
+        vertex3 = b2Clamp(b2Vec2(v3.x, v3.y), min, max);
 
         render_tri_strip(rdl,
             vertex1.x, vertex1.y,
@@ -109,8 +111,7 @@ extern "C" {
         vertex1 = groundBody->GetWorldPoint(groundBox.m_vertices[2]);
 
         v1 = b2Mul(mainM, b2Vec3(vertex1.x, vertex1.y, 1.));
-        vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), b2Vec2(0., 0.), b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16));
-
+        vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);
 
         render_tri_strip_next(rdl, vertex1.x, vertex1.y);
         return 0;
