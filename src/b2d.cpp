@@ -20,6 +20,10 @@ extern "C" {
 
     Game::Game(RdpDisplayList* rdlParam)
     {
+        if (get_tv_type() == TV_PAL) {
+            timeStep = 1.0 / 50.0;
+        }
+
         rdl = rdlParam;
 
         box1Transform.Set(b2Vec2(2.0f, 1.0f), 1.0f);
