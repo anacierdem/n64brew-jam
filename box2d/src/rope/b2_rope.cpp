@@ -25,6 +25,12 @@
 
 #include <stdio.h>
 
+
+extern "C" {
+    #include <libdragon.h>
+}
+
+
 struct b2RopeStretch
 {
 	int32 i1, i2;
@@ -194,6 +200,9 @@ void b2Rope::SetTuning(const b2RopeTuning& tuning)
 
 	for (int32 i = 0; i < m_bendCount; ++i)
 	{
+		debugf("HERE %u\n", i);
+
+
 		b2RopeBend& c = m_bendConstraints[i];
 
 		float L1sqr = c.L1 * c.L1;
@@ -221,20 +230,30 @@ void b2Rope::SetTuning(const b2RopeTuning& tuning)
 		c.spring = mass * bendOmega * bendOmega;
 		c.damper = 2.0f * mass * m_tuning.bendDamping * bendOmega;
 	}
+
+	debugf("HERE !\n");
 	
 	const float stretchOmega = 2.0f * b2_pi * m_tuning.stretchHertz;
 
+	debugf("HERE !2\n");
+
 	for (int32 i = 0; i < m_stretchCount; ++i)
 	{
+		debugf("HERE X%u\n", i);
 		b2RopeStretch& c = m_stretchConstraints[i];
+
+		debugf("HERE Y%u\n", i);
 
 		float sum = c.invMass1 + c.invMass2;
 		if (sum == 0.0f)
 		{
 			continue;
 		}
+		debugf("HERE sum%f\n", sum);
 
 		float mass = 1.0f / sum;
+
+		debugf("HERE Z%f %f\n", stretchOmega, m_tuning.stretchDamping);
 
 		c.spring = mass * stretchOmega * stretchOmega;
 		c.damper = 2.0f * mass * m_tuning.stretchDamping * stretchOmega;

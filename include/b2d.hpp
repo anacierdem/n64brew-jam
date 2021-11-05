@@ -7,6 +7,7 @@
 #include "rdl.h"
 
 #include "rope.hpp"
+#include "box.hpp"
 
 class Game
 {
@@ -28,6 +29,9 @@ class Game
         b2Vec3 cameraPos = {0., 0., 1.};
 
         Rope* rope;
+
+        static const int box_count = 10;
+        Box* boxes[box_count];
 
     public:
         Game(RdpDisplayList* rdlParam);

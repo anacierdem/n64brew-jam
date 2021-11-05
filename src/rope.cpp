@@ -9,8 +9,6 @@ extern "C" {
     #include "geometry.h"
 }
 
-float to16_16 = 65536.f;
-
 Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
     ropeDef.count = count;
 
@@ -24,7 +22,11 @@ Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
     {
         b2Vec2 add = diff;
         add *= (float)i;
-        masses[i] = (i == 0 || i == (ropeDef.count - 1)) ? 0.0f : 0.5f;
+        if (i == 0 || i == (ropeDef.count - 1)) {
+            masses[i] = 0.0f;
+        } else {
+            masses[i] = 0.5f;
+        }
         vertices[i] = add;
 
         debugf("x: %0.2f, y: %0.2f\n", vertices[i].x, vertices[i].y);
@@ -42,7 +44,8 @@ Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
     rope.Create(ropeDef);
     rope.SetTuning(ropeTuning);
 }
-void Rope::update(RdpDisplayList* rdl, b2Vec2& pos1, b2Vec2& pos2) {
+void Rope::update(RdpDisplayList* rdl, b2Vec2 pos1, b2Vec2 pos2) {
+    float to16_16 = 65536.f;
     rope.Step(timeStep, velocityIterations, pos1, pos2);
 
     for (int i = 0; i < ropeDef.count - 1; i++)
