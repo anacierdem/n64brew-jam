@@ -61,6 +61,8 @@ struct B2_API b2RopeTuning
 		isometric = false;
 		fixedEffectiveMass = false;
 		warmStart = false;
+		stretchHertz = 1.0f;
+		stretchDamping = 0.0f;
 	}
 
 	b2StretchingModel stretchingModel;

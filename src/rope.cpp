@@ -41,8 +41,9 @@ Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
     // ropeTuning.bendDamping = 0.1f;
     // ropeTuning.damping = 0.1f;
 
+    ropeDef.tuning = ropeTuning;
+
     rope.Create(ropeDef);
-    rope.SetTuning(ropeTuning);
 }
 void Rope::update(RdpDisplayList* rdl, b2Vec2 pos1, b2Vec2 pos2) {
     float to16_16 = 65536.f;
