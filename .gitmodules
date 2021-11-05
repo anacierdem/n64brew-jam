@@ -2,6 +2,3 @@
 	path = libdragon
 	url = https://github.com/DragonMinded/libdragon
 	branch = trunk
-[submodule "box2d"]
-	path = box2d
-	url = https://github.com/erincatto/box2d
