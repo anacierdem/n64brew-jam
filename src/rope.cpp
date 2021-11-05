@@ -43,14 +43,18 @@ Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
     rope.SetTuning(ropeTuning);
 }
 void Rope::update(RdpDisplayList* rdl, b2Vec2& pos1, b2Vec2& pos2) {
-    b2Vec2 offset(0.02, 0.0);
     rope.Step(timeStep, velocityIterations, pos1, pos2);
 
     for (int i = 0; i < ropeDef.count - 1; i++)
     {
         b2Vec2 vertex1 = rope.m_ps[i];
-        b2Vec2 vertex2 = rope.m_ps[i] + offset;
         b2Vec2 vertex3 = rope.m_ps[i+1];
+
+        b2Vec2 offset = (vertex3 - vertex1).Skew();
+        offset.Normalize();
+        offset *= 0.02;
+
+        b2Vec2 vertex2 = rope.m_ps[i] + offset;
 
         render_tri_strip(rdl,
             vertex1.x * 80. * to16_16,   (vertex1.y) * 40. * to16_16,
