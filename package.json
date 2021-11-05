@@ -10,5 +10,8 @@
   "license": "MIT",
   "devDependencies": {
     "ed64": "^2.0.3"
+  },
+  "dependencies": {
+    "libdragon": "^10.2.1"
   }
 }

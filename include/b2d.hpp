@@ -6,6 +6,8 @@
 #include "box2d/box2d.h"
 #include "rdl.h"
 
+#include "rope.hpp"
+
 class Game
 {
     private:
@@ -24,6 +26,8 @@ class Game
 
         float scale = 1.0f;
         b2Vec3 cameraPos = {0., 0., 1.};
+
+        Rope* rope;
 
     public:
         Game(RdpDisplayList* rdlParam);

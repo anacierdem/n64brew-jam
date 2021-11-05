@@ -25,7 +25,7 @@ int main(void)
 
     static display_context_t disp = 0;
 
-    RdpDisplayList *rdl = rdl_heap_alloc(200);
+    RdpDisplayList *rdl = rdl_heap_alloc(300);
 
     Game* testGame = new_Game(rdl);
     long long last_update = timer_ticks();
@@ -36,7 +36,6 @@ int main(void)
         struct controller_data keys = get_keys_pressed();
 
         while( !(disp = display_lock()) );
-
         rdp_attach_display( disp );
 
         rdl_reset(rdl);
@@ -47,6 +46,7 @@ int main(void)
 
         rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(0,0,0,255)));
         rdl_push(rdl,RdpFillRectangleI(0, 0, 640, 240));
+
 
         // rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 0, 128)));
 

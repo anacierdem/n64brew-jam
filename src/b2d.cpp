@@ -2,9 +2,10 @@
 
 #include "box2d/box2d.h"
 
-float to16_16 = 65536.f;
+static float to16_16 = 65536.f;
+
 #include "box.cpp"
-#include "rope.cpp"
+#include "rope.hpp"
 
 b2Vec2 gravity(0.0f, 10.0f);
 b2World world(gravity);
@@ -14,8 +15,6 @@ b2Transform box2Transform;
 
 Box box1(&world);
 Box box2(&world);
-Rope rope1(5, b2Vec2(4.0f, 0.5f));
-Rope rope2(10, b2Vec2(2.0f, 0.5f));
 
 extern "C" {
     #include <libdragon.h>
@@ -33,7 +32,8 @@ extern "C" {
         groundBox.SetAsBox(50.0f, 12.0f);
         groundBody->CreateFixture(&groundBox, 0.0f);
 
-         debugf("count: %d\n", groundBox.m_count);
+        rope = new Rope(10, box1Transform.p, box2Transform.p);
+        reset();
     };
 
     void Game::reset() {
@@ -46,24 +46,26 @@ extern "C" {
         box2.body->SetLinearVelocity(b2Vec2(0., 0.));
         box2.body->SetAngularVelocity(0.);
 
-        rope1.reset();
-        rope2.reset();
+        rope->reset();
     }
 
     int Game::update(int controllers, controller_data keys) {
+        debugf("update\n");
+
         if((controllers & CONTROLLER_1_INSERTED)) {
             // debugf("x: %d y: %d\n", keys.c[0].x, keys.c[0].y);
-            // box1.body->ApplyForceToCenter(b2Vec2((float)keys.c[0].x / 2.0f, -(float)keys.c[0].y / 2.0f) , true);
+            box1.body->ApplyForceToCenter(b2Vec2((float)keys.c[0].x / 4.0f, -(float)keys.c[0].y / 2.0f) , true);
             if( keys.c[0].A )
             {
                 this->reset();
             }
 
-            cameraPos.Set(keys.c[0].x, -keys.c[0].y, 1.);
+            // cameraPos.Set(keys.c[0].x, -keys.c[0].y, 1.);
         }
 
 
         if((controllers & CONTROLLER_2_INSERTED)) {
+            box2.body->ApplyForceToCenter(b2Vec2((float)keys.c[1].x / 4.0f, -(float)keys.c[1].y / 2.0f) , true);
             if( keys.c[1].A )
             {
                 this->reset();
@@ -74,10 +76,14 @@ extern "C" {
 
         // float scale = b2Abs((box1.body->GetPosition() - box2.body->GetPosition()).x) * 160.;
         float scale = 80.;
-        box1.update(rdl, b2Vec2(cameraPos.x / scale, cameraPos.y /  (scale/2.)), scale);
-        box2.update(rdl, b2Vec2(cameraPos.x / scale, cameraPos.y / (scale/2.)), scale);
-        rope1.update(rdl);
-        rope2.update(rdl);
+
+        b2Vec2 cPos(cameraPos.x / scale, cameraPos.y / (scale/2.));
+        box1.update(rdl, cPos, scale);
+        box2.update(rdl, cPos, scale);
+
+        b2Vec2 pos1 = box1.body->GetPosition();
+        b2Vec2 pos2 = box2.body->GetPosition();
+        rope->update(rdl,pos1, pos2);
 
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(120, 100, 100, 255)));
 
