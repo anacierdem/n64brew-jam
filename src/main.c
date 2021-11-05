@@ -4,7 +4,7 @@
 
 #include "rdl.h"
 #include "geometry.h"
-#include "b2d.hpp"
+#include "game.hpp"
 
 int main(void)
 {
