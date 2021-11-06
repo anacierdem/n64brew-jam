@@ -13,6 +13,13 @@ namespace constants {
     constexpr float to16_16 = 65536.f;
 }
 
+enum CollisionCategory: uint16
+{
+    enemy = 0x0001,
+    environment = 0x0002,
+    hand = 0x0004,
+};
+
 class Game
 {
     private:
@@ -22,7 +29,7 @@ class Game
         b2BodyDef bodyDef;
         b2Body* body;
         b2PolygonShape dynamicBox;
-        b2FixtureDef fixtureDef;
+        b2FixtureDef groundFixtureDef;
         int32 velocityIterations = 6;
         int32 positionIterations = 2;
         float timeStep = 1.0f / 60.0f;
@@ -39,7 +46,7 @@ class Game
 
     public:
         Game(RdpDisplayList* rdlParam);
-        int update(int controllers, controller_data keys);
+        int update();
         void reset();
 };
 
@@ -59,7 +66,7 @@ typedef struct Game Game;
 #include <libdragon.h>
 EXPORT_C Game* new_Game(RdpDisplayList*);
 EXPORT_C void delete_Game(Game*);
-EXPORT_C int update_Game(Game*, int controllers, struct controller_data keys);
+EXPORT_C int update_Game(Game*);
 
 #endif /* __B2D_H */
 

@@ -29,8 +29,6 @@ Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
             masses[i] = 0.5f;
         }
         vertices[i] = add;
-
-        debugf("x: %0.2f, y: %0.2f\n", vertices[i].x, vertices[i].y);
     }
 
     ropeDef.gravity = b2Vec2(0.0f, 10.0f);
@@ -59,9 +57,9 @@ void Rope::update(RdpDisplayList* rdl, b2Vec2 pos1, b2Vec2 pos2) {
         b2Vec2 vertex2 = rope.m_ps[i] + offset;
 
         render_tri_strip(rdl,
-            vertex1.x * 80. * constants::to16_16,   (vertex1.y) * 40. * constants::to16_16,
-            vertex2.x * 80. * constants::to16_16,   (vertex2.y) * 40. * constants::to16_16,
-            vertex3.x * 80. * constants::to16_16,   (vertex3.y) * 40. * constants::to16_16
+            vertex1.x * 80. * constants::to16_16, (vertex1.y) * 40. * constants::to16_16,
+            vertex2.x * 80. * constants::to16_16, (vertex2.y) * 40. * constants::to16_16,
+            vertex3.x * 80. * constants::to16_16, (vertex3.y) * 40. * constants::to16_16
         );
 
         vertex1 = rope.m_ps[i+1] + offset;

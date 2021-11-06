@@ -7,9 +7,9 @@ extern "C" {
 #include "box2d/box2d.h"
 
 #include "game.hpp"
-#include "box.hpp"
+#include "hand.hpp"
 
-Box::Box(b2World* world) {
+Hand::Hand(b2World* world) {
     bodyDef.type = b2_dynamicBody;
     body = world->CreateBody(&bodyDef);
     dynamicBox.SetAsBox(0.2f, 0.2f);
@@ -20,15 +20,14 @@ Box::Box(b2World* world) {
     fixtureDef.restitution = 0.5f;
 
     b2Filter filter;
-    filter.categoryBits = CollisionCategory::enemy;
-    filter.maskBits = CollisionCategory::enemy | CollisionCategory::hand;
-
+    filter.categoryBits = CollisionCategory::hand;
+    filter.maskBits = CollisionCategory::enemy | CollisionCategory::environment;
     fixtureDef.filter = filter;
 
     body->CreateFixture(&fixtureDef);
 }
 
-void Box::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
+void Hand::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
     b2Vec2 vertex1 = body->GetWorldPoint(dynamicBox.m_vertices[0]);
     b2Vec2 vertex2 = body->GetWorldPoint(dynamicBox.m_vertices[1]);
     b2Vec2 vertex3 = body->GetWorldPoint(dynamicBox.m_vertices[3]);
