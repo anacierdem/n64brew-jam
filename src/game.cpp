@@ -43,7 +43,7 @@ extern "C" {
         groundFixtureDef.filter = filter;
         groundBody->CreateFixture(&groundFixtureDef);
 
-        rope = new Rope(10, box1Transform.p, box2Transform.p);
+        rope = new Rope(20, box1Transform.p, box2Transform.p);
 
         for (int i = 0; i < box_count; i ++) {
             boxes[i] = new Box(&world);
