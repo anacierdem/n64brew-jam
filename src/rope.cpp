@@ -3,6 +3,7 @@
 #include "box2d/b2_rope.h"
 
 #include "rope.hpp"
+#include "game.hpp"
 
 extern "C" {
     #include <libdragon.h>
@@ -38,15 +39,12 @@ Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
     ropeDef.position = pos1;
 
     ropeTuning.bendStiffness= 0.0001f;
-    // ropeTuning.bendDamping = 0.1f;
-    // ropeTuning.damping = 0.1f;
 
     ropeDef.tuning = ropeTuning;
 
     rope.Create(ropeDef);
 }
 void Rope::update(RdpDisplayList* rdl, b2Vec2 pos1, b2Vec2 pos2) {
-    float to16_16 = 65536.f;
     rope.Step(timeStep, velocityIterations, pos1, pos2);
 
     for (int i = 0; i < ropeDef.count - 1; i++)
@@ -61,13 +59,13 @@ void Rope::update(RdpDisplayList* rdl, b2Vec2 pos1, b2Vec2 pos2) {
         b2Vec2 vertex2 = rope.m_ps[i] + offset;
 
         render_tri_strip(rdl,
-            vertex1.x * 80. * to16_16,   (vertex1.y) * 40. * to16_16,
-            vertex2.x * 80. * to16_16,   (vertex2.y) * 40. * to16_16,
-            vertex3.x * 80. * to16_16,   (vertex3.y) * 40. * to16_16
+            vertex1.x * 80. * constants::to16_16,   (vertex1.y) * 40. * constants::to16_16,
+            vertex2.x * 80. * constants::to16_16,   (vertex2.y) * 40. * constants::to16_16,
+            vertex3.x * 80. * constants::to16_16,   (vertex3.y) * 40. * constants::to16_16
         );
 
         vertex1 = rope.m_ps[i+1] + offset;
-        render_tri_strip_next(rdl, vertex1.x * 80. * to16_16,   (vertex1.y) * 40. * to16_16);
+        render_tri_strip_next(rdl, vertex1.x * 80. * constants::to16_16,   (vertex1.y) * 40. * constants::to16_16);
     }
 }
 

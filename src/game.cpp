@@ -63,18 +63,11 @@ extern "C" {
     }
 
     int Game::update(int controllers, controller_data keys) {
-        float to16_16 = 65536.f;
-
         if((controllers & CONTROLLER_1_INSERTED)) {
-            // debugf("x: %d y: %d\n", keys.c[0].x, keys.c[0].y);
-            // box1.body->ApplyForceToCenter(b2Vec2((float)keys.c[0].x / 40.0f, -(float)keys.c[0].y / 20.0f) , true);
-            // box1.body->SetTransform(b2Vec2((float)keys.c[0].x / 20.0f, -(float)keys.c[0].y / 20.0f), 0.);
-
             if( keys.c[0].Z )
             {
                 box1.body->SetLinearVelocity(b2Vec2((float)keys.c[0].x / 20.0f, -(float)keys.c[0].y / 20.0f));
             }
-
 
             if( keys.c[0].A )
             {
@@ -84,11 +77,7 @@ extern "C" {
             // cameraPos.Set(keys.c[0].x, -keys.c[0].y, 1.);
         }
 
-
         if((controllers & CONTROLLER_2_INSERTED)) {
-            // box2.body->ApplyForceToCenter(b2Vec2((float)keys.c[1].x / 40.0f, -(float)keys.c[1].y / 20.0f) , true);
-            // box2.body->SetTransform(b2Vec2((float)keys.c[1].x / 20.0f, -(float)keys.c[1].y / 20.0f), 0.);
-
             if( keys.c[1].Z )
             {
                 box2.body->SetLinearVelocity(b2Vec2((float)keys.c[1].x / 20.0f, -(float)keys.c[1].y / 20.0f));
@@ -108,9 +97,9 @@ extern "C" {
         b2Vec2 cPos(cameraPos.x / scale, cameraPos.y / (scale/2.));
 
         b2Mat33 mainM(
-            b2Vec3(scale * to16_16, 0., 0.),
-            b2Vec3(0., (scale/2) * to16_16, 0.),
-            b2Vec3(-cameraPos.x * to16_16, -cameraPos.y * to16_16, 1.)
+            b2Vec3(scale * constants::to16_16, 0., 0.),
+            b2Vec3(0., (scale/2) * constants::to16_16, 0.),
+            b2Vec3(-cameraPos.x * constants::to16_16, -cameraPos.y * constants::to16_16, 1.)
         );
 
         b2Vec2 vertex1 = groundBody->GetWorldPoint(groundBox.m_vertices[0]);
@@ -122,7 +111,7 @@ extern "C" {
         b2Vec3 v3 = b2Mul(mainM, b2Vec3(vertex3.x, vertex3.y, 1.));
 
         b2Vec2 min = b2Vec2(0., 0.);
-        b2Vec2 max = b2Vec2(8. * scale * to16_16, 6. * (scale/2) * to16_16);
+        b2Vec2 max = b2Vec2(8. * scale * constants::to16_16, 6. * (scale/2) * constants::to16_16);
 
         vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);
         vertex2 = b2Clamp(b2Vec2(v2.x, v2.y), min, max);

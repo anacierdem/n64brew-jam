@@ -2,6 +2,7 @@
 #include "box2d/box2d.h"
 
 #include "box.hpp"
+#include "game.hpp"
 
 extern "C" {
     #include <libdragon.h>
@@ -23,8 +24,6 @@ Box::Box(b2World* world) {
 }
 
 void Box::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
-    float to16_16 = 65536.f;
-
     b2Vec2 vertex1 = body->GetWorldPoint(dynamicBox.m_vertices[0]);
     b2Vec2 vertex2 = body->GetWorldPoint(dynamicBox.m_vertices[1]);
     b2Vec2 vertex3 = body->GetWorldPoint(dynamicBox.m_vertices[3]);
@@ -35,13 +34,13 @@ void Box::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
 
     // TODO: build a simple transform for this
     render_tri_strip(rdl,
-        vertex1.x * scale * to16_16,   (vertex1.y) * (scale/2.) * to16_16,
-        vertex2.x * scale * to16_16,   (vertex2.y) * (scale/2.) * to16_16,
-        vertex3.x * scale * to16_16,   (vertex3.y) * (scale/2.) * to16_16
+        vertex1.x * scale * constants::to16_16, (vertex1.y) * (scale/2.) * constants::to16_16,
+        vertex2.x * scale * constants::to16_16, (vertex2.y) * (scale/2.) * constants::to16_16,
+        vertex3.x * scale * constants::to16_16, (vertex3.y) * (scale/2.) * constants::to16_16
     );
 
     vertex1 = body->GetWorldPoint(dynamicBox.m_vertices[2]);
     vertex1 -= cameraPos;
 
-    render_tri_strip_next(rdl, vertex1.x * scale * to16_16,   (vertex1.y) * (scale/2.) * to16_16);
+    render_tri_strip_next(rdl, vertex1.x * scale * constants::to16_16,   (vertex1.y) * (scale/2.) * constants::to16_16);
 }

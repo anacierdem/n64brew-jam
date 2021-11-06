@@ -9,6 +9,10 @@
 #include "rope.hpp"
 #include "box.hpp"
 
+namespace constants {
+    constexpr float to16_16 = 65536.f;
+}
+
 class Game
 {
     private:
