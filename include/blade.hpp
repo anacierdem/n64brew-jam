@@ -14,7 +14,7 @@ class Blade : public Box
 {
     public:
         Blade(b2World* world);
-        void update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale);
+        void update(RdpDisplayList* rdl, b2Vec2 cameraPos);
 };
 
 

@@ -37,7 +37,7 @@ void Enemy::reset(int level) {
         (level - constants::startIncreasingSpeedAtLevel + 2);
 }
 
-void Enemy::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
+void Enemy::update(RdpDisplayList* rdl, b2Vec2 cameraPos) {
     if (shouldResetWith) {
         float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / constants::gameAreaWidth);
         body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius), rx);
@@ -54,5 +54,5 @@ void Enemy::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
         body->SetAngularVelocity(0.f);
         shouldResetWith = 0;
     }
-    Box::update(rdl, cameraPos, scale);
+    Box::update(rdl, cameraPos);
 }

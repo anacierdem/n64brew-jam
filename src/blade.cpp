@@ -25,7 +25,7 @@ Blade::Blade(b2World* world) : Box(world) {
     body->CreateFixture(&fixtureDef);
 }
 
-void Blade::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
+void Blade::update(RdpDisplayList* rdl, b2Vec2 cameraPos) {
     rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(80, 80, 80, 255)));
-    Box::update(rdl, cameraPos, scale);
+    Box::update(rdl, cameraPos);
 }

@@ -25,7 +25,16 @@ Hand::Hand(b2World* world) : Box(world) {
     body->CreateFixture(&fixtureDef);
 }
 
-void Hand::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
-    rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
-    Box::update(rdl, cameraPos, scale);
+void Hand::update(RdpDisplayList* rdl, b2Vec2 cameraPos, bool held) {
+    b2Fixture* fixture = body->GetFixtureList();
+    if (held) {
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
+        fixtureDef.filter.maskBits = CollisionCategory::enemy | CollisionCategory::environment | CollisionCategory::blade;
+        fixture->SetFilterData(fixtureDef.filter);
+    } else {
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 50)));
+        fixtureDef.filter.maskBits = CollisionCategory::environment;
+        fixture->SetFilterData(fixtureDef.filter);
+    }
+    Box::update(rdl, cameraPos);
 }

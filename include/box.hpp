@@ -18,7 +18,7 @@ class Box
     public:
         b2Body* body;
         Box(b2World* world);
-        void update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale);
+        void update(RdpDisplayList* rdl, b2Vec2 cameraPos);
 };
 
 

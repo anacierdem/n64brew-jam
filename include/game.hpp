@@ -15,6 +15,7 @@ namespace constants {
     constexpr float gameAreaHeight = 6.f;
     constexpr int startIncreasingSpeedAtLevel = 20;
     constexpr float swawnSafeRadius = 1.0f;
+    constexpr float scale = 80.;
 }
 
 enum CollisionCategory: uint16
@@ -41,7 +42,6 @@ class Game : public b2ContactListener
 
         RdpDisplayList* rdl;
 
-        float scale = 1.0f;
         b2Vec3 cameraPos = {0., 0., 1.};
 
         Rope* rope;
@@ -50,6 +50,12 @@ class Game : public b2ContactListener
         Enemy* enemies[box_count];
 
         bool shouldReset = false;
+        int controllers = 0;
+        struct controller_data keys;
+        struct controller_data keysDown;
+
+        bool holdingLeft = false;
+        bool holdingRight = false;
 
         // Gameplay
         int highScore = 0;

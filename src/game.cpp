@@ -12,8 +12,9 @@
 b2Vec2 gravity(0.0f, 1.0f);
 b2World world(gravity);
 
-b2Transform box1Transform;
-b2Transform box2Transform;
+// Start position
+b2Transform leftHandInitialTransform;
+b2Transform rightHandInitialTransform;
 
 Hand leftHand(&world);
 Hand rightHand(&world);
@@ -33,8 +34,9 @@ extern "C" {
 
         rdl = rdlParam;
 
-        box1Transform.Set(b2Vec2(2.0f, 1.0f), 1.0f);
-        box2Transform.Set(b2Vec2(constants::gameAreaWidth - 2.0f, 1.0f), -1.2f);
+        // Start position
+        leftHandInitialTransform.Set(b2Vec2(2.0f, 2.0f), 1.0f);
+        rightHandInitialTransform.Set(b2Vec2(constants::gameAreaWidth - 2.0f, 2.0f), -1.2f);
 
         groundBodyDef.position.Set(0.0f, constants::gameAreaHeight);
         groundBody = world.CreateBody(&groundBodyDef);
@@ -49,7 +51,7 @@ extern "C" {
         groundFixtureDef.filter = filter;
         groundBody->CreateFixture(&groundFixtureDef);
 
-        rope = new Rope(19, box1Transform.p, box2Transform.p);
+        rope = new Rope(19, leftHandInitialTransform.p, rightHandInitialTransform.p);
 
         for (int i = 0; i < box_count; i ++) {
             enemies[i] = new Enemy(&world);
@@ -60,9 +62,9 @@ extern "C" {
     };
 
     void Game::reset() {
-        leftHand.body->SetTransform(box1Transform.p, box1Transform.q.GetAngle());
+        leftHand.body->SetTransform(leftHandInitialTransform.p, leftHandInitialTransform.q.GetAngle());
         leftHand.body->SetAwake(true);
-        rightHand.body->SetTransform(box2Transform.p, box2Transform.q.GetAngle());
+        rightHand.body->SetTransform(rightHandInitialTransform.p, rightHandInitialTransform.q.GetAngle());
         rightHand.body->SetAwake(true);
         leftHand.body->SetLinearVelocity(b2Vec2(0., 0.));
         leftHand.body->SetAngularVelocity(0.);
@@ -167,52 +169,77 @@ extern "C" {
         if (isDead) {
             leftHand.body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
             rightHand.body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-            leftHand.body->SetTransform(box1Transform.p, box1Transform.q.GetAngle());
-            rightHand.body->SetTransform(box2Transform.p, box2Transform.q.GetAngle());
+            leftHand.body->SetTransform(leftHandInitialTransform.p, leftHandInitialTransform.q.GetAngle());
+            rightHand.body->SetTransform(rightHandInitialTransform.p, rightHandInitialTransform.q.GetAngle());
         }
 
         // Step simulation!
         world.Step(timeStep, velocityIterations, positionIterations);
 
-        // Handle input
+        // Read input
         controller_scan();
-        int controllers = get_controllers_present();
-        struct controller_data keys = get_keys_pressed();
-        struct controller_data keys_down = get_keys_down();
+        controllers = get_controllers_present();
+        keys = get_keys_pressed();
+        keysDown = get_keys_down();
 
-        if((controllers & CONTROLLER_1_INSERTED)) {
-            if( keys_down.c[0].start && isDead)
+        if((controllers & CONTROLLER_1_INSERTED && controllers & CONTROLLER_2_INSERTED)) {
+            // Dual controller mode
+            if( ((keys.c[0].Z && keysDown.c[1].Z) || (keysDown.c[0].Z && keys.c[1].Z)) && isDead)
             {
                 // TODO: implement start
                 isDead = false;
             }
 
-            if( keys.c[0].Z && !isDead)
+            holdingLeft = keys.c[0].Z;
+            if( holdingLeft && !isDead)
             {
-                leftHand.body->SetLinearVelocity(b2Vec2((float)keys.c[0].x / 20.0f, -(float)keys.c[0].y / 20.0f));
+                leftHand.body->SetLinearVelocity(b2Vec2(
+                    static_cast<float>(keys.c[0].x) / 20.0f,
+                    -static_cast<float>(keys.c[0].y) / 20.0f
+                ));
             }
-        }
 
-        if((controllers & CONTROLLER_2_INSERTED)) {
-            if( keys_down.c[1].start && isDead)
+            holdingRight = keys.c[1].Z;
+            if( holdingRight && !isDead)
+            {
+                rightHand.body->SetLinearVelocity(b2Vec2(
+                    static_cast<float>(keys.c[1].x) / 20.0f,
+                    -static_cast<float>(keys.c[1].y) / 20.0f
+                ));
+            }
+        } else if((controllers & CONTROLLER_1_INSERTED)) {
+            // Single controller mode
+            if( ((keys.c[0].L && keysDown.c[1].R) || (keysDown.c[0].L && keys.c[1].R)) && isDead)
             {
                 // TODO: implement start
                 isDead = false;
             }
 
-            if( keys.c[1].Z  && !isDead)
+            holdingLeft = keys.c[0].L;
+            if( holdingLeft && !isDead)
             {
-                rightHand.body->SetLinearVelocity(b2Vec2((float)keys.c[1].x / 20.0f, -(float)keys.c[1].y / 20.0f));
+                leftHand.body->SetLinearVelocity(b2Vec2(
+                    static_cast<float>(keys.c[0].left) * -2.0f + static_cast<float>(keys.c[0].right) * 2.0f,
+                    static_cast<float>(keys.c[0].up)* -2.0f + static_cast<float>(keys.c[0].down) * 2.0f
+                ));
+            }
+
+            holdingRight = keys.c[0].L;
+            if( holdingRight && !isDead)
+            {
+                rightHand.body->SetLinearVelocity(b2Vec2(
+                    static_cast<float>(keys.c[0].C_left) * -2.0f + static_cast<float>(keys.c[0].C_right) * 2.0f,
+                    static_cast<float>(keys.c[0].C_up)* -2.0f + static_cast<float>(keys.c[0].C_down) * 2.0f
+                ));
             }
         }
 
         // Drawing parameters
-        float scale = 80.;
-        b2Vec2 cPos(cameraPos.x / scale, cameraPos.y / (scale/2.));
+        b2Vec2 cPos(cameraPos.x / constants::scale, cameraPos.y / (constants::scale/2.));
 
         b2Mat33 mainM(
-            b2Vec3(scale * constants::to16_16, 0., 0.),
-            b2Vec3(0., (scale/2) * constants::to16_16, 0.),
+            b2Vec3(constants::scale * constants::to16_16, 0., 0.),
+            b2Vec3(0., (constants::scale/2) * constants::to16_16, 0.),
             b2Vec3(-cameraPos.x * constants::to16_16, -cameraPos.y * constants::to16_16, 1.)
         );
 
@@ -228,8 +255,8 @@ extern "C" {
 
         b2Vec2 min = b2Vec2(0., 0.);
         b2Vec2 max = b2Vec2(
-            constants::gameAreaWidth * scale * constants::to16_16,
-            constants::gameAreaHeight * (scale/2) * constants::to16_16
+            constants::gameAreaWidth * constants::scale * constants::to16_16,
+            constants::gameAreaHeight * (constants::scale/2) * constants::to16_16
         );
 
         vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);
@@ -259,7 +286,7 @@ extern "C" {
             }
 
             enemies[i]->body->SetEnabled(true);
-            enemies[i]->update(rdl, cPos, scale);
+            enemies[i]->update(rdl, cPos);
             if (enemies[i]->body->GetPosition().y > constants::gameAreaHeight + constants::swawnSafeRadius ||
                 enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius ||
                 enemies[i]->body->GetPosition().x > constants::gameAreaWidth + constants::swawnSafeRadius) {
@@ -285,11 +312,11 @@ extern "C" {
 
         // Draw everything except enemies below
 
-        bladeE.update(rdl, cPos, scale);
+        bladeE.update(rdl, cPos);
 
         // Draw hands
-        leftHand.update(rdl, cPos, scale);
-        rightHand.update(rdl, cPos, scale);
+        leftHand.update(rdl, cPos, holdingLeft);
+        rightHand.update(rdl, cPos, holdingRight);
 
         // Draw roppe
         rope->draw(rdl);
@@ -298,15 +325,29 @@ extern "C" {
 
     void Game::updateUI(display_context_t disp) {
         char sbuf[1024];
-        graphics_set_color(0xFFFFFFFF, 0x00000000);
         if (isDead) {
+            graphics_set_color(0x888888FF, 0x00000000);
+
+            if((controllers & CONTROLLER_1_INSERTED && controllers & CONTROLLER_2_INSERTED)) {
+                graphics_draw_text(disp, 320 -24*4, 130, "with both controllers ;)");
+            } else {
+                graphics_draw_text(disp, 320 -40*4, 130, "use dual controllers for best experience");
+            }
+
             // Display menu
-            graphics_draw_text(disp, 320 -11*4, 120, "PRESS START");
+            graphics_set_color(0xFFFFFFFF, 0x00000000);
+
+            if((controllers & CONTROLLER_1_INSERTED && controllers & CONTROLLER_2_INSERTED)) {
+                graphics_draw_text(disp, 320 -28*4, 120, "Press both triggers to START");
+            } else {
+                graphics_draw_text(disp, 320 -20*4, 120, "Press L & R to START");
+            }
 
             sprintf(sbuf, "HIGHSCORE: %d", highScore);
-            graphics_draw_text(disp, 320 - strlen(sbuf)*4, 130, sbuf);
+            graphics_draw_text(disp, 320 - strlen(sbuf)*4, 144, sbuf);
         }
 
+        graphics_set_color(0xFFFFFFFF, 0x00000000);
         sprintf(sbuf, "SCORE: %d LEVEL: %d", score, level);
         graphics_draw_text(disp, 60, 20, sbuf);
 

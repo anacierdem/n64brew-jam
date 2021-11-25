@@ -17,7 +17,7 @@ class Enemy : public Box
     public:
         Enemy(b2World* world);
         void reset(int multiplier);
-        void update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale);
+        void update(RdpDisplayList* rdl, b2Vec2 cameraPos);
 };
 
 
