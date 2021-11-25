@@ -14,10 +14,15 @@ class Enemy : public Box
 {
     private:
         int shouldResetWith = 0;
+        int64_t startedShowingScore = 0;
     public:
         Enemy(b2World* world);
-        void reset(int multiplier);
+        void die(int multiplier, int score);
         void update(RdpDisplayList* rdl, b2Vec2 cameraPos);
+
+        b2Vec2 scorePosition;
+        bool showingScore = false;
+        int score;
 };
 
 

@@ -30,7 +30,23 @@ Enemy::Enemy(b2World* world) : Box(world){
     body->CreateFixture(&fixtureDef);
 }
 
-void Enemy::reset(int level) {
+void Enemy::die(int level, int s) {
+    score = s;
+    showingScore = s > 0;
+
+    if(!showingScore) return;
+
+    scorePosition = body->GetPosition();
+    scorePosition = b2Vec2(
+        constants::scale * scorePosition.x,
+        scorePosition.y >
+            (constants::gameAreaHeight - constants::swawnSafeRadius) ?
+            ((constants::scale/2.0f) * constants::gameAreaHeight - 12) :
+            (constants::scale/2.0f) * scorePosition.y
+    );
+
+    startedShowingScore = timer_ticks();
+
     // Not possible to SetTransform in a contact callback, defer to next update
     shouldResetWith = level < constants::startIncreasingSpeedAtLevel ?
         1 :
@@ -41,7 +57,6 @@ void Enemy::update(RdpDisplayList* rdl, b2Vec2 cameraPos) {
     if (shouldResetWith) {
         float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / constants::gameAreaWidth);
         body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius), rx);
-        b2Vec2 oldVelocity = body->GetLinearVelocity();
         float multiplier = static_cast<float>(shouldResetWith - 1);
         b2Vec2 newVelocity(
             multiplier * ((constants::gameAreaWidth / 2.0f) - rx) / constants::gameAreaWidth,
@@ -54,5 +69,10 @@ void Enemy::update(RdpDisplayList* rdl, b2Vec2 cameraPos) {
         body->SetAngularVelocity(0.f);
         shouldResetWith = 0;
     }
+
+    if (timer_ticks() > startedShowingScore + TICKS_FROM_MS(300)) {
+        showingScore = false;
+    }
+
     Box::update(rdl, cameraPos);
 }

@@ -141,7 +141,7 @@ extern "C" {
 
         if (enemy != nullptr) {
             addScore(10);
-            enemy->reset(level);
+            enemy->die(level, 10);
         }
     }
 
@@ -286,12 +286,18 @@ extern "C" {
 
             enemies[i]->body->SetEnabled(true);
             enemies[i]->update(rdl, cPos);
-            if (enemies[i]->body->GetPosition().y > constants::gameAreaHeight + constants::swawnSafeRadius ||
-                enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius ||
+
+            if (enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius ||
                 enemies[i]->body->GetPosition().x > constants::gameAreaWidth + constants::swawnSafeRadius) {
+                enemies[i]->die(level, 0);
+                continue;
+            }
+
+            if (enemies[i]->body->GetPosition().y > constants::gameAreaHeight + constants::swawnSafeRadius) {
                 // Minor scoring condition
                 addScore(1);
-                enemies[i]->reset(level);
+                enemies[i]->die(level, 1);
+                continue;
             }
         }
 
@@ -356,9 +362,6 @@ extern "C" {
         sprintf(sbuf, "SCORE: %d LEVEL: %d", score, level);
         graphics_draw_text(disp, 60, 20, sbuf);
 
-        // Lives
-        // graphics_draw_text(disp, 580 - 5*8, 20, "LIVES");
-
         sbuf[0] = '\0';
 
         for (int i = 0; i < lives; i++) {
@@ -366,7 +369,18 @@ extern "C" {
         }
 
         graphics_set_color(0xFF0000FF, 0x00000000);
-        graphics_draw_text(disp, 580 - strlen(sbuf)*8, 20, sbuf); // - 6*8
+        graphics_draw_text(disp, 580 - strlen(sbuf)*8, 20, sbuf);
+
+        graphics_set_color(0x00FF00FF, 0x00000000);
+        for (int i = 0; i < box_count; i ++) {
+            if (enemies[i]->showingScore) {
+                sprintf(sbuf, "+%d", enemies[i]->score);
+                graphics_draw_text(disp,
+                    enemies[i]->scorePosition.x,
+                    enemies[i]->scorePosition.y
+                , sbuf);
+            }
+        }
     }
 
     Game* new_Game(RdpDisplayList* rdl)
