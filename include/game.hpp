@@ -13,6 +13,8 @@ namespace constants {
     constexpr float to16_16 = 65536.f;
     constexpr float gameAreaWidth = 8.f;
     constexpr float gameAreaHeight = 6.f;
+    constexpr int startIncreasingSpeedAtLevel = 20;
+    constexpr float swawnSafeRadius = 1.0f;
 }
 
 enum CollisionCategory: uint16
@@ -47,12 +49,15 @@ class Game : public b2ContactListener
         static const int box_count = 10;
         Enemy* enemies[box_count];
 
+        bool shouldReset = false;
+
         // Gameplay
         int highScore = 0;
         int score = 0;
         int lives = 3;
         bool isDead = true;
-        bool shouldReset = false;
+
+        int level = 0;
 
     public:
         Game(RdpDisplayList* rdlParam);

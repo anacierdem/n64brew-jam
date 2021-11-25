@@ -13,10 +13,10 @@ extern "C" {
 class Enemy : public Box
 {
     private:
-        bool shouldReset = false;
+        int shouldResetWith = 0;
     public:
         Enemy(b2World* world);
-        void reset();
+        void reset(int multiplier);
         void update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale);
 };
 

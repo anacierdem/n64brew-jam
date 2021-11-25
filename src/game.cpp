@@ -71,18 +71,27 @@ extern "C" {
 
         bladeE.body->SetTransform(b2Vec2(0.0, 0.0), 0.0);
 
-        for (int i = 0; i < box_count; i ++) {
-            float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaWidth);
-            float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaHeight);
-            enemies[i]->body->SetTransform(b2Vec2(rx, ry), rx);
-        }
-
-        rope->reset();
-
+        // Reset game
         isDead = true;
         score = 0;
         lives = 3;
         shouldReset = false;
+        level = 0;
+
+        int activeCount = 5 + level;
+        for (int i = 0; i < box_count; i ++) {
+            float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaWidth);
+            float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaHeight);
+            if (i < activeCount) {
+                enemies[i]->body->SetTransform(b2Vec2(rx, ry), rx);
+                enemies[i]->body->SetEnabled(true);
+            } else {
+                enemies[i]->body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius), rx);
+                enemies[i]->body->SetEnabled(false);
+            }
+        }
+
+        rope->reset();
     }
 
     void Game::BeginContact(b2Contact* contact)
@@ -130,7 +139,7 @@ extern "C" {
 
         if (enemy != nullptr) {
             addScore(10);
-            enemy->reset();
+            enemy->reset(level);
         }
     }
 
@@ -139,7 +148,7 @@ extern "C" {
         if (isDead) return;
         score += points;
         highScore = std::max(score, highScore);
-        debugf("new score: %d, high: %d\n", score, highScore);
+        level = score / 50;
     }
 
     int Game::update() {
@@ -242,12 +251,21 @@ extern "C" {
         render_tri_strip_next(rdl, vertex1.x, vertex1.y);
 
         // Update and re-spawn enemies if necessary
+        int activeCount = 5 + level;
+        debugf("count: %d\n", activeCount);
         for (int i = 0; i < box_count; i ++) {
+            if (i >= activeCount) {
+                break;
+            }
+
+            enemies[i]->body->SetEnabled(true);
             enemies[i]->update(rdl, cPos, scale);
-            if (enemies[i]->body->GetPosition().y > constants::gameAreaHeight) {
+            if (enemies[i]->body->GetPosition().y > constants::gameAreaHeight + constants::swawnSafeRadius ||
+                enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius ||
+                enemies[i]->body->GetPosition().x > constants::gameAreaWidth + constants::swawnSafeRadius) {
                 // Minor scoring condition
                 addScore(1);
-                enemies[i]->reset();
+                enemies[i]->reset(level);
             }
         }
 
@@ -289,7 +307,7 @@ extern "C" {
             graphics_draw_text(disp, 320 - strlen(sbuf)*4, 130, sbuf);
         }
 
-        sprintf(sbuf, "SCORE: %d", score);
+        sprintf(sbuf, "SCORE: %d LEVEL: %d", score, level);
         graphics_draw_text(disp, 60, 20, sbuf);
 
         // Lives

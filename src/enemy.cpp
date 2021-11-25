@@ -24,24 +24,35 @@ Enemy::Enemy(b2World* world) : Box(world){
     fixtureDef.filter = filter;
 
     b2FixtureUserData userData;
-    userData.pointer = reinterpret_cast<uintptr_t> (this);
+    userData.pointer = reinterpret_cast<uintptr_t>(this);
     fixtureDef.userData = userData;
 
     body->CreateFixture(&fixtureDef);
 }
 
-void Enemy::reset() {
+void Enemy::reset(int level) {
     // Not possible to SetTransform in a contact callback, defer to next update
-    shouldReset = true;
+    shouldResetWith = level < constants::startIncreasingSpeedAtLevel ?
+        1 :
+        (level - constants::startIncreasingSpeedAtLevel + 2);
 }
 
 void Enemy::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
-    if (shouldReset) {
-        float rx = static_cast<float> (rand()) / static_cast<float> (RAND_MAX / constants::gameAreaWidth);
-        body->SetTransform(b2Vec2(rx, -1.), rx);
-        body->SetLinearVelocity(b2Vec2(0.f,0.f));
+    if (shouldResetWith) {
+        float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / constants::gameAreaWidth);
+        body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius), rx);
+        b2Vec2 oldVelocity = body->GetLinearVelocity();
+        float multiplier = static_cast<float>(shouldResetWith - 1);
+        b2Vec2 newVelocity(
+            multiplier * ((constants::gameAreaWidth / 2.0f) - rx) / constants::gameAreaWidth,
+            multiplier
+        );
+        // Cap speeds
+        newVelocity.x = newVelocity.x > 10.0f ? 10.0f : newVelocity.x;
+        newVelocity.y = newVelocity.y > 20.0f ? 20.0f : newVelocity.y;
+        body->SetLinearVelocity(newVelocity);
         body->SetAngularVelocity(0.f);
-        shouldReset = false;
+        shouldResetWith = 0;
     }
     Box::update(rdl, cameraPos, scale);
 }
