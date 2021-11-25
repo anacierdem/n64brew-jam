@@ -139,6 +139,7 @@ extern "C" {
         if (isDead) return;
         score += points;
         highScore = std::max(score, highScore);
+        debugf("new score: %d, high: %d\n", score, highScore);
     }
 
     int Game::update() {
@@ -282,17 +283,17 @@ extern "C" {
         graphics_set_color(0xFFFFFFFF, 0x00000000);
         if (isDead) {
             // Display menu
-            graphics_draw_text(disp, 320 -10*8, 120, "PRESS START");
+            graphics_draw_text(disp, 320 -11*4, 120, "PRESS START");
 
             sprintf(sbuf, "HIGHSCORE: %d", highScore);
-            graphics_draw_text(disp, 320 - strlen(sbuf)*8, 130, "HIGH SCORE:");
+            graphics_draw_text(disp, 320 - strlen(sbuf)*4, 130, sbuf);
         }
 
         sprintf(sbuf, "SCORE: %d", score);
         graphics_draw_text(disp, 40, 20, sbuf);
 
         sprintf(sbuf, "LIVES: %d", lives);
-        graphics_draw_text(disp, 600 - strlen(sbuf)*8, 20, sbuf);
+        graphics_draw_text(disp, 600 - strlen(sbuf)*4, 20, sbuf);
     }
 
     Game* new_Game(RdpDisplayList* rdl)
