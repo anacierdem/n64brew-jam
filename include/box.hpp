@@ -10,7 +10,7 @@ extern "C" {
 
 class Box
 {
-    private:
+    protected:
         b2BodyDef bodyDef;
         b2PolygonShape dynamicBox;
         b2FixtureDef fixtureDef;

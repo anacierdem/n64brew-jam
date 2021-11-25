@@ -7,7 +7,7 @@
 #include "rdl.h"
 
 #include "rope.hpp"
-#include "box.hpp"
+#include "enemy.hpp"
 
 namespace constants {
     constexpr float to16_16 = 65536.f;
@@ -44,7 +44,7 @@ class Game : public b2ContactListener
         Rope* rope;
 
         static const int box_count = 10;
-        Box* boxes[box_count];
+        Enemy* enemies[box_count];
 
         // Gameplay
         int highScore = 0;
@@ -58,6 +58,7 @@ class Game : public b2ContactListener
         int update();
         void updateUI(display_context_t disp);
         void reset();
+        void addScore(int points);
 
         void BeginContact(b2Contact* contact);
 };

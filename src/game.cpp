@@ -45,10 +45,10 @@ extern "C" {
         groundFixtureDef.filter = filter;
         groundBody->CreateFixture(&groundFixtureDef);
 
-        rope = new Rope(20, box1Transform.p, box2Transform.p);
+        rope = new Rope(19, box1Transform.p, box2Transform.p);
 
         for (int i = 0; i < box_count; i ++) {
-            boxes[i] = new Box(&world);
+            enemies[i] = new Enemy(&world);
         }
 
         world.SetContactListener(this);
@@ -68,7 +68,7 @@ extern "C" {
         for (int i = 0; i < box_count; i ++) {
             float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaWidth);
             float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaHeight);
-            boxes[i]->body->SetTransform(b2Vec2(rx, ry), rx);
+            enemies[i]->body->SetTransform(b2Vec2(rx, ry), rx);
         }
 
         rope->reset();
@@ -82,13 +82,22 @@ extern "C" {
     void Game::BeginContact(b2Contact* contact)
     {
         if (isDead) return;
-        b2Body* bodyA = contact->GetFixtureA()->GetBody();
-        b2Body* bodyB = contact->GetFixtureB()->GetBody();
+        b2Fixture* fixtureA = contact->GetFixtureA();
+        b2Fixture* fixtureB = contact->GetFixtureB();
+        // b2Body* bodyA = fixtureA->GetBody();
+        // b2Body* bodyB = fixtureB->GetBody();
+        b2Filter filterA = fixtureA->GetFilterData();
+        b2Filter filterB = fixtureA->GetFilterData();
 
-        if (bodyA == leftHand.body || bodyA == rightHand.body || bodyB == rightHand.body || bodyB == rightHand.body) {
-            score++;
-            highScore = std::max(score, highScore);
+        if (
+            filterA.categoryBits == CollisionCategory::enemy &&
+            filterB.categoryBits == CollisionCategory::enemy) {
+            return;
+        }
 
+        if (
+            filterA.categoryBits == CollisionCategory::hand ||
+            filterB.categoryBits == CollisionCategory::hand) {
             lives--;
 
             if (lives <= 0) {
@@ -96,6 +105,13 @@ extern "C" {
                 shouldReset = true;
             }
         }
+    }
+
+    void Game::addScore(int points)
+    {
+        if (isDead) return;
+        score += points;
+        highScore = std::max(score, highScore);
     }
 
     int Game::update() {
@@ -130,6 +146,7 @@ extern "C" {
         if((controllers & CONTROLLER_1_INSERTED)) {
             if( keys_down.c[0].start && isDead)
             {
+                // TODO: implement start
                 isDead = false;
             }
 
@@ -142,6 +159,7 @@ extern "C" {
         if((controllers & CONTROLLER_2_INSERTED)) {
             if( keys_down.c[1].start && isDead)
             {
+                // TODO: implement start
                 isDead = false;
             }
 
@@ -200,13 +218,16 @@ extern "C" {
         leftHand.update(rdl, cPos, scale);
         rightHand.update(rdl, cPos, scale);
 
-        // Re-spawn boxes
+        // Re-spawn enemies
         for (int i = 0; i < box_count; i ++) {
-            boxes[i]->update(rdl, cPos, scale);
-            if (boxes[i]->body->GetPosition().y > 6.) {
-                float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 8.);
-                boxes[i]->body->SetTransform(b2Vec2(rx, -1.), rx);
-                boxes[i]->body->SetLinearVelocity(b2Vec2(0.,0.));
+            enemies[i]->update(rdl, cPos, scale);
+            if (enemies[i]->body->GetPosition().y > constants::gameAreaHeight) {
+                // Minor scoring condition
+                addScore(1);
+
+                float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaWidth);
+                enemies[i]->body->SetTransform(b2Vec2(rx, -1.), rx);
+                enemies[i]->body->SetLinearVelocity(b2Vec2(0.,0.));
             }
         }
 

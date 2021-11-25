@@ -1,5 +1,5 @@
-#ifndef __HAND_H
-#define __HAND_H
+#ifndef __ENEMY_H
+#define __ENEMY_H
 
 #include "box2d/box2d.h"
 
@@ -10,11 +10,11 @@ extern "C" {
     #include "geometry.h"
 }
 
-class Hand : public Box
+class Enemy : public Box
 {
     public:
-        Hand(b2World* world);
+        Enemy(b2World* world) ;
 };
 
 
-#endif /* __HAND_H */
+#endif /* __ENEMY_H */

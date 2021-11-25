@@ -12,20 +12,6 @@ extern "C" {
 Box::Box(b2World* world) {
     bodyDef.type = b2_dynamicBody;
     body = world->CreateBody(&bodyDef);
-    dynamicBox.SetAsBox(0.2f, 0.2f);
-
-    fixtureDef.shape = &dynamicBox;
-    fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.3f;
-    fixtureDef.restitution = 0.5f;
-
-    b2Filter filter;
-    filter.categoryBits = CollisionCategory::enemy;
-    filter.maskBits = CollisionCategory::enemy | CollisionCategory::hand;
-
-    fixtureDef.filter = filter;
-
-    body->CreateFixture(&fixtureDef);
 }
 
 void Box::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {

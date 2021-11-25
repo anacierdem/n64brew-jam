@@ -7,9 +7,9 @@ extern "C" {
 #include "box2d/box2d.h"
 
 #include "game.hpp"
-#include "hand.hpp"
+#include "enemy.hpp"
 
-Hand::Hand(b2World* world) : Box(world) {
+Enemy::Enemy(b2World* world) : Box(world){
     dynamicBox.SetAsBox(0.2f, 0.2f);
 
     fixtureDef.shape = &dynamicBox;
@@ -18,8 +18,9 @@ Hand::Hand(b2World* world) : Box(world) {
     fixtureDef.restitution = 0.5f;
 
     b2Filter filter;
-    filter.categoryBits = CollisionCategory::hand;
-    filter.maskBits = CollisionCategory::enemy | CollisionCategory::environment;
+    filter.categoryBits = CollisionCategory::enemy;
+    filter.maskBits = CollisionCategory::enemy | CollisionCategory::hand;
+
     fixtureDef.filter = filter;
 
     body->CreateFixture(&fixtureDef);
