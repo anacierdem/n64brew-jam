@@ -335,7 +335,7 @@ extern "C" {
     }
 
     void Game::updateUI(display_context_t disp) {
-        char sbuf[1024];
+        char sbuf[512];
         if (isDead) {
             graphics_set_color(0x888888FF, 0x00000000);
 
@@ -346,7 +346,11 @@ extern "C" {
             }
 
             // Display menu
-            graphics_set_color(0xFFFFFFFF, 0x00000000);
+            if ((timer_ticks() % TICKS_FROM_MS(600)) < TICKS_FROM_MS(300)) {
+                graphics_set_color(0xFFFFFFFF, 0x00000000);
+            } else {
+                graphics_set_color(0x888888FF, 0x00000000);
+            }
 
             if((controllers & CONTROLLER_1_INSERTED && controllers & CONTROLLER_2_INSERTED)) {
                 graphics_draw_text(disp, 320 -28*4, 120, "Press both triggers to START");
@@ -354,6 +358,7 @@ extern "C" {
                 graphics_draw_text(disp, 320 -20*4, 120, "Press L & R to START");
             }
 
+            graphics_set_color(0xFFFFFFFF, 0x00000000);
             sprintf(sbuf, "HIGHSCORE: %d", highScore);
             graphics_draw_text(disp, 320 - strlen(sbuf)*4, 144, sbuf);
         }
