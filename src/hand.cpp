@@ -19,7 +19,7 @@ Hand::Hand(b2World* world) : Box(world) {
 
     b2Filter filter;
     filter.categoryBits = CollisionCategory::hand;
-    filter.maskBits = CollisionCategory::enemy | CollisionCategory::environment;
+    filter.maskBits = CollisionCategory::enemy | CollisionCategory::environment | CollisionCategory::blade;
     fixtureDef.filter = filter;
 
     body->CreateFixture(&fixtureDef);
