@@ -1,5 +1,5 @@
-#ifndef __ENEMY_H
-#define __ENEMY_H
+#ifndef __BLADE_H
+#define __BLADE_H
 
 #include "box2d/box2d.h"
 
@@ -10,15 +10,12 @@ extern "C" {
     #include "geometry.h"
 }
 
-class Enemy : public Box
+class Blade : public Box
 {
-    private:
-        bool shouldReset = false;
     public:
-        Enemy(b2World* world);
-        void reset();
+        Blade(b2World* world);
         void update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale);
 };
 
 
-#endif /* __ENEMY_H */
+#endif /* __BLADE_H */

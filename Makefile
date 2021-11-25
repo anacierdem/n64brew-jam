@@ -26,7 +26,7 @@ $(BUILD_DIR)/box2d/src/rope/%.o: box2d/src/rope/%.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 SRC = main.c rdl.c geometry.c
-CXX_SRC = game.cpp rope.cpp box.cpp enemy.cpp hand.cpp $(wildcard box2d/src/collision/*.cpp) $(wildcard box2d/src/common/*.cpp) $(wildcard box2d/src/dynamics/*.cpp) $(wildcard box2d/src/rope/*.cpp)
+CXX_SRC = game.cpp rope.cpp box.cpp enemy.cpp hand.cpp blade.cpp $(wildcard box2d/src/collision/*.cpp) $(wildcard box2d/src/common/*.cpp) $(wildcard box2d/src/dynamics/*.cpp) $(wildcard box2d/src/rope/*.cpp)
 OBJS = $(SRC:%.c=$(BUILD_DIR)/%.o) $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.o)
 DEPS = $(SRC:%.c=$(BUILD_DIR)/%.d) $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.d)
 

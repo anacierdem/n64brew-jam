@@ -7,10 +7,10 @@ extern "C" {
 #include "box2d/box2d.h"
 
 #include "game.hpp"
-#include "hand.hpp"
+#include "blade.hpp"
 
-Hand::Hand(b2World* world) : Box(world) {
-    dynamicBox.SetAsBox(0.2f, 0.2f);
+Blade::Blade(b2World* world) : Box(world) {
+    dynamicBox.SetAsBox(0.4f, 0.4f);
 
     fixtureDef.shape = &dynamicBox;
     fixtureDef.density = 1.0f;
@@ -18,14 +18,14 @@ Hand::Hand(b2World* world) : Box(world) {
     fixtureDef.restitution = 0.5f;
 
     b2Filter filter;
-    filter.categoryBits = CollisionCategory::hand;
-    filter.maskBits = CollisionCategory::enemy | CollisionCategory::environment;
+    filter.categoryBits = CollisionCategory::blade;
+    filter.maskBits = CollisionCategory::enemy | CollisionCategory::hand;
     fixtureDef.filter = filter;
 
     body->CreateFixture(&fixtureDef);
 }
 
-void Hand::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
-    rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
+void Blade::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
+    rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(80, 80, 80, 255)));
     Box::update(rdl, cameraPos, scale);
 }

@@ -20,6 +20,7 @@ enum CollisionCategory: uint16
     enemy = 0x0001,
     environment = 0x0002,
     hand = 0x0004,
+    blade = 0x0008,
 };
 
 class Game : public b2ContactListener

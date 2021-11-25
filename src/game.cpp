@@ -7,6 +7,7 @@
 #include "box.hpp"
 #include "hand.hpp"
 #include "rope.hpp"
+#include "blade.hpp"
 
 b2Vec2 gravity(0.0f, 1.0f);
 b2World world(gravity);
@@ -16,6 +17,9 @@ b2Transform box2Transform;
 
 Hand leftHand(&world);
 Hand rightHand(&world);
+
+// Why can't use blade as a name?
+Blade bladeE(&world);
 
 extern "C" {
     #include <libdragon.h>
@@ -65,6 +69,8 @@ extern "C" {
         rightHand.body->SetLinearVelocity(b2Vec2(0., 0.));
         rightHand.body->SetAngularVelocity(0.);
 
+        bladeE.body->SetTransform(b2Vec2(0.0, 0.0), 0.0);
+
         for (int i = 0; i < box_count; i ++) {
             float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaWidth);
             float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaHeight);
@@ -81,29 +87,50 @@ extern "C" {
 
     void Game::BeginContact(b2Contact* contact)
     {
-        if (isDead) return;
         b2Fixture* fixtureA = contact->GetFixtureA();
         b2Fixture* fixtureB = contact->GetFixtureB();
-        // b2Body* bodyA = fixtureA->GetBody();
-        // b2Body* bodyB = fixtureB->GetBody();
         b2Filter filterA = fixtureA->GetFilterData();
-        b2Filter filterB = fixtureA->GetFilterData();
+        b2Filter filterB = fixtureB->GetFilterData();
 
+        // We don't care about enemy contacts
         if (
             filterA.categoryBits == CollisionCategory::enemy &&
             filterB.categoryBits == CollisionCategory::enemy) {
             return;
         }
 
+        // If something touches hands, loose a life
         if (
-            filterA.categoryBits == CollisionCategory::hand ||
-            filterB.categoryBits == CollisionCategory::hand) {
+            !isDead &&
+            (
+                filterA.categoryBits == CollisionCategory::hand ||
+                filterB.categoryBits == CollisionCategory::hand
+            )
+        ) {
+
+            // TODO: implement looseLife?
             lives--;
 
             if (lives <= 0) {
                 // Not possible to SetTransform in a contact callback, defer to next update
                 shouldReset = true;
             }
+        }
+
+        Enemy* enemy = nullptr;
+        if (filterA.categoryBits == CollisionCategory::enemy && filterB.categoryBits == CollisionCategory::blade) {
+            enemy = reinterpret_cast<Enemy*> (fixtureA->GetUserData().pointer);
+            assert(enemy != nullptr);
+        }
+
+        if (filterB.categoryBits == CollisionCategory::enemy && filterA.categoryBits == CollisionCategory::blade) {
+            enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
+            assert(enemy != nullptr);
+        }
+
+        if (enemy != nullptr) {
+            addScore(10);
+            enemy->reset();
         }
     }
 
@@ -180,6 +207,7 @@ extern "C" {
         );
 
         // Draw ground
+        // TODO: use the Box class for this as well
         b2Vec2 vertex1 = groundBody->GetWorldPoint(groundBox.m_vertices[0]);
         b2Vec2 vertex2 = groundBody->GetWorldPoint(groundBox.m_vertices[1]);
         b2Vec2 vertex3 = groundBody->GetWorldPoint(groundBox.m_vertices[3]);
@@ -212,29 +240,22 @@ extern "C" {
 
         render_tri_strip_next(rdl, vertex1.x, vertex1.y);
 
-        // Draw hands
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
-
-        leftHand.update(rdl, cPos, scale);
-        rightHand.update(rdl, cPos, scale);
-
-        // Re-spawn enemies
+        // Update and re-spawn enemies if necessary
         for (int i = 0; i < box_count; i ++) {
             enemies[i]->update(rdl, cPos, scale);
             if (enemies[i]->body->GetPosition().y > constants::gameAreaHeight) {
                 // Minor scoring condition
                 addScore(1);
-
-                float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaWidth);
-                enemies[i]->body->SetTransform(b2Vec2(rx, -1.), rx);
-                enemies[i]->body->SetLinearVelocity(b2Vec2(0.,0.));
+                enemies[i]->reset();
             }
         }
 
         // Handle rope
         b2Vec2 pos1 = leftHand.body->GetPosition();
         b2Vec2 pos2 = rightHand.body->GetPosition();
-        rope->update(rdl, pos1, pos2);
+
+        bladeE.body->SetTransform(rope->update(pos1, pos2), bladeE.body->GetAngle());
+        bladeE.body->SetAngularVelocity(1000.0f * timeStep);
 
         b2Vec2 distanceVector = (pos2 - pos1);
         float distanceOverflow = distanceVector.Length() - 5.0f;
@@ -243,6 +264,16 @@ extern "C" {
             rightHand.body->ApplyForceToCenter(-distanceVector, true);
         }
 
+        // Draw everything except enemies below
+
+        bladeE.update(rdl, cPos, scale);
+
+        // Draw hands
+        leftHand.update(rdl, cPos, scale);
+        rightHand.update(rdl, cPos, scale);
+
+        // Draw roppe
+        rope->draw(rdl);
         return 0;
     }
 

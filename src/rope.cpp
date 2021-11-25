@@ -10,6 +10,7 @@ extern "C" {
     #include "geometry.h"
 }
 
+// TODO: move things into a PlayerContraption classs
 Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
     ropeDef.count = count;
 
@@ -25,6 +26,8 @@ Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
         add *= (float)i;
         if (i == 0 || i == (ropeDef.count - 1)) {
             masses[i] = 0.0f;
+        } else if (i == (ropeDef.count/2)) {
+            masses[i] = 5.0f;
         } else {
             masses[i] = 0.5f;
         }
@@ -42,9 +45,12 @@ Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
 
     rope.Create(ropeDef);
 }
-void Rope::update(RdpDisplayList* rdl, b2Vec2 pos1, b2Vec2 pos2) {
+b2Vec2 Rope::update(b2Vec2 pos1, b2Vec2 pos2) {
     rope.Step(timeStep, velocityIterations, pos1, pos2);
+    return rope.m_ps[ropeDef.count / 2];
+}
 
+void Rope::draw(RdpDisplayList* rdl) {
     for (int i = 0; i < ropeDef.count - 1; i++)
     {
         b2Vec2 vertex1 = rope.m_ps[i];

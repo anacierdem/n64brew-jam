@@ -24,6 +24,7 @@ void Box::update(RdpDisplayList* rdl, b2Vec2 cameraPos, float scale) {
     vertex3 -= cameraPos;
 
     // TODO: build a simple transform for this
+    // TODO: clamp to valid range or we get exceptions for large values
     render_tri_strip(rdl,
         vertex1.x * scale * constants::to16_16, (vertex1.y) * (scale/2.) * constants::to16_16,
         vertex2.x * scale * constants::to16_16, (vertex2.y) * (scale/2.) * constants::to16_16,
