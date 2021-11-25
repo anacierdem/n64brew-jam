@@ -11,6 +11,8 @@
 
 namespace constants {
     constexpr float to16_16 = 65536.f;
+    constexpr float gameAreaWidth = 8.f;
+    constexpr float gameAreaHeight = 6.f;
 }
 
 enum CollisionCategory: uint16
@@ -20,7 +22,7 @@ enum CollisionCategory: uint16
     hand = 0x0004,
 };
 
-class Game
+class Game : public b2ContactListener
 {
     private:
         b2BodyDef groundBodyDef;
@@ -44,10 +46,20 @@ class Game
         static const int box_count = 10;
         Box* boxes[box_count];
 
+        // Gameplay
+        int highScore = 0;
+        int score = 0;
+        int lives = 3;
+        bool isDead = true;
+        bool shouldReset = false;
+
     public:
         Game(RdpDisplayList* rdlParam);
         int update();
+        void updateUI(display_context_t disp);
         void reset();
+
+        void BeginContact(b2Contact* contact);
 };
 
 #else
@@ -67,6 +79,7 @@ typedef struct Game Game;
 EXPORT_C Game* new_Game(RdpDisplayList*);
 EXPORT_C void delete_Game(Game*);
 EXPORT_C int update_Game(Game*);
+EXPORT_C void update_UI(Game*, display_context_t disp);
 
 #endif /* __B2D_H */
 
