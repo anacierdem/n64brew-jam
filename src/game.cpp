@@ -279,7 +279,6 @@ extern "C" {
 
         // Update and re-spawn enemies if necessary
         int activeCount = 5 + level;
-        debugf("count: %d\n", activeCount);
         for (int i = 0; i < box_count; i ++) {
             if (i >= activeCount) {
                 break;
@@ -304,22 +303,28 @@ extern "C" {
         bladeE.body->SetAngularVelocity(1000.0f * timeStep);
 
         b2Vec2 distanceVector = (pos2 - pos1);
-        float distanceOverflow = distanceVector.Length() - 5.0f;
-        if (distanceOverflow > 0.0f) {
+        float distanceOverflow = distanceVector.Length() - constants::allowedDistance;
+
+        if (distanceOverflow > 0.0f && holdingLeft && holdingRight) {
+            isDead = true;
+        }
+
+        if (distanceOverflow > 0.0f && !(holdingLeft && holdingRight)) {
             leftHand.body->ApplyForceToCenter(distanceVector, true);
             rightHand.body->ApplyForceToCenter(-distanceVector, true);
         }
 
         // Draw everything except enemies below
-
         bladeE.update(rdl, cPos);
 
         // Draw hands
         leftHand.update(rdl, cPos, holdingLeft);
         rightHand.update(rdl, cPos, holdingRight);
 
-        // Draw roppe
-        rope->draw(rdl);
+        // Draw rope
+        float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
+        tension = tension > 0.0f ? 0.0f : tension;
+        rope->draw(rdl, (holdingLeft && holdingRight) ? (tension + 1.0) : 0.0 );
         return 0;
     }
 

@@ -15,7 +15,8 @@ namespace constants {
     constexpr float gameAreaHeight = 6.f;
     constexpr int startIncreasingSpeedAtLevel = 20;
     constexpr float swawnSafeRadius = 1.0f;
-    constexpr float scale = 80.;
+    constexpr float scale = 80.0f;
+    constexpr float allowedDistance = 5.0f;
 }
 
 enum CollisionCategory: uint16

@@ -50,8 +50,10 @@ b2Vec2 Rope::update(b2Vec2 pos1, b2Vec2 pos2) {
     return rope.m_ps[ropeDef.count / 2];
 }
 
-void Rope::draw(RdpDisplayList* rdl) {
-    rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 100)));
+void Rope::draw(RdpDisplayList* rdl, float tension) {
+    int amount = 255 -tension * 255;
+
+    rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, amount, amount, 100)));
     for (int i = 0; i < ropeDef.count - 1; i++)
     {
         b2Vec2 vertex1 = rope.m_ps[i];
