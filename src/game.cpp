@@ -290,10 +290,19 @@ extern "C" {
         }
 
         sprintf(sbuf, "SCORE: %d", score);
-        graphics_draw_text(disp, 40, 20, sbuf);
+        graphics_draw_text(disp, 60, 20, sbuf);
 
-        sprintf(sbuf, "LIVES: %d", lives);
-        graphics_draw_text(disp, 600 - strlen(sbuf)*4, 20, sbuf);
+        // Lives
+        // graphics_draw_text(disp, 580 - 5*8, 20, "LIVES");
+
+        sbuf[0] = '\0';
+
+        for (int i = 0; i < lives; i++) {
+            strcat(sbuf, "< ");
+        }
+
+        graphics_set_color(0xFF0000FF, 0x00000000);
+        graphics_draw_text(disp, 580 - strlen(sbuf)*8, 20, sbuf); // - 6*8
     }
 
     Game* new_Game(RdpDisplayList* rdl)
