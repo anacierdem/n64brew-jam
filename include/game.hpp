@@ -78,10 +78,12 @@ class Game : public b2ContactListener, Box
 
         // Animation
         int64_t startedShowingDamage = std::numeric_limits<int64_t>::min();
+        int64_t lastUpdate = std::numeric_limits<int64_t>::min();
 
     public:
         Game(RdpDisplayList* rdlParam);
-        int update();
+        void updateBG();
+        void update();
         void updateUI(display_context_t disp);
         void reset();
         void addScore(int points);
@@ -99,11 +101,12 @@ typedef struct Game Game;
     #define EXPORT_C
 #endif
 
-
-#include <libdragon.h>
 EXPORT_C Game* new_Game(RdpDisplayList*);
+// TODO: implement cleanup routines
 EXPORT_C void delete_Game(Game*);
-EXPORT_C int update_Game(Game*);
+
+EXPORT_C void update_BG(Game*);
+EXPORT_C void update_Game(Game*);
 EXPORT_C void update_UI(Game*, display_context_t disp);
 
 #endif /* __B2D_H */

@@ -18,10 +18,10 @@ int main(void)
 
     static display_context_t disp = 0;
 
-    RdpDisplayList *rdl = rdl_heap_alloc(300);
+    RdpDisplayList *rdl = rdl_stack_alloc(1000);
 
+    // TODO: move to stack
     Game* testGame = new_Game(rdl);
-    // long long last_update = timer_ticks();
 
     // Set scissor
     rdl_push(rdl,RdpSetClippingI(0, 0, 640, 240));
@@ -45,31 +45,13 @@ int main(void)
 
         rdl_push(rdl,RdpSyncPipe());
 
-        // Clear
-        rdl_push(rdl,RdpSetOtherModes(SOM_CYCLE_FILL));
-
-        rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(0,0,0,255)));
-        rdl_push(rdl,RdpFillRectangleI(0, 0, 640, 240));
-
-        // Set modes
-        rdl_push(rdl, RdpSetOtherModes(
-            SOM_CYCLE_1 |
-            SOM_BLENDING |
-            SOM_READ_ENABLE |
-            SOM_AA_ENABLE |
-            SOM_COLOR_ON_COVERAGE |
-            SOM_COVERAGE_DEST_WRAP |
-            // (P*A + M*B)
-            (cast64(0x0) << 30) | (cast64(0x0) << 28) | (cast64(0x0) << 26) | (cast64(0x0) << 24) |
-            (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) );
-
+        update_BG(testGame);
         update_Game(testGame);
 
         rdl_flush(rdl);
         rdl_exec(rdl);
 
         rdp_detach_display();
-
         update_UI(testGame, disp);
 
         // Present

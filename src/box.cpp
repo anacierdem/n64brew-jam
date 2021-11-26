@@ -22,7 +22,7 @@ void Box::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     b2Vec2 min = b2Vec2(0., 0.);
     b2Vec2 max = b2Vec2(
         constants::gameAreaWidth * constants::scale * constants::to16_16,
-        constants::gameAreaHeight * (constants::scale/2) * constants::to16_16
+        constants::gameAreaHeight * (constants::scale/2.0f) * constants::to16_16
     );
 
     vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);

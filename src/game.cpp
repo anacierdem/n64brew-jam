@@ -4,6 +4,7 @@ b2Vec2 gravity(0.0f, 1.0f);
 b2World world(gravity);
 
 // Start positions
+// TODO: move to constants
 b2Vec2 leftHandInitialPos = {2.0f, 2.0f};
 b2Vec2 rightHandInitialPos = {constants::gameAreaWidth - 2.0f, 2.0f};
 float leftHandInitialAngle = 1.0f;
@@ -20,6 +21,7 @@ Rope gameRope(19, leftHandInitialPos, rightHandInitialPos);
 extern "C" {
     Game::Game(RdpDisplayList* rdlParam) : Box()
     {
+        world.SetContactListener(this);
         if (get_tv_type() == TV_PAL) {
             timeStep = 1.0 / 50.0;
         }
@@ -41,11 +43,10 @@ extern "C" {
         fixtureDef.filter = filter;
         body->CreateFixture(&fixtureDef);
 
-        for (int i = 0; i < box_count; i ++) {
+        for (int i = 0; i < box_count; i++) {
             enemies[i] = new Enemy(&world);
         }
 
-        world.SetContactListener(this);
         reset();
     };
 
@@ -54,12 +55,12 @@ extern "C" {
         leftHand.body->SetAwake(true);
         rightHand.body->SetTransform(rightHandInitialPos, rightHandInitialAngle);
         rightHand.body->SetAwake(true);
-        leftHand.body->SetLinearVelocity(b2Vec2(0., 0.));
-        leftHand.body->SetAngularVelocity(0.);
-        rightHand.body->SetLinearVelocity(b2Vec2(0., 0.));
-        rightHand.body->SetAngularVelocity(0.);
+        leftHand.body->SetLinearVelocity(b2Vec2_zero);
+        leftHand.body->SetAngularVelocity(0.0f);
+        rightHand.body->SetLinearVelocity(b2Vec2_zero);
+        rightHand.body->SetAngularVelocity(0.0f);
 
-        bladeE.body->SetTransform(b2Vec2(0.0, 0.0), 0.0);
+        bladeE.body->SetTransform(b2Vec2_zero, 0.0f);
 
         // Reset game
         isDead = true;
@@ -72,6 +73,7 @@ extern "C" {
         for (int i = 0; i < box_count; i ++) {
             float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaWidth);
             float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaHeight);
+            enemies[i]->body->SetLinearVelocity(b2Vec2_zero);
             if (i < activeCount) {
                 enemies[i]->body->SetTransform(b2Vec2(rx, ry), rx);
                 enemies[i]->body->SetEnabled(true);
@@ -111,6 +113,8 @@ extern "C" {
             if (hand == &leftHand) leftHand.takeDamage(rdl);
             if (hand == &rightHand) rightHand.takeDamage(rdl);
 
+            startedShowingDamage = timer_ticks();
+
             // TODO: implement looseLife?
             lives--;
 
@@ -145,7 +149,36 @@ extern "C" {
         level = score / 50;
     }
 
-    int Game::update() {
+    // Full screen quad proved to be costly
+    void Game::updateBG() {
+        rdl_push(rdl,RdpSetOtherModes(SOM_CYCLE_FILL));
+
+        int64_t animationTime = timer_ticks() - startedShowingDamage;
+
+        // Full screen flash
+        if (animationTime > 0 && animationTime < TICKS_FROM_MS(25)) {
+            rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
+        } else {
+            rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(0,0,0,255)));
+        }
+
+        // Clear
+        rdl_push(rdl,RdpFillRectangleI(0, 0, 640, 240));
+
+        // Set other modes
+        rdl_push(rdl, RdpSetOtherModes(
+            SOM_CYCLE_1 |
+            SOM_BLENDING |
+            SOM_READ_ENABLE |
+            SOM_AA_ENABLE |
+            SOM_COLOR_ON_COVERAGE |
+            SOM_COVERAGE_DEST_WRAP |
+            // (P*A + M*B)
+            (cast64(0x0) << 30) | (cast64(0x0) << 28) | (cast64(0x0) << 26) | (cast64(0x0) << 24) |
+            (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) );
+    }
+
+    void Game::update() {
         // Do pre conditions
         b2Vec2 posL = leftHand.body->GetPosition();
         b2Vec2 posR = rightHand.body->GetPosition();
@@ -155,7 +188,6 @@ extern "C" {
             posL.y < 0.0f || posL.y > constants::gameAreaHeight || posR.y < 0.0f || posR.y > constants::gameAreaHeight
         ) {
             reset();
-            return 0;
         }
 
         if (isDead) {
@@ -229,7 +261,7 @@ extern "C" {
         // Main transformation matrix
         b2Mat33 mainM(
             b2Vec3(constants::scale * constants::to16_16, 0., 0.),
-            b2Vec3(0., (constants::scale/2) * constants::to16_16, 0.),
+            b2Vec3(0., (constants::scale/2.0f) * constants::to16_16, 0.),
             b2Vec3(-cameraPos.x * constants::to16_16, -cameraPos.y * constants::to16_16, 1.)
         );
 
@@ -239,7 +271,7 @@ extern "C" {
 
         // Update and re-spawn enemies if necessary
         int activeCount = 5 + level;
-        for (int i = 0; i < box_count; i ++) {
+        for (int i = 0; i < box_count; i++) {
             if (i >= activeCount) {
                 break;
             }
@@ -266,7 +298,7 @@ extern "C" {
         b2Vec2 pos2 = rightHand.body->GetPosition();
 
         bladeE.body->SetTransform(gameRope.update(pos1, pos2), bladeE.body->GetAngle());
-        bladeE.body->SetAngularVelocity(1000.0f * timeStep);
+        bladeE.body->SetAngularVelocity(1500.0f * timeStep);
 
         b2Vec2 distanceVector = (pos2 - pos1);
         float distanceOverflow = distanceVector.Length() - constants::allowedDistance;
@@ -291,7 +323,6 @@ extern "C" {
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
         tension = tension > 0.0f ? 0.0f : tension;
         gameRope.draw(rdl, mainM, (holdingLeft && holdingRight) ? (tension + 1.0) : 0.0 );
-        return 0;
     }
 
     void Game::updateUI(display_context_t disp) {
@@ -323,9 +354,6 @@ extern "C" {
             graphics_draw_text(disp, 320 - strlen(sbuf)*4, 144, sbuf);
         }
 
-        graphics_set_color(0xFFFFFFFF, 0x00000000);
-        sprintf(sbuf, "SCORE: %d LEVEL: %d", score, level);
-        graphics_draw_text(disp, 60, 20, sbuf);
 
         sbuf[0] = '\0';
 
@@ -346,6 +374,19 @@ extern "C" {
                 , sbuf);
             }
         }
+
+        graphics_set_color(0xFFFFFFFF, 0x00000000);
+        sprintf(sbuf, "SCORE: %d LEVEL: %d T: %0.1f", score, level,  TIMER_MICROS_LL(timer_ticks() - lastUpdate) / 1000.0f);
+        graphics_draw_text(disp, 60, 20, sbuf);
+
+
+        // Frame limiter
+        // while(TIMER_MICROS_LL(timer_ticks() - lastUpdate) < (timeStep * 1000.0f * 990.0f));
+
+        // graphics_set_color(0xFFFFFFFF, 0x00000000);
+        // sprintf(sbuf, "F: %0.1f", TIMER_MICROS_LL(timer_ticks() - lastUpdate) / 1000.0f);
+        // graphics_draw_text(disp, 60, 32, sbuf);
+        lastUpdate = timer_ticks();
     }
 
     Game* new_Game(RdpDisplayList* rdl)
@@ -358,7 +399,12 @@ extern "C" {
         delete self;
     }
 
-    int update_Game(Game* self)
+    void update_BG(Game* self)
+    {
+        return self->updateBG();
+    }
+
+    void update_Game(Game* self)
     {
         return self->update();
     }
