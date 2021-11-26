@@ -1,9 +1,12 @@
 #ifndef __ENEMY_H
 #define __ENEMY_H
 
+#include <stdlib.h>
+
 #include "box2d/box2d.h"
 
 #include "box.hpp"
+#include "game.hpp"
 
 extern "C" {
     #include <libdragon.h>

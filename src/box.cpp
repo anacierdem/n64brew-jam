@@ -9,8 +9,6 @@ extern "C" {
 #include "game.hpp"
 #include "box.hpp"
 
-Box::Box(b2World* world) {}
-
 // TODO: override the draw class instead
 void Box::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     b2Vec2 vertex1 = body->GetWorldPoint(polygonShape.m_vertices[0]);

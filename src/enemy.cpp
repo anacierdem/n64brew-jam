@@ -1,15 +1,6 @@
-
-extern "C" {
-    #include <libdragon.h>
-    #include "geometry.h"
-}
-
-#include "box2d/box2d.h"
-
-#include "game.hpp"
 #include "enemy.hpp"
 
-Enemy::Enemy(b2World* world) : Box(world){
+Enemy::Enemy(b2World* world) : Box(){
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
     body = world->CreateBody(&bodyDef);

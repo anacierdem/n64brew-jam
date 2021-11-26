@@ -16,7 +16,7 @@ class Box
 
     public:
         b2Body* body;
-        Box(b2World* world);
+        Box() {};
         void update(RdpDisplayList* rdl, b2Mat33& matrix);
 };
 

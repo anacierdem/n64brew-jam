@@ -1,13 +1,4 @@
-#include <algorithm>
-
 #include "game.hpp"
-
-#include "box2d/box2d.h"
-
-#include "box.hpp"
-#include "hand.hpp"
-#include "rope.hpp"
-#include "blade.hpp"
 
 b2Vec2 gravity(0.0f, 1.0f);
 b2World world(gravity);
@@ -27,10 +18,7 @@ Blade bladeE(&world);
 Rope gameRope(19, leftHandInitialPos, rightHandInitialPos);
 
 extern "C" {
-    #include <libdragon.h>
-    #include "geometry.h"
-
-    Game::Game(RdpDisplayList* rdlParam) : Box(&world)
+    Game::Game(RdpDisplayList* rdlParam) : Box()
     {
         if (get_tv_type() == TV_PAL) {
             timeStep = 1.0 / 50.0;

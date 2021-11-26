@@ -9,7 +9,7 @@ extern "C" {
 #include "game.hpp"
 #include "hand.hpp"
 
-Hand::Hand(b2World* world) : Box(world) {
+Hand::Hand(b2World* world) : Box() {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
     body = world->CreateBody(&bodyDef);

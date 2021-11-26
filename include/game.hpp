@@ -4,13 +4,24 @@
 #ifdef __cplusplus
 
 #include <limits>
+#include <algorithm>
+#include <stdlib.h>
 
 #include "box2d/box2d.h"
 #include "rdl.h"
 
+#include "hand.hpp"
 #include "rope.hpp"
+#include "blade.hpp"
 #include "enemy.hpp"
 #include "box.hpp"
+
+extern "C" {
+    #include <libdragon.h>
+    #include "geometry.h"
+}
+
+class Enemy;
 
 namespace constants {
     constexpr float to16_16 = 65536.f;
@@ -44,8 +55,9 @@ class Game : public b2ContactListener, Box
 
         b2Vec3 cameraPos = {0., 0., 1.};
 
-        // TODO: move to stack
-        static const int box_count = 10;
+        // TODO: move to stack - how to keep the original pointer
+        // created when the array is static?
+        static const int box_count = 20;
         Enemy* enemies[box_count];
 
         bool shouldReset = false;
