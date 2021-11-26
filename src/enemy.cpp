@@ -5,7 +5,23 @@ Enemy::Enemy(b2World* world) : Box(){
     bodyDef.type = b2_dynamicBody;
     body = world->CreateBody(&bodyDef);
 
-    polygonShape.SetAsBox(0.2f, 0.2f);
+    // float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.3f);
+
+    float size = 0.2f; //  * (0.8f + rx)
+
+    float r1 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.03f);
+    float r2 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.03f);
+    float r3 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.03f);
+    float r4 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.03f);
+
+    b2Vec2 vertices[4] = {
+        { 1.0f * size + r1, 1.0f * size + r1},
+        {-1.0f * size + r2, 1.0f * size  + r2},
+        {-1.0f * size  + r3, -1.0f * size + r3},
+        {1.0f * size + r4, -1.0f * size + r4}
+    };
+    polygonShape.Set(vertices, 4);
+    // polygonShape.SetAsBox(0.2f * (0.8f + rx), 0.2f * (0.8f + rx));
 
     fixtureDef.shape = &polygonShape;
     fixtureDef.density = 1.0f;
@@ -53,7 +69,7 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
         body->SetEnabled(true);
         float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / constants::gameAreaWidth);
         float rx2 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius), rx);
+        body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius -rx2), rx);
         float multiplier = static_cast<float>(shouldResetWith - 1) * 0.2f;
         b2Vec2 newVelocity(
             multiplier * (rx2 - 0.5f),
