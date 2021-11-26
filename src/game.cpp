@@ -71,16 +71,9 @@ extern "C" {
 
         int activeCount = 5 + level;
         for (int i = 0; i < box_count; i ++) {
-            float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaWidth);
-            float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / constants::gameAreaHeight);
-            enemies[i]->body->SetLinearVelocity(b2Vec2_zero);
-            if (i < activeCount) {
-                enemies[i]->body->SetTransform(b2Vec2(rx, ry), rx);
-                enemies[i]->body->SetEnabled(true);
-            } else {
-                enemies[i]->body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius), rx);
-                enemies[i]->body->SetEnabled(false);
-            }
+            // Disable if not active
+            enemies[i]->body->SetEnabled(i < activeCount);
+            enemies[i]->die(level, 0);
         }
 
         gameRope.reset();
@@ -276,7 +269,6 @@ extern "C" {
                 break;
             }
 
-            enemies[i]->body->SetEnabled(true);
             enemies[i]->update(rdl, mainM);
 
             if (enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius ||

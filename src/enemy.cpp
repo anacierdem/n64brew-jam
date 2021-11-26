@@ -50,18 +50,20 @@ void Enemy::die(int level, int s) {
 
 void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     if (shouldResetWith) {
+        body->SetEnabled(true);
         float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / constants::gameAreaWidth);
+        float rx2 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius), rx);
-        float multiplier = static_cast<float>(shouldResetWith - 1);
+        float multiplier = static_cast<float>(shouldResetWith - 1) * 0.2f;
         b2Vec2 newVelocity(
-            multiplier * ((constants::gameAreaWidth / 2.0f) - rx) / constants::gameAreaWidth,
+            multiplier * (rx2 - 0.5f),
             multiplier
         );
         // Cap speeds
         newVelocity.x = newVelocity.x > 10.0f ? 10.0f : newVelocity.x;
         newVelocity.y = newVelocity.y > 20.0f ? 20.0f : newVelocity.y;
         body->SetLinearVelocity(newVelocity);
-        body->SetAngularVelocity(0.f);
+        body->SetAngularVelocity((rx2 - 0.5f) * (3.0f * (1.0f + multiplier)));
         shouldResetWith = 0;
     }
 
