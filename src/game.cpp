@@ -12,15 +12,19 @@
 b2Vec2 gravity(0.0f, 1.0f);
 b2World world(gravity);
 
-// Start position
-b2Transform leftHandInitialTransform;
-b2Transform rightHandInitialTransform;
+// Start positions
+b2Vec2 leftHandInitialPos = {2.0f, 2.0f};
+b2Vec2 rightHandInitialPos = {constants::gameAreaWidth - 2.0f, 2.0f};
+float leftHandInitialAngle = 1.0f;
+float rightHandInitialAngle = -1.2f;
 
 Hand leftHand(&world);
 Hand rightHand(&world);
 
 // Why can't use blade as a name?
 Blade bladeE(&world);
+
+Rope gameRope(19, leftHandInitialPos, rightHandInitialPos);
 
 extern "C" {
     #include <libdragon.h>
@@ -33,10 +37,6 @@ extern "C" {
         }
 
         rdl = rdlParam;
-
-        // Start position
-        leftHandInitialTransform.Set(b2Vec2(2.0f, 2.0f), 1.0f);
-        rightHandInitialTransform.Set(b2Vec2(constants::gameAreaWidth - 2.0f, 2.0f), -1.2f);
 
         b2BodyDef bodyDef;
         bodyDef.type = b2_staticBody;
@@ -53,8 +53,6 @@ extern "C" {
         fixtureDef.filter = filter;
         body->CreateFixture(&fixtureDef);
 
-        rope = new Rope(19, leftHandInitialTransform.p, rightHandInitialTransform.p);
-
         for (int i = 0; i < box_count; i ++) {
             enemies[i] = new Enemy(&world);
         }
@@ -64,9 +62,9 @@ extern "C" {
     };
 
     void Game::reset() {
-        leftHand.body->SetTransform(leftHandInitialTransform.p, leftHandInitialTransform.q.GetAngle());
+        leftHand.body->SetTransform(leftHandInitialPos, leftHandInitialAngle);
         leftHand.body->SetAwake(true);
-        rightHand.body->SetTransform(rightHandInitialTransform.p, rightHandInitialTransform.q.GetAngle());
+        rightHand.body->SetTransform(rightHandInitialPos, rightHandInitialAngle);
         rightHand.body->SetAwake(true);
         leftHand.body->SetLinearVelocity(b2Vec2(0., 0.));
         leftHand.body->SetAngularVelocity(0.);
@@ -95,7 +93,7 @@ extern "C" {
             }
         }
 
-        rope->reset();
+        gameRope.reset();
     }
 
     void Game::BeginContact(b2Contact* contact)
@@ -175,8 +173,8 @@ extern "C" {
         if (isDead) {
             leftHand.body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
             rightHand.body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-            leftHand.body->SetTransform(leftHandInitialTransform.p, leftHandInitialTransform.q.GetAngle());
-            rightHand.body->SetTransform(rightHandInitialTransform.p, rightHandInitialTransform.q.GetAngle());
+            leftHand.body->SetTransform(leftHandInitialPos, leftHandInitialAngle);
+            rightHand.body->SetTransform(rightHandInitialPos, rightHandInitialAngle);
         }
 
         // Step simulation!
@@ -279,7 +277,7 @@ extern "C" {
         b2Vec2 pos1 = leftHand.body->GetPosition();
         b2Vec2 pos2 = rightHand.body->GetPosition();
 
-        bladeE.body->SetTransform(rope->update(pos1, pos2), bladeE.body->GetAngle());
+        bladeE.body->SetTransform(gameRope.update(pos1, pos2), bladeE.body->GetAngle());
         bladeE.body->SetAngularVelocity(1000.0f * timeStep);
 
         b2Vec2 distanceVector = (pos2 - pos1);
@@ -304,7 +302,7 @@ extern "C" {
         // Draw rope
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
         tension = tension > 0.0f ? 0.0f : tension;
-        rope->draw(rdl, mainM, (holdingLeft && holdingRight) ? (tension + 1.0) : 0.0 );
+        gameRope.draw(rdl, mainM, (holdingLeft && holdingRight) ? (tension + 1.0) : 0.0 );
         return 0;
     }
 

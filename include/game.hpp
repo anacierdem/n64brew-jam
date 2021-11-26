@@ -45,7 +45,6 @@ class Game : public b2ContactListener, Box
         b2Vec3 cameraPos = {0., 0., 1.};
 
         // TODO: move to stack
-        Rope* rope;
         static const int box_count = 10;
         Enemy* enemies[box_count];
 

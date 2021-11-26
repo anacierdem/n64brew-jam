@@ -21,6 +21,8 @@ class Rope
         int32 positionIterations = 2;
         float timeStep = 1.0f / 60.0f;
 
+        // static const int count = 19;
+
     public:
         Rope(int count, b2Vec2 pos1, b2Vec2 pos2);
         b2Vec2 update(b2Vec2 pos1, b2Vec2 pos2);
