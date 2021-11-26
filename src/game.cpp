@@ -119,6 +119,10 @@ extern "C" {
                 filterB.categoryBits == CollisionCategory::hand
             )
         ) {
+            Hand* hand = reinterpret_cast<Hand*> (fixtureA->GetUserData().pointer);
+            if (hand == nullptr) hand = reinterpret_cast<Hand*> (fixtureB->GetUserData().pointer);
+            if (hand == &leftHand) leftHand.takeDamage(rdl);
+            if (hand == &rightHand) rightHand.takeDamage(rdl);
 
             // TODO: implement looseLife?
             lives--;

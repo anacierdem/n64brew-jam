@@ -31,6 +31,8 @@ enum CollisionCategory: uint16
 class Game : public b2ContactListener, Box
 {
     private:
+        void BeginContact(b2Contact* contact);
+
         RdpDisplayList* rdl;
 
         // Simulation params
@@ -67,8 +69,6 @@ class Game : public b2ContactListener, Box
         void updateUI(display_context_t disp);
         void reset();
         void addScore(int points);
-
-        void BeginContact(b2Contact* contact);
 };
 
 #else

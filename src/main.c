@@ -45,7 +45,6 @@ int main(void)
 
         rdl_push(rdl,RdpSyncPipe());
 
-
         // Clear
         rdl_push(rdl,RdpSetOtherModes(SOM_CYCLE_FILL));
 
@@ -63,10 +62,6 @@ int main(void)
             // (P*A + M*B)
             (cast64(0x0) << 30) | (cast64(0x0) << 28) | (cast64(0x0) << 26) | (cast64(0x0) << 24) |
             (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) );
-
-
-        // float delta = (float)TIMER_MICROS(timer_ticks() - last_update) / 1000.f;
-        // last_update = timer_ticks();
 
         update_Game(testGame);
 

@@ -1,6 +1,8 @@
 #ifndef __HAND_H
 #define __HAND_H
 
+#include <limits>
+
 #include "box2d/box2d.h"
 
 #include "box.hpp"
@@ -12,9 +14,12 @@ extern "C" {
 
 class Hand : public Box
 {
+    private:
+        int64_t startedShowingDamage = std::numeric_limits<int64_t>::min();
     public:
         Hand(b2World* world);
         void update(RdpDisplayList* rdl, b2Mat33& matrix, bool held);
+        void takeDamage(RdpDisplayList* rdl);
 };
 
 
