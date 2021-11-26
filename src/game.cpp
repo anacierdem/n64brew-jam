@@ -7,8 +7,8 @@ b2World world(gravity);
 // TODO: move to constants
 b2Vec2 leftHandInitialPos = {2.0f, 2.0f};
 b2Vec2 rightHandInitialPos = {constants::gameAreaWidth - 2.0f, 2.0f};
-float leftHandInitialAngle = 1.0f;
-float rightHandInitialAngle = -1.2f;
+float leftHandInitialAngle = 0.;
+float rightHandInitialAngle = 0.;
 
 Hand leftHand(&world);
 Hand rightHand(&world);
@@ -175,9 +175,19 @@ extern "C" {
         // Do pre conditions
         b2Vec2 posL = leftHand.body->GetPosition();
         b2Vec2 posR = rightHand.body->GetPosition();
+
+        b2Vec2 limits = b2Vec2(
+            constants::gameAreaWidth,
+            constants::gameAreaHeight
+        );
+        posL = b2Clamp(posL, b2Vec2_zero,limits);
+        leftHand.body->SetTransform(posL, leftHand.body->GetAngle());
+
+        posR = b2Clamp(posR, b2Vec2_zero, limits);
+        rightHand.body->SetTransform(posR, rightHand.body->GetAngle());
+
         if (
             shouldReset ||
-            posL.x < 0.0f || posL.x > constants::gameAreaWidth || posR.x < 0.0f || posR.x > constants::gameAreaWidth ||
             posL.y < 0.0f || posL.y > constants::gameAreaHeight || posR.y < 0.0f || posR.y > constants::gameAreaHeight
         ) {
             reset();
