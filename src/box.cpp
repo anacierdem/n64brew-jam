@@ -9,15 +9,13 @@ extern "C" {
 #include "game.hpp"
 #include "box.hpp"
 
-Box::Box(b2World* world) {
-    bodyDef.type = b2_dynamicBody;
-}
+Box::Box(b2World* world) {}
 
 // TODO: override the draw class instead
 void Box::update(RdpDisplayList* rdl, b2Mat33& matrix) {
-    b2Vec2 vertex1 = body->GetWorldPoint(dynamicBox.m_vertices[0]);
-    b2Vec2 vertex2 = body->GetWorldPoint(dynamicBox.m_vertices[1]);
-    b2Vec2 vertex3 = body->GetWorldPoint(dynamicBox.m_vertices[3]);
+    b2Vec2 vertex1 = body->GetWorldPoint(polygonShape.m_vertices[0]);
+    b2Vec2 vertex2 = body->GetWorldPoint(polygonShape.m_vertices[1]);
+    b2Vec2 vertex3 = body->GetWorldPoint(polygonShape.m_vertices[3]);
 
     b2Vec3 v1 = b2Mul(matrix, b2Vec3(vertex1.x, vertex1.y, 1.));
     b2Vec3 v2 = b2Mul(matrix, b2Vec3(vertex2.x, vertex2.y, 1.));
@@ -41,7 +39,7 @@ void Box::update(RdpDisplayList* rdl, b2Mat33& matrix) {
         vertex3.x, vertex3.y
     );
 
-    vertex1 = body->GetWorldPoint(dynamicBox.m_vertices[2]);
+    vertex1 = body->GetWorldPoint(polygonShape.m_vertices[2]);
 
     v1 = b2Mul(matrix, b2Vec3(vertex1.x, vertex1.y, 1.));
     vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);

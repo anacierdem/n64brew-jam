@@ -38,12 +38,13 @@ extern "C" {
         leftHandInitialTransform.Set(b2Vec2(2.0f, 2.0f), 1.0f);
         rightHandInitialTransform.Set(b2Vec2(constants::gameAreaWidth - 2.0f, 2.0f), -1.2f);
 
+        b2BodyDef bodyDef;
         bodyDef.type = b2_staticBody;
         bodyDef.position.Set(0.0f, constants::gameAreaHeight);
         body = world.CreateBody(&bodyDef);
-        dynamicBox.SetAsBox(50.0f, 0.1f);
+        polygonShape.SetAsBox(50.0f, 0.1f);
 
-        fixtureDef.shape = &dynamicBox;
+        fixtureDef.shape = &polygonShape;
         fixtureDef.density = 0.0f;
 
         b2Filter filter;

@@ -3,6 +3,8 @@
 
 #ifdef __cplusplus
 
+#include <limits>
+
 #include "box2d/box2d.h"
 #include "rdl.h"
 
@@ -42,16 +44,17 @@ class Game : public b2ContactListener, Box
 
         b2Vec3 cameraPos = {0., 0., 1.};
 
+        // TODO: move to stack
         Rope* rope;
-
         static const int box_count = 10;
         Enemy* enemies[box_count];
 
         bool shouldReset = false;
+
+        // Controller data
         int controllers = 0;
         struct controller_data keys;
         struct controller_data keysDown;
-
         bool holdingLeft = false;
         bool holdingRight = false;
 
@@ -60,8 +63,10 @@ class Game : public b2ContactListener, Box
         int score = 0;
         int lives = 3;
         bool isDead = true;
-
         int level = 0;
+
+        // Animation
+        int64_t startedShowingDamage = std::numeric_limits<int64_t>::min();
 
     public:
         Game(RdpDisplayList* rdlParam);

@@ -10,11 +10,13 @@ extern "C" {
 #include "blade.hpp"
 
 Blade::Blade(b2World* world) : Box(world) {
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
     body = world->CreateBody(&bodyDef);
 
-    dynamicBox.SetAsBox(0.4f, 0.4f);
+    polygonShape.SetAsBox(0.4f, 0.4f);
 
-    fixtureDef.shape = &dynamicBox;
+    fixtureDef.shape = &polygonShape;
     fixtureDef.density = 1.0f;
     fixtureDef.friction = 0.3f;
     fixtureDef.restitution = 0.5f;
