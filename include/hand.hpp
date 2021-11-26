@@ -14,7 +14,7 @@ class Hand : public Box
 {
     public:
         Hand(b2World* world);
-        void update(RdpDisplayList* rdl, b2Vec2 cameraPos, bool held);
+        void update(RdpDisplayList* rdl, b2Mat33& matrix, bool held);
 };
 
 

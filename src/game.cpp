@@ -26,7 +26,7 @@ extern "C" {
     #include <libdragon.h>
     #include "geometry.h"
 
-    Game::Game(RdpDisplayList* rdlParam)
+    Game::Game(RdpDisplayList* rdlParam) : Box(&world)
     {
         if (get_tv_type() == TV_PAL) {
             timeStep = 1.0 / 50.0;
@@ -38,18 +38,19 @@ extern "C" {
         leftHandInitialTransform.Set(b2Vec2(2.0f, 2.0f), 1.0f);
         rightHandInitialTransform.Set(b2Vec2(constants::gameAreaWidth - 2.0f, 2.0f), -1.2f);
 
-        groundBodyDef.position.Set(0.0f, constants::gameAreaHeight);
-        groundBody = world.CreateBody(&groundBodyDef);
-        groundBox.SetAsBox(50.0f, 0.1f);
+        bodyDef.type = b2_staticBody;
+        bodyDef.position.Set(0.0f, constants::gameAreaHeight);
+        body = world.CreateBody(&bodyDef);
+        dynamicBox.SetAsBox(50.0f, 0.1f);
 
-        groundFixtureDef.shape = &groundBox;
-        groundFixtureDef.density = 0.0f;
+        fixtureDef.shape = &dynamicBox;
+        fixtureDef.density = 0.0f;
 
         b2Filter filter;
         filter.categoryBits = CollisionCategory::environment;
 
-        groundFixtureDef.filter = filter;
-        groundBody->CreateFixture(&groundFixtureDef);
+        fixtureDef.filter = filter;
+        body->CreateFixture(&fixtureDef);
 
         rope = new Rope(19, leftHandInitialTransform.p, rightHandInitialTransform.p);
 
@@ -234,9 +235,7 @@ extern "C" {
             }
         }
 
-        // Drawing parameters
-        b2Vec2 cPos(cameraPos.x / constants::scale, cameraPos.y / (constants::scale/2.));
-
+        // Main transformation matrix
         b2Mat33 mainM(
             b2Vec3(constants::scale * constants::to16_16, 0., 0.),
             b2Vec3(0., (constants::scale/2) * constants::to16_16, 0.),
@@ -244,38 +243,8 @@ extern "C" {
         );
 
         // Draw ground
-        // TODO: use the Box class for this as well
-        b2Vec2 vertex1 = groundBody->GetWorldPoint(groundBox.m_vertices[0]);
-        b2Vec2 vertex2 = groundBody->GetWorldPoint(groundBox.m_vertices[1]);
-        b2Vec2 vertex3 = groundBody->GetWorldPoint(groundBox.m_vertices[3]);
-
-        b2Vec3 v1 = b2Mul(mainM, b2Vec3(vertex1.x, vertex1.y, 1.));
-        b2Vec3 v2 = b2Mul(mainM, b2Vec3(vertex2.x, vertex2.y, 1.));
-        b2Vec3 v3 = b2Mul(mainM, b2Vec3(vertex3.x, vertex3.y, 1.));
-
-        b2Vec2 min = b2Vec2(0., 0.);
-        b2Vec2 max = b2Vec2(
-            constants::gameAreaWidth * constants::scale * constants::to16_16,
-            constants::gameAreaHeight * (constants::scale/2) * constants::to16_16
-        );
-
-        vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);
-        vertex2 = b2Clamp(b2Vec2(v2.x, v2.y), min, max);
-        vertex3 = b2Clamp(b2Vec2(v3.x, v3.y), min, max);
-
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(120, 100, 100, 255)));
-        render_tri_strip(rdl,
-            vertex1.x, vertex1.y,
-            vertex2.x, vertex2.y,
-            vertex3.x, vertex3.y
-        );
-
-        vertex1 = groundBody->GetWorldPoint(groundBox.m_vertices[2]);
-
-        v1 = b2Mul(mainM, b2Vec3(vertex1.x, vertex1.y, 1.));
-        vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);
-
-        render_tri_strip_next(rdl, vertex1.x, vertex1.y);
+        Box::update(rdl, mainM);
 
         // Update and re-spawn enemies if necessary
         int activeCount = 5 + level;
@@ -285,7 +254,7 @@ extern "C" {
             }
 
             enemies[i]->body->SetEnabled(true);
-            enemies[i]->update(rdl, cPos);
+            enemies[i]->update(rdl, mainM);
 
             if (enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius ||
                 enemies[i]->body->GetPosition().x > constants::gameAreaWidth + constants::swawnSafeRadius) {
@@ -321,16 +290,16 @@ extern "C" {
         }
 
         // Draw everything except enemies below
-        bladeE.update(rdl, cPos);
+        bladeE.update(rdl, mainM);
 
         // Draw hands
-        leftHand.update(rdl, cPos, holdingLeft);
-        rightHand.update(rdl, cPos, holdingRight);
+        leftHand.update(rdl, mainM, holdingLeft);
+        rightHand.update(rdl, mainM, holdingRight);
 
         // Draw rope
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
         tension = tension > 0.0f ? 0.0f : tension;
-        rope->draw(rdl, (holdingLeft && holdingRight) ? (tension + 1.0) : 0.0 );
+        rope->draw(rdl, mainM, (holdingLeft && holdingRight) ? (tension + 1.0) : 0.0 );
         return 0;
     }
 
@@ -359,7 +328,7 @@ extern "C" {
             }
 
             graphics_set_color(0xFFFFFFFF, 0x00000000);
-            sprintf(sbuf, "HIGHSCORE: %d", highScore);
+            sprintf(sbuf, "HISCORE: %d", highScore);
             graphics_draw_text(disp, 320 - strlen(sbuf)*4, 144, sbuf);
         }
 

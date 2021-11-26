@@ -8,6 +8,7 @@
 
 #include "rope.hpp"
 #include "enemy.hpp"
+#include "box.hpp"
 
 namespace constants {
     constexpr float to16_16 = 65536.f;
@@ -27,21 +28,15 @@ enum CollisionCategory: uint16
     blade = 0x0008,
 };
 
-class Game : public b2ContactListener
+class Game : public b2ContactListener, Box
 {
     private:
-        b2BodyDef groundBodyDef;
-        b2Body* groundBody;
-        b2PolygonShape groundBox;
-        b2BodyDef bodyDef;
-        b2Body* body;
-        b2PolygonShape dynamicBox;
-        b2FixtureDef groundFixtureDef;
+        RdpDisplayList* rdl;
+
+        // Simulation params
         int32 velocityIterations = 6;
         int32 positionIterations = 2;
         float timeStep = 1.0f / 60.0f;
-
-        RdpDisplayList* rdl;
 
         b2Vec3 cameraPos = {0., 0., 1.};
 

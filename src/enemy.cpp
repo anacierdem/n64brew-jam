@@ -10,6 +10,8 @@ extern "C" {
 #include "enemy.hpp"
 
 Enemy::Enemy(b2World* world) : Box(world){
+    body = world->CreateBody(&bodyDef);
+
     dynamicBox.SetAsBox(0.2f, 0.2f);
 
     fixtureDef.shape = &dynamicBox;
@@ -53,7 +55,7 @@ void Enemy::die(int level, int s) {
         (level - constants::startIncreasingSpeedAtLevel + 2);
 }
 
-void Enemy::update(RdpDisplayList* rdl, b2Vec2 cameraPos) {
+void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     if (shouldResetWith) {
         float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / constants::gameAreaWidth);
         body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius), rx);
@@ -74,5 +76,5 @@ void Enemy::update(RdpDisplayList* rdl, b2Vec2 cameraPos) {
         showingScore = false;
     }
 
-    Box::update(rdl, cameraPos);
+    Box::update(rdl, matrix);
 }

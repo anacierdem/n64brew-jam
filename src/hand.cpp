@@ -10,6 +10,8 @@ extern "C" {
 #include "hand.hpp"
 
 Hand::Hand(b2World* world) : Box(world) {
+    body = world->CreateBody(&bodyDef);
+
     dynamicBox.SetAsBox(0.2f, 0.2f);
 
     fixtureDef.shape = &dynamicBox;
@@ -25,7 +27,7 @@ Hand::Hand(b2World* world) : Box(world) {
     body->CreateFixture(&fixtureDef);
 }
 
-void Hand::update(RdpDisplayList* rdl, b2Vec2 cameraPos, bool held) {
+void Hand::update(RdpDisplayList* rdl, b2Mat33& matrix, bool held) {
     b2Fixture* fixture = body->GetFixtureList();
     if (held) {
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
@@ -36,5 +38,5 @@ void Hand::update(RdpDisplayList* rdl, b2Vec2 cameraPos, bool held) {
         fixtureDef.filter.maskBits = CollisionCategory::environment;
         fixture->SetFilterData(fixtureDef.filter);
     }
-    Box::update(rdl, cameraPos);
+    Box::update(rdl, matrix);
 }

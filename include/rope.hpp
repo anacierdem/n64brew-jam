@@ -24,7 +24,7 @@ class Rope
     public:
         Rope(int count, b2Vec2 pos1, b2Vec2 pos2);
         b2Vec2 update(b2Vec2 pos1, b2Vec2 pos2);
-        void draw(RdpDisplayList* rdl, float tension);
+        void draw(RdpDisplayList* rdl, b2Mat33& matrix, float tension);
         void reset();
 };
 

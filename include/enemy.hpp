@@ -18,7 +18,7 @@ class Enemy : public Box
     public:
         Enemy(b2World* world);
         void die(int multiplier, int score);
-        void update(RdpDisplayList* rdl, b2Vec2 cameraPos);
+        void update(RdpDisplayList* rdl, b2Mat33& matrix);
 
         b2Vec2 scorePosition;
         bool showingScore = false;

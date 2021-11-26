@@ -10,6 +10,8 @@ extern "C" {
 #include "blade.hpp"
 
 Blade::Blade(b2World* world) : Box(world) {
+    body = world->CreateBody(&bodyDef);
+
     dynamicBox.SetAsBox(0.4f, 0.4f);
 
     fixtureDef.shape = &dynamicBox;
@@ -25,7 +27,7 @@ Blade::Blade(b2World* world) : Box(world) {
     body->CreateFixture(&fixtureDef);
 }
 
-void Blade::update(RdpDisplayList* rdl, b2Vec2 cameraPos) {
+void Blade::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(80, 80, 80, 255)));
-    Box::update(rdl, cameraPos);
+    Box::update(rdl, matrix);
 }
