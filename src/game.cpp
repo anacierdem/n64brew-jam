@@ -322,9 +322,9 @@ extern "C" {
             }
 
             if((controllers & CONTROLLER_1_INSERTED && controllers & CONTROLLER_2_INSERTED)) {
-                graphics_draw_text(disp, 320 -28*4, 120, "Press both triggers to START");
+                graphics_draw_text(disp, 320 -28*4, 120, "Hold both triggers to START");
             } else {
-                graphics_draw_text(disp, 320 -20*4, 120, "Press L & R to START");
+                graphics_draw_text(disp, 320 -20*4, 120, "Hold L & R to START");
             }
 
             graphics_set_color(0xFFFFFFFF, 0x00000000);
