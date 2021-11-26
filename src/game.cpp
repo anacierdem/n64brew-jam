@@ -281,7 +281,7 @@ extern "C" {
         float distanceOverflow = distanceVector.Length() - constants::allowedDistance;
 
         if (distanceOverflow > 0.0f && holdingLeft && holdingRight) {
-            isDead = true;
+            reset();
         }
 
         if (distanceOverflow > 0.0f && !(holdingLeft && holdingRight)) {
