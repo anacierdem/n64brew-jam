@@ -29,18 +29,18 @@ void Enemy::die(int level, int s) {
     score = s;
     showingScore = s > 0;
 
-    if(!showingScore) return;
+    if (showingScore) {
+        scorePosition = body->GetPosition();
+        scorePosition = b2Vec2(
+            constants::scale * scorePosition.x,
+            scorePosition.y >
+                (constants::gameAreaHeight - constants::swawnSafeRadius) ?
+                ((constants::scale/2.0f) * constants::gameAreaHeight - 12) :
+                (constants::scale/2.0f) * scorePosition.y
+        );
 
-    scorePosition = body->GetPosition();
-    scorePosition = b2Vec2(
-        constants::scale * scorePosition.x,
-        scorePosition.y >
-            (constants::gameAreaHeight - constants::swawnSafeRadius) ?
-            ((constants::scale/2.0f) * constants::gameAreaHeight - 12) :
-            (constants::scale/2.0f) * scorePosition.y
-    );
-
-    startedShowingScore = timer_ticks();
+        startedShowingScore = timer_ticks();
+    }
 
     // Not possible to SetTransform in a contact callback, defer to next update
     shouldResetWith = level < constants::startIncreasingSpeedAtLevel ?
