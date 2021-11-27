@@ -7,8 +7,8 @@ b2World world(gravity);
 // TODO: move to constants
 b2Vec2 leftHandInitialPos = {2.0f, 2.0f};
 b2Vec2 rightHandInitialPos = {constants::gameAreaWidth - 2.0f, 2.0f};
-float leftHandInitialAngle = 0.;
-float rightHandInitialAngle = 0.;
+float leftHandInitialAngle = 0.1;
+float rightHandInitialAngle = -0.1;
 
 Hand leftHand(&world);
 Hand rightHand(&world);
@@ -63,20 +63,28 @@ extern "C" {
         bladeE.body->SetTransform(b2Vec2_zero, 0.0f);
 
         // Reset game
-        isDead = true;
         score = 0;
         lives = 3;
-        shouldReset = false;
         level = 0;
+        isReset = true;
+        isDead = true;
 
         int activeCount = 5 + level;
         for (int i = 0; i < box_count; i ++) {
             // Disable if not active
             enemies[i]->body->SetEnabled(i < activeCount);
-            enemies[i]->die(level, 0);
+            enemies[i]->die(level, 0, false);
         }
 
         gameRope.reset();
+    }
+
+    void Game::gameOver() {
+        if(!isDead) {
+            // leftHand.body->SetLinearVelocity(b2Vec2_zero);
+            // rightHand.body->SetLinearVelocity(b2Vec2_zero);
+            isDead = true;
+        }
     }
 
     void Game::BeginContact(b2Contact* contact)
@@ -133,8 +141,7 @@ extern "C" {
 
             if (lives <= 0) {
                 lives = 0;
-                // Not possible to SetTransform in a contact callback, defer to next update
-                shouldReset = true;
+                gameOver();
             }
         }
 
@@ -151,7 +158,7 @@ extern "C" {
 
         if (enemy != nullptr) {
             addScore(10);
-            enemy->die(level, 10);
+            enemy->die(level, 10, isDead && !isReset);
         }
     }
 
@@ -218,13 +225,13 @@ extern "C" {
         rightHand.body->SetAngularVelocity(rightHand.body->GetAngularVelocity() * 0.999f);
 
         if (
-            shouldReset ||
+            posL.x < 0.0f || posL.x > constants::gameAreaWidth || posR.x < 0.0f || posR.x > constants::gameAreaWidth ||
             posL.y < 0.0f || posL.y > constants::gameAreaHeight || posR.y < 0.0f || posR.y > constants::gameAreaHeight
         ) {
             reset();
         }
 
-        if (isDead) {
+        if (isReset) {
             leftHand.body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
             rightHand.body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
             leftHand.body->SetTransform(leftHandInitialPos, leftHandInitialAngle);
@@ -242,10 +249,17 @@ extern "C" {
 
         if((controllers & CONTROLLER_1_INSERTED && controllers & CONTROLLER_2_INSERTED)) {
             // Dual controller mode
-            if( ((keys.c[0].Z && keysDown.c[1].Z) || (keysDown.c[0].Z && keys.c[1].Z)) && isDead)
+            if( ((keys.c[0].Z && keysDown.c[1].Z) || (keysDown.c[0].Z && keys.c[1].Z)) && isDead && isReset)
             {
                 // TODO: implement start
                 isDead = false;
+                isReset = false;
+            }
+
+            // Releasing both triggers while dead resets the game
+            if((!keys.c[0].Z && !keys.c[1].Z) && isDead && !isReset)
+            {
+                reset();
             }
 
             holdingLeft = keys.c[0].Z;
@@ -267,10 +281,17 @@ extern "C" {
             }
         } else if((controllers & CONTROLLER_1_INSERTED)) {
             // Single controller mode
-            if( ((keys.c[0].L && keysDown.c[1].R) || (keysDown.c[0].L && keys.c[1].R)) && isDead)
+            if( ((keys.c[0].L && keysDown.c[0].R) || (keysDown.c[0].L && keys.c[0].R)) && isDead && isReset)
             {
                 // TODO: implement start
                 isDead = false;
+                isReset = false;
+            }
+
+            // Releasing both triggers while dead resets the game
+            if((!keys.c[0].L && !keys.c[0].R) && isDead && !isReset)
+            {
+                reset();
             }
 
             holdingLeft = keys.c[0].L;
@@ -282,7 +303,7 @@ extern "C" {
                 ));
             }
 
-            holdingRight = keys.c[0].L;
+            holdingRight = keys.c[0].R;
             if( holdingRight && !isDead)
             {
                 rightHand.body->SetLinearVelocity(b2Vec2(
@@ -314,14 +335,14 @@ extern "C" {
 
             if (enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius ||
                 enemies[i]->body->GetPosition().x > constants::gameAreaWidth + constants::swawnSafeRadius) {
-                enemies[i]->die(level, 0);
+                enemies[i]->die(level, 0, isDead && !isReset);
                 continue;
             }
 
             if (enemies[i]->body->GetPosition().y > constants::gameAreaHeight + constants::swawnSafeRadius) {
                 // Minor scoring condition
                 addScore(1);
-                enemies[i]->die(level, 1);
+                enemies[i]->die(level, 1, isDead && !isReset);
                 continue;
             }
         }
@@ -336,11 +357,13 @@ extern "C" {
         b2Vec2 distanceVector = (pos2 - pos1);
         float distanceOverflow = distanceVector.Length() - constants::allowedDistance;
 
+        // Rope snaps if too far apart
         if (distanceOverflow > 0.0f && holdingLeft && holdingRight) {
-            reset();
+            gameOver();
         }
 
-        if (distanceOverflow > 0.0f && !(holdingLeft && holdingRight)) {
+        // They attract each other if not holding both
+        if (distanceOverflow > 0.0f && (!(holdingLeft && holdingRight) || isDead)) {
             leftHand.body->ApplyForceToCenter(distanceVector, true);
             rightHand.body->ApplyForceToCenter(-distanceVector, true);
         }
@@ -349,8 +372,8 @@ extern "C" {
         bladeE.update(rdl, mainM);
 
         // Draw hands
-        leftHand.update(rdl, mainM, holdingLeft);
-        rightHand.update(rdl, mainM, holdingRight);
+        leftHand.update(rdl, mainM, holdingLeft && !isDead);
+        rightHand.update(rdl, mainM, holdingRight && !isDead);
 
         // Draw rope
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
@@ -360,7 +383,7 @@ extern "C" {
 
     void Game::updateUI(display_context_t disp) {
         char sbuf[512];
-        if (isDead) {
+        if (isReset) {
             graphics_set_color(0x888888FF, 0x00000000);
 
             if((controllers & CONTROLLER_1_INSERTED && controllers & CONTROLLER_2_INSERTED)) {
@@ -387,6 +410,10 @@ extern "C" {
             graphics_draw_text(disp, 320 - strlen(sbuf)*4, 144, sbuf);
         }
 
+        if (isDead && !isReset) {
+            graphics_set_color(0xFF0000FF, 0x00000000);
+            graphics_draw_text(disp, 320 -9*4, 120, "GAME OVER");
+        }
 
         sbuf[0] = '\0';
 

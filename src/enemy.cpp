@@ -41,9 +41,17 @@ Enemy::Enemy(b2World* world) : Box(){
     body->CreateFixture(&fixtureDef);
 }
 
-void Enemy::die(int level, int s) {
+void Enemy::die(int level, int s, bool gameOver) {
     score = s;
     showingScore = s > 0;
+
+    if (gameOver) {
+        fixtureDef.filter.maskBits =  CollisionCategory::enemy | CollisionCategory::hand | CollisionCategory::blade | CollisionCategory::environment;
+    } else {
+        fixtureDef.filter.maskBits = CollisionCategory::enemy | CollisionCategory::hand | CollisionCategory::blade;
+    }
+    b2Fixture* fixture = body->GetFixtureList();
+    fixture->SetFilterData(fixtureDef.filter);
 
     if (showingScore) {
         scorePosition = body->GetPosition();

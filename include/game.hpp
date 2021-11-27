@@ -61,8 +61,6 @@ class Game : public b2ContactListener, Box
         static const int box_count = 20;
         Enemy* enemies[box_count];
 
-        bool shouldReset = false;
-
         // Controller data
         int controllers = 0;
         struct controller_data keys;
@@ -75,6 +73,7 @@ class Game : public b2ContactListener, Box
         int score = 0;
         int lives = 3;
         bool isDead = true;
+        bool isReset = true;
         int level = 0;
 
         // Animation and grace period
@@ -89,6 +88,7 @@ class Game : public b2ContactListener, Box
         void updateUI(display_context_t disp);
         void reset();
         void addScore(int points);
+        void gameOver();
 };
 
 #else

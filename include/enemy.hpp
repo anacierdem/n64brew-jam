@@ -20,7 +20,7 @@ class Enemy : public Box
         int64_t startedShowingScore = 0;
     public:
         Enemy(b2World* world);
-        void die(int multiplier, int score);
+        void die(int multiplier, int score, bool isDead);
         void update(RdpDisplayList* rdl, b2Mat33& matrix);
 
         b2Vec2 scorePosition;
