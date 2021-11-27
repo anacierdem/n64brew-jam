@@ -31,6 +31,7 @@ namespace constants {
     constexpr float swawnSafeRadius = 0.45f; // Must be larget than enemy size
     constexpr float scale = 80.0f;
     constexpr float allowedDistance = 5.0f;
+    constexpr int gracePeriodMs = 300;
 }
 
 enum CollisionCategory: uint16
@@ -76,8 +77,9 @@ class Game : public b2ContactListener, Box
         bool isDead = true;
         int level = 0;
 
-        // Animation
-        int64_t startedShowingDamage = std::numeric_limits<int64_t>::min();
+        // Animation and grace period
+        int64_t startedShowingDamageL = std::numeric_limits<int64_t>::min();
+        int64_t startedShowingDamageR = std::numeric_limits<int64_t>::min();
         int64_t lastUpdate = std::numeric_limits<int64_t>::min();
 
     public:

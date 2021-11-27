@@ -83,7 +83,7 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
         shouldResetWith = 0;
     }
 
-    if (timer_ticks() > startedShowingScore + TICKS_FROM_MS(300)) {
+    if (timer_ticks() > startedShowingScore + TICKS_FROM_MS(constants::gracePeriodMs)) {
         showingScore = false;
     }
 

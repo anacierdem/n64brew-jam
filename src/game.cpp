@@ -81,6 +81,9 @@ extern "C" {
 
     void Game::BeginContact(b2Contact* contact)
     {
+        int64_t gracePeriodL = timer_ticks() - startedShowingDamageL;
+        int64_t gracePeriodR = timer_ticks() - startedShowingDamageR;
+
         b2Fixture* fixtureA = contact->GetFixtureA();
         b2Fixture* fixtureB = contact->GetFixtureB();
         b2Filter filterA = fixtureA->GetFilterData();
@@ -94,6 +97,7 @@ extern "C" {
         }
 
         // If something touches hands, loose a life
+        // TODO: implement looseLife?
         if (
             !isDead &&
             (
@@ -103,15 +107,32 @@ extern "C" {
         ) {
             Hand* hand = reinterpret_cast<Hand*> (fixtureA->GetUserData().pointer);
             if (hand == nullptr) hand = reinterpret_cast<Hand*> (fixtureB->GetUserData().pointer);
-            if (hand == &leftHand) leftHand.takeDamage(rdl);
-            if (hand == &rightHand) rightHand.takeDamage(rdl);
 
-            startedShowingDamage = timer_ticks();
+            bool damageTaken = false;
+            if (hand == &leftHand && (gracePeriodL < 0 || gracePeriodL > TICKS_FROM_MS(constants::gracePeriodMs))) {
+                startedShowingDamageL = timer_ticks();
+                leftHand.takeDamage(rdl);
+                damageTaken = true;
+            };
+            if (hand == &rightHand && (gracePeriodR < 0 || gracePeriodR > TICKS_FROM_MS(constants::gracePeriodMs))) {
+                startedShowingDamageR = timer_ticks();
+                rightHand.takeDamage(rdl);
+                damageTaken = true;
+            }
 
-            // TODO: implement looseLife?
-            lives--;
+            if (damageTaken) lives--;
+
+            // Ground causes loosing an extra live
+            if (
+                damageTaken && 
+                (filterA.categoryBits == CollisionCategory::environment ||
+                filterB.categoryBits == CollisionCategory::environment)
+            ) {
+                lives--;
+            }
 
             if (lives <= 0) {
+                lives = 0;
                 // Not possible to SetTransform in a contact callback, defer to next update
                 shouldReset = true;
             }
@@ -146,13 +167,21 @@ extern "C" {
     void Game::updateBG() {
         rdl_push(rdl,RdpSetOtherModes(SOM_CYCLE_FILL));
 
-        int64_t animationTime = timer_ticks() - startedShowingDamage;
+        int64_t animationTime = timer_ticks() - std::max(startedShowingDamageL, startedShowingDamageR);
 
         // Full screen flash
         if (animationTime > 0 && animationTime < TICKS_FROM_MS(25)) {
             rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
+            cameraPos = b2Vec3(10.f, 5.f, 10.0f);
+        } else if (animationTime > 0 && animationTime < TICKS_FROM_MS(50)) {
+            rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
+            cameraPos = b2Vec3(-10.f, 5.f, 10.0f);
+        } else if (animationTime > 0 && animationTime < TICKS_FROM_MS(75)) {
+            rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
+            cameraPos = b2Vec3(10.f, 5.f, 10.0f);
         } else {
             rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(0,0,0,255)));
+            cameraPos = b2Vec3(0.f, 0.f, 0.f);
         }
 
         // Clear
@@ -182,9 +211,11 @@ extern "C" {
         );
         posL = b2Clamp(posL, b2Vec2_zero,limits);
         leftHand.body->SetTransform(posL, leftHand.body->GetAngle());
+        leftHand.body->SetAngularVelocity(leftHand.body->GetAngularVelocity() * 0.999f);
 
         posR = b2Clamp(posR, b2Vec2_zero, limits);
         rightHand.body->SetTransform(posR, rightHand.body->GetAngle());
+        rightHand.body->SetAngularVelocity(rightHand.body->GetAngularVelocity() * 0.999f);
 
         if (
             shouldReset ||
