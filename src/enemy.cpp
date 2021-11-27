@@ -46,7 +46,7 @@ void Enemy::die(int level, int s, bool gameOver) {
     showingScore = s > 0;
 
     if (gameOver) {
-        fixtureDef.filter.maskBits =  CollisionCategory::enemy | CollisionCategory::hand | CollisionCategory::blade | CollisionCategory::environment;
+        fixtureDef.filter.maskBits = CollisionCategory::enemy | CollisionCategory::hand | CollisionCategory::blade | CollisionCategory::environment;
     } else {
         fixtureDef.filter.maskBits = CollisionCategory::enemy | CollisionCategory::hand | CollisionCategory::blade;
     }

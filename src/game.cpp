@@ -440,10 +440,12 @@ extern "C" {
         // Frame limiter
         // while(TIMER_MICROS_LL(timer_ticks() - lastUpdate) < (timeStep * 1000.0f * 990.0f));
 
-        // graphics_set_color(0xFFFFFFFF, 0x00000000);
-        // sprintf(sbuf, "F: %0.1f", TIMER_MICROS_LL(timer_ticks() - lastUpdate) / 1000.0f);
-        // graphics_draw_text(disp, 60, 32, sbuf);
+#ifndef NDEBUG
+        graphics_set_color(0xFFFFFFFF, 0x00000000);
+        sprintf(sbuf, "F: %0.1f", TIMER_MICROS_LL(timer_ticks() - lastUpdate) / 1000.0f);
+        graphics_draw_text(disp, 60, 32, sbuf);
         lastUpdate = timer_ticks();
+#endif
     }
 
     Game* new_Game(RdpDisplayList* rdl)

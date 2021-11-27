@@ -79,7 +79,10 @@ class Game : public b2ContactListener, Box
         // Animation and grace period
         int64_t startedShowingDamageL = std::numeric_limits<int64_t>::min();
         int64_t startedShowingDamageR = std::numeric_limits<int64_t>::min();
+
+#ifndef NDEBUG
         int64_t lastUpdate = std::numeric_limits<int64_t>::min();
+#endif
 
     public:
         Game(RdpDisplayList* rdlParam);
