@@ -13,19 +13,29 @@ extern "C" {
     #include "geometry.h"
 }
 
+enum enemyDamageType {
+    health = 1,
+    regularEnemy = -1,
+};
+
 class Enemy : public Box
 {
     private:
         int shouldResetWith = 0;
         int64_t startedShowingScore = 0;
+
+        enemyDamageType type = regularEnemy;
+
     public:
         Enemy(b2World* world);
         void die(int multiplier, int score, bool isDead);
         void update(RdpDisplayList* rdl, b2Mat33& matrix);
+        enemyDamageType getDamageType() const;
 
+        // Scoring
+        int score;
         b2Vec2 scorePosition;
         bool showingScore = false;
-        int score;
 };
 
 

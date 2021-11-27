@@ -32,6 +32,7 @@ namespace constants {
     constexpr float scale = 80.0f;
     constexpr float allowedDistance = 5.0f;
     constexpr int gracePeriodMs = 300;
+    constexpr float healthRate = 0.02;
 }
 
 enum CollisionCategory: uint16
@@ -76,9 +77,8 @@ class Game : public b2ContactListener, Box
         bool isReset = true;
         int level = 0;
 
-        // Animation and grace period
-        int64_t startedShowingDamageL = std::numeric_limits<int64_t>::min();
-        int64_t startedShowingDamageR = std::numeric_limits<int64_t>::min();
+        // Animation
+        int64_t startedShowingDamage = std::numeric_limits<int64_t>::min();
 
 #ifndef NDEBUG
         int64_t lastUpdate = std::numeric_limits<int64_t>::min();

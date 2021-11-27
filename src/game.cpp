@@ -87,54 +87,65 @@ extern "C" {
 
     void Game::BeginContact(b2Contact* contact)
     {
-        int64_t gracePeriodL = timer_ticks() - startedShowingDamageL;
-        int64_t gracePeriodR = timer_ticks() - startedShowingDamageR;
-
         b2Fixture* fixtureA = contact->GetFixtureA();
         b2Fixture* fixtureB = contact->GetFixtureB();
         b2Filter filterA = fixtureA->GetFilterData();
         b2Filter filterB = fixtureB->GetFilterData();
 
-        // We don't care about enemy contacts
-        if (
-            filterA.categoryBits == CollisionCategory::enemy &&
-            filterB.categoryBits == CollisionCategory::enemy) {
+        uint16 bits = filterA.categoryBits | filterB.categoryBits;
+
+        // We don't care about enemy-enemy contacts
+        if (bits == CollisionCategory::enemy) {
             return;
         }
 
-        // If something touches hands, loose a life
         // TODO: implement looseLife?
         if (
             !isDead &&
-            (
-                filterA.categoryBits == CollisionCategory::hand ||
-                filterB.categoryBits == CollisionCategory::hand
-            )
-        ) {
-            Hand* hand = reinterpret_cast<Hand*> (fixtureA->GetUserData().pointer);
-            if (hand == nullptr) hand = reinterpret_cast<Hand*> (fixtureB->GetUserData().pointer);
+            bits & CollisionCategory::hand &&
+            (bits & (CollisionCategory::enemy | CollisionCategory::blade | CollisionCategory::environment))
+        ){
+            Hand* hand = nullptr;
+            Enemy* enemy = nullptr;
 
-            bool damageTaken = false;
-            if (hand == &leftHand && (gracePeriodL < 0 || gracePeriodL > TICKS_FROM_MS(constants::gracePeriodMs))) {
-                startedShowingDamageL = timer_ticks();
-                leftHand.takeDamage(rdl);
-                damageTaken = true;
-            };
-            if (hand == &rightHand && (gracePeriodR < 0 || gracePeriodR > TICKS_FROM_MS(constants::gracePeriodMs))) {
-                startedShowingDamageR = timer_ticks();
-                rightHand.takeDamage(rdl);
-                damageTaken = true;
+            if (filterA.categoryBits == CollisionCategory::hand)
+                hand = reinterpret_cast<Hand*> (fixtureA->GetUserData().pointer);
+            if (filterB.categoryBits == CollisionCategory::hand)
+                hand = reinterpret_cast<Hand*> (fixtureB->GetUserData().pointer);
+            assert(hand != nullptr);
+
+            if (bits & CollisionCategory::environment) {
+                hand->takeDamage(rdl);
+                // Touching ground is always deadly
+                gameOver();
             }
 
-            if (damageTaken) lives--;
+            if (bits & CollisionCategory::blade) {
+                if (hand->takeDamage(rdl)) {
+                    lives -= 1;
+                }
+            } 
 
-            // Ground causes loosing an extra live
-            if (
-                damageTaken && 
-                (filterA.categoryBits == CollisionCategory::environment ||
-                filterB.categoryBits == CollisionCategory::environment)
-            ) {
-                lives--;
+            if (bits & CollisionCategory::enemy) {
+                if (filterA.categoryBits == CollisionCategory::enemy)
+                    enemy = reinterpret_cast<Enemy*> (fixtureA->GetUserData().pointer);
+                if (filterB.categoryBits == CollisionCategory::enemy)
+                    enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
+                assert(enemy != nullptr);
+
+                enemyDamageType dmg = enemy->getDamageType();
+                if (dmg == health) {
+                    addScore(15);
+                    enemy->die(level, 15, false);
+                    lives += dmg;
+                } else if (hand->takeDamage(rdl)) {
+                    startedShowingDamage = timer_ticks();
+                    lives += dmg;
+                }
+            }
+
+            if (lives >= 3) {
+                lives = 3;
             }
 
             if (lives <= 0) {
@@ -143,20 +154,13 @@ extern "C" {
             }
         }
 
-        Enemy* enemy = nullptr;
-        if (filterA.categoryBits == CollisionCategory::enemy && filterB.categoryBits == CollisionCategory::blade) {
-            enemy = reinterpret_cast<Enemy*> (fixtureA->GetUserData().pointer);
+        if (bits == (CollisionCategory::enemy | CollisionCategory::blade)) {
+            Enemy* enemy = reinterpret_cast<Enemy*> (fixtureA->GetUserData().pointer);
+            if (enemy == nullptr) enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
             assert(enemy != nullptr);
-        }
-
-        if (filterB.categoryBits == CollisionCategory::enemy && filterA.categoryBits == CollisionCategory::blade) {
-            enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
-            assert(enemy != nullptr);
-        }
-
-        if (enemy != nullptr) {
-            addScore(10);
-            enemy->die(level, 10, isDead && !isReset);
+            int scoreToAdd = enemy->getDamageType() != health ? 10 : 0;
+            addScore(scoreToAdd);
+            enemy->die(level, scoreToAdd, isDead && !isReset);
         }
     }
 
@@ -172,7 +176,7 @@ extern "C" {
     void Game::updateBG() {
         rdl_push(rdl,RdpSetOtherModes(SOM_CYCLE_FILL));
 
-        int64_t animationTime = timer_ticks() - std::max(startedShowingDamageL, startedShowingDamageR);
+        int64_t animationTime = timer_ticks() - startedShowingDamage;
 
         // Full screen flash
         if (animationTime > 0 && animationTime < TICKS_FROM_MS(25)) {
@@ -216,11 +220,11 @@ extern "C" {
         );
         posL = b2Clamp(posL, b2Vec2_zero,limits);
         leftHand.body->SetTransform(posL, leftHand.body->GetAngle());
-        leftHand.body->SetAngularVelocity(leftHand.body->GetAngularVelocity() * 0.999f);
+        leftHand.body->SetAngularVelocity(leftHand.body->GetAngularVelocity() * 0.99f);
 
         posR = b2Clamp(posR, b2Vec2_zero, limits);
         rightHand.body->SetTransform(posR, rightHand.body->GetAngle());
-        rightHand.body->SetAngularVelocity(rightHand.body->GetAngularVelocity() * 0.999f);
+        rightHand.body->SetAngularVelocity(rightHand.body->GetAngularVelocity() * 0.99f);
 
         if (
             posL.x < 0.0f || posL.x > constants::gameAreaWidth || posR.x < 0.0f || posR.x > constants::gameAreaWidth ||
@@ -370,8 +374,8 @@ extern "C" {
         bladeE.update(rdl, mainM);
 
         // Draw hands
-        leftHand.update(rdl, mainM, holdingLeft && !isDead);
-        rightHand.update(rdl, mainM, holdingRight && !isDead);
+        leftHand.update(rdl, mainM, holdingLeft);
+        rightHand.update(rdl, mainM, holdingRight);
 
         // Draw rope
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;

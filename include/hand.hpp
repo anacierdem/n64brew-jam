@@ -19,7 +19,7 @@ class Hand : public Box
     public:
         Hand(b2World* world);
         void update(RdpDisplayList* rdl, b2Mat33& matrix, bool held);
-        void takeDamage(RdpDisplayList* rdl);
+        bool takeDamage(RdpDisplayList* rdl);
 };
 
 

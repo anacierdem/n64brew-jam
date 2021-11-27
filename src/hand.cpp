@@ -85,6 +85,11 @@ void Hand::update(RdpDisplayList* rdl, b2Mat33& matrix, bool held) {
     );
 }
 
-void Hand::takeDamage(RdpDisplayList* rdl) {
-    startedShowingDamage = timer_ticks();
+bool Hand::takeDamage(RdpDisplayList* rdl) {
+    int64_t gracePeriod = timer_ticks() - startedShowingDamage;
+    if (gracePeriod < 0 || gracePeriod > TICKS_FROM_MS(constants::gracePeriodMs)) {
+        startedShowingDamage = timer_ticks();
+        return true;
+    };
+    return false;
 }

@@ -89,11 +89,22 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
         body->SetLinearVelocity(newVelocity);
         body->SetAngularVelocity((rx2 - 0.5f) * (3.0f * (1.0f + multiplier)));
         shouldResetWith = 0;
+
+        type = rx2 < constants::healthRate ? health : regularEnemy;
     }
 
     if (timer_ticks() > startedShowingScore + TICKS_FROM_MS(constants::gracePeriodMs)) {
         showingScore = false;
     }
 
+    if (type == health) {
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(100, 255, 100, 100)));
+    } else {
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(120, 100, 100, 255)));
+    }
     Box::update(rdl, matrix);
+}
+
+enemyDamageType Enemy::getDamageType() const {
+    return type;
 }
