@@ -81,8 +81,6 @@ extern "C" {
 
     void Game::gameOver() {
         if(!isDead) {
-            // leftHand.body->SetLinearVelocity(b2Vec2_zero);
-            // rightHand.body->SetLinearVelocity(b2Vec2_zero);
             isDead = true;
         }
     }
@@ -387,9 +385,9 @@ extern "C" {
             graphics_set_color(0x888888FF, 0x00000000);
 
             if((controllers & CONTROLLER_1_INSERTED && controllers & CONTROLLER_2_INSERTED)) {
-                graphics_draw_text(disp, 320 -24*4, 130, "with both controllers ;)");
+                graphics_draw_text(disp, 320 -24*4, 140, "with both controllers ;)");
             } else {
-                graphics_draw_text(disp, 320 -40*4, 130, "use dual controllers for best experience");
+                graphics_draw_text(disp, 320 -40*4, 140, "use dual controllers for best experience");
             }
 
             // Display menu
@@ -400,14 +398,14 @@ extern "C" {
             }
 
             if((controllers & CONTROLLER_1_INSERTED && controllers & CONTROLLER_2_INSERTED)) {
-                graphics_draw_text(disp, 320 -28*4, 120, "Hold both triggers to START");
+                graphics_draw_text(disp, 320 -28*4, 130, "Hold both triggers to START");
             } else {
-                graphics_draw_text(disp, 320 -20*4, 120, "Hold L & R to START");
+                graphics_draw_text(disp, 320 -20*4, 130, "Hold L & R to START");
             }
 
             graphics_set_color(0xFFFFFFFF, 0x00000000);
             sprintf(sbuf, "HISCORE: %d", highScore);
-            graphics_draw_text(disp, 320 - strlen(sbuf)*4, 144, sbuf);
+            graphics_draw_text(disp, 320 - strlen(sbuf)*4, 154, sbuf);
         }
 
         if (isDead && !isReset) {
@@ -436,9 +434,8 @@ extern "C" {
         }
 
         graphics_set_color(0xFFFFFFFF, 0x00000000);
-        sprintf(sbuf, "SCORE: %d LEVEL: %d T: %0.1f", score, level,  TIMER_MICROS_LL(timer_ticks() - lastUpdate) / 1000.0f);
+        sprintf(sbuf, "SCORE: %d LEVEL: %d", score, level);
         graphics_draw_text(disp, 60, 20, sbuf);
-
 
         // Frame limiter
         // while(TIMER_MICROS_LL(timer_ticks() - lastUpdate) < (timeStep * 1000.0f * 990.0f));
