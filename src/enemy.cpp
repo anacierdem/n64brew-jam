@@ -77,7 +77,7 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
         body->SetEnabled(true);
         float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / constants::gameAreaWidth);
         float rx2 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius -rx2), rx);
+        body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius -2.0f * rx2), rx);
         float multiplier = static_cast<float>(shouldResetWith - 1) * 0.2f;
         b2Vec2 newVelocity(
             multiplier * (rx2 - 0.5f),
