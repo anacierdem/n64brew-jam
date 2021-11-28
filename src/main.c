@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+
 #include <libdragon.h>
 
 #include "rdl.h"
@@ -7,6 +9,8 @@
 
 int main(void)
 {
+    int seed = TICKS_READ();
+    srand(seed);
     // Default scene width: 8m, heigth: 6m
     display_init(RESOLUTION_640x240, DEPTH_32_BPP, 2, GAMMA_NONE, ANTIALIAS_OFF);
 
@@ -15,6 +19,7 @@ int main(void)
     rdp_init();
     timer_init();
     controller_init();
+    debugf("init seed: %u\n", seed);
 
     static display_context_t disp = 0;
 

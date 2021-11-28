@@ -5,20 +5,20 @@ Enemy::Enemy(b2World* world) : Box(){
     bodyDef.type = b2_dynamicBody;
     body = world->CreateBody(&bodyDef);
 
-    // float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.3f);
+    // float rx = 0.3f - static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
     float size = 0.2f; //  * (0.8f + rx)
 
-    float r1 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.03f);
-    float r2 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.03f);
-    float r3 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.03f);
-    float r4 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 0.03f);
+    float r1 = 0.03f * static_cast<float>(rand()) / RAND_MAX;
+    float r2 = 0.03f * static_cast<float>(rand()) / RAND_MAX;
+    float r3 = 0.03f * static_cast<float>(rand()) / RAND_MAX;
+    float r4 = 0.03f * static_cast<float>(rand()) / RAND_MAX;
 
     b2Vec2 vertices[4] = {
-        { 1.0f * size + r1, 1.0f * size + r1},
-        {-1.0f * size + r2, 1.0f * size  + r2},
-        {-1.0f * size  + r3, -1.0f * size + r3},
-        {1.0f * size + r4, -1.0f * size + r4}
+        { 1.0f * (size + r1), 1.0f * (size + r1)},
+        {-1.0f * (size + r2), 1.0f * (size  + r2)},
+        {-1.0f * (size  + r3), -1.0f * (size + r3)},
+        {1.0f * (size + r4), -1.0f * (size + r4)}
     };
     polygonShape.Set(vertices, 4);
     // polygonShape.SetAsBox(0.2f * (0.8f + rx), 0.2f * (0.8f + rx));
@@ -75,8 +75,8 @@ void Enemy::die(int level, int s, bool gameOver) {
 void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     if (shouldResetWith) {
         body->SetEnabled(true);
-        float rx = static_cast<float>(rand()) / static_cast<float>(RAND_MAX / constants::gameAreaWidth);
-        float rx2 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        float rx = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
+        float rx2 = static_cast<float>(rand()) / RAND_MAX;
         body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius -2.0f * rx2), rx);
         float multiplier = static_cast<float>(shouldResetWith - 1) * 0.2f;
         b2Vec2 newVelocity(
