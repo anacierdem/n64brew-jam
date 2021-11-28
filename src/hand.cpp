@@ -15,7 +15,7 @@ Hand::Hand(b2World* world) : Box() {
     body = world->CreateBody(&bodyDef);
 
     float size = 0.3f;
-    b2Vec2 vertices[3] = {{ 0.0f * size, -1.0f * size},{-0.866f * size, 0.5 * size}, {0.866f * size, 0.5 * size}};
+    b2Vec2 vertices[3] = {{ 0.0f * size, -1.0f * size},{-0.866f * size, 0.5f * size}, {0.866f * size, 0.5f * size}};
     polygonShape.Set(vertices, 3);
 
     fixtureDef.shape = &polygonShape;
