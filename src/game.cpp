@@ -438,16 +438,18 @@ extern "C" {
         }
 
         graphics_set_color(0xFFFFFFFF, 0x00000000);
-        sprintf(sbuf, "SCORE: %d LEVEL: %d", score, level);
+        sprintf(sbuf, "SCORE: %d", score);
         graphics_draw_text(disp, 60, 20, sbuf);
 
         // Frame limiter
         // while(TIMER_MICROS_LL(timer_ticks() - lastUpdate) < (timeStep * 1000.0f * 990.0f));
 
 #ifndef NDEBUG
-        graphics_set_color(0xFFFFFFFF, 0x00000000);
-        sprintf(sbuf, "F: %0.1f", TIMER_MICROS_LL(timer_ticks() - lastUpdate) / 1000.0f);
+        sprintf(sbuf, "LEVEL: %d", score, level);
         graphics_draw_text(disp, 60, 32, sbuf);
+
+        sprintf(sbuf, "F: %0.1f", TIMER_MICROS_LL(timer_ticks() - lastUpdate) / 1000.0f);
+        graphics_draw_text(disp, 60, 44, sbuf);
         lastUpdate = timer_ticks();
 #endif
     }
