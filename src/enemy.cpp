@@ -97,7 +97,7 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     if (type == health) {
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(100, 255, 100, 100)));
     } else {
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(120, 100, 100, 255)));
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(150, 68, 201, 180)));
     }
     Box::update(rdl, matrix);
 }

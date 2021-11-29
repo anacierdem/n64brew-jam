@@ -221,7 +221,7 @@ extern "C" {
             }
         }
 
-        if (bits == (CollisionCategory::enemy | CollisionCategory::blade)) {
+        if (!isDead && bits == (CollisionCategory::enemy | CollisionCategory::blade)) {
             Enemy* enemy = reinterpret_cast<Enemy*> (fixtureA->GetUserData().pointer);
             if (enemy == nullptr) enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
             assert(enemy != nullptr);
@@ -402,10 +402,6 @@ extern "C" {
             b2Vec3(-cameraPos.x * constants::to16_16, -cameraPos.y * constants::to16_16, 1.)
         );
 
-        // Draw ground
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(120, 100, 100, 255)));
-        Box::update(rdl, mainM);
-
         // Update and re-spawn enemies if necessary
         int activeCount = constants::startCount + level;
         for (int i = 0; i < box_count; i++) {
@@ -445,16 +441,36 @@ extern "C" {
         }
 
         // Draw everything except enemies below
-        bladeE.update(rdl, mainM);
+        bladeE.update(rdl, mainM, !isDead);
 
         // Draw hands
-        leftHand.update(rdl, mainM, holdingLeft);
-        rightHand.update(rdl, mainM, holdingRight);
+        leftHand.update(rdl, mainM, holdingLeft && (!isDead || isReset));
+        rightHand.update(rdl, mainM, holdingRight && (!isDead || isReset));
 
         // Draw rope
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
         tension = tension > 0.0f ? 0.0f : tension;
         gameRope.draw(rdl, mainM, (holdingLeft && holdingRight) ? (tension + 1.0) : 0.0 );
+
+        // Draw ground
+        if (!isDead) {
+            // Draw noise if not dead
+            rdl_push(rdl, RdpSetOtherModes(
+                SOM_CYCLE_1 |
+                SOM_BLENDING |
+                SOM_READ_ENABLE |
+                SOM_AA_ENABLE |
+                SOM_COLOR_ON_COVERAGE |
+                SOM_COVERAGE_DEST_WRAP |
+                SOM_ENABLE_DITHER_ALPHA |
+                SOM_ENABLE_ALPHA_COMPARE |
+                // (P*A + M*B)
+                (cast64(0x0) << 30) | (cast64(0x0) << 28) | (cast64(0x0) << 26) | (cast64(0x0) << 24) |
+                (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) );
+        }
+
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(150, 68, 201, 180)));
+        Box::update(rdl, mainM);
     }
 
     void Game::updateUI(display_context_t disp) {

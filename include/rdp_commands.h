@@ -255,6 +255,9 @@
 #define SOM_COVERAGE_DEST_SAVE          ((cast64(3)) << 8)
 #define SOM_COLOR_ON_COVERAGE           ((cast64(1)) << 7)
 
+#define SOM_ENABLE_DITHER_ALPHA         ((cast64(1)) << 1)
+#define SOM_ENABLE_ALPHA_COMPARE        ((cast64(1)) << 0)
+
 
 #define RdpSetOtherModes(som_flags) \
     ((cast64(0x2f)<<56) | ((som_flags) ^ (cast64(6)<<41)))
