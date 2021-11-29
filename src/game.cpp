@@ -53,7 +53,38 @@ extern "C" {
         wav64_open(&gameover, "gameover.wav64");
         wav64_open(&pickup, "pickup.wav64");
         wav64_open(&jump, "jump.wav64");
+        mixer_ch_set_vol(constants::pickupChannel, 0.4f, 0.4f);
+
+        wav64_open(&(ambient[0]), "ambient1.wav64");
+        mixer_ch_play(constants::musicChannel1, &(ambient[0]).wave);
+        mixer_ch_set_vol(constants::musicChannel1, 0.8f, 0.6f);
+
+        wav64_open(&(ambient[1]), "ambient2.wav64");
+        mixer_ch_play(constants::musicChannel2, &(ambient[1]).wave);
+        mixer_ch_set_vol(constants::musicChannel2, 0.6f, 0.8f);
+
+        mixer_add_event(ambient[0].wave.len, (int (*)(void*))&Game::loop1Callback, this);
+        mixer_add_event(ambient[1].wave.len, (int (*)(void*))&Game::loop2Callback, this);
     };
+
+    // A quick hack for an unnerving feel
+    int Game::loop1Callback() {
+        float r = 6000.0f * static_cast<float>(rand()) / RAND_MAX;
+        int newFreq = 44100.0f - 3000.0f + r;
+        int newLength = (static_cast<float>(ambient[0].wave.len) / 44100.0f) * newFreq;
+        mixer_ch_play(constants::musicChannel1, &(ambient[0]).wave);
+        mixer_ch_set_freq(constants::musicChannel1, newFreq);
+        return static_cast<int>(newLength);
+    }
+
+    int Game::loop2Callback() {
+        float r = 6000.0f * static_cast<float>(rand()) / RAND_MAX;
+        int newFreq = 44100.0f - 3000.0f + r;
+        int newLength = (static_cast<float>(ambient[1].wave.len) / 44100.0f) * newFreq;
+        mixer_ch_play(constants::musicChannel2, &(ambient[1]).wave);
+        mixer_ch_set_freq(constants::musicChannel2, newFreq);
+        return static_cast<int>(newLength);
+    }
 
     void Game::reset() {
         leftHand.body->SetTransform(leftHandInitialPos, leftHandInitialAngle);
@@ -102,6 +133,7 @@ extern "C" {
 
     void Game::gameOver() {
         if(!isDead) {
+            mixer_ch_stop(constants::gameoverChannel);
             mixer_ch_play(constants::gameoverChannel, &gameover.wave);
             isDead = true;
         }
@@ -123,6 +155,7 @@ extern "C" {
             bits == (CollisionCategory::hand | CollisionCategory::enemy) ||
             bits == (CollisionCategory::hand | CollisionCategory::environment)
         )) {
+            mixer_ch_stop(constants::jumpChannel);
             mixer_ch_play(constants::jumpChannel, &jump.wave);
         }
 
@@ -168,6 +201,7 @@ extern "C" {
 
                 enemyDamageType dmg = enemy->getDamageType();
                 if (dmg == health) {
+                    mixer_ch_stop(constants::healthChannel);
                     mixer_ch_play(constants::healthChannel, &collectHealth.wave);
                     enemy->die(level, addScore(2), false);
                     lives += dmg;
@@ -192,9 +226,8 @@ extern "C" {
             if (enemy == nullptr) enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
             assert(enemy != nullptr);
             int scoreToAdd = enemy->getDamageType() != health ? 1 : 0;
-            if (scoreToAdd) {
-                mixer_ch_play(constants::pickupChannel, &pickup.wave);
-            }
+            mixer_ch_stop(constants::pickupChannel);
+            mixer_ch_play(constants::pickupChannel, &pickup.wave);
             enemy->die(level, addScore(scoreToAdd), isDead && !isReset);
         }
     }

@@ -25,8 +25,8 @@ int main(void)
     rdp_init();
     timer_init();
     controller_init();
-    audio_init(44100, 4);
-    mixer_init(16);
+    audio_init(44100, 6);
+    mixer_init(7);
 
     debugf("init seed: %u\n", seed);
 

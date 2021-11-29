@@ -42,12 +42,14 @@ namespace constants {
     constexpr int maxCount = 15; // 15
     constexpr int maxLives = 3; // 3
 
-    // Channels
+    // Audio channels
     constexpr int hitTakenChannel = 0;
     constexpr int jumpChannel = 0;
     constexpr int pickupChannel = 1;
     constexpr int healthChannel = 2;
     constexpr int gameoverChannel = 2;
+    constexpr int musicChannel1 = 3;
+    constexpr int musicChannel2 = 5;
 }
 
 enum CollisionCategory: uint16
@@ -96,7 +98,10 @@ class Game : public b2ContactListener, Box
         int64_t startedShowingDamage = std::numeric_limits<int64_t>::min();
 
         // Audio
-        wav64_t collectHealth, gameover, pickup, jump;
+        wav64_t collectHealth, gameover, pickup, jump, ambient[2];
+        int64_t nextCallback = 0;
+        int loop1Callback();
+        int loop2Callback();
 
 #ifndef NDEBUG
         int64_t lastUpdate = std::numeric_limits<int64_t>::min();
