@@ -367,24 +367,32 @@ extern "C" {
             }
         } else if((controllers & CONTROLLER_1_INSERTED)) {
             // Single controller mode
-            if( ((keys.c[0].L && keysDown.c[0].R) || (keysDown.c[0].L && keys.c[0].R)) && isDead && isReset)
+            if( (((keys.c[0].L || keys.c[0].Z) && keysDown.c[0].R) ||
+                ((keysDown.c[0].L || keysDown.c[0].Z) && keys.c[0].R)) && isDead && isReset)
             {
                 start();
             }
 
             // Releasing both triggers while dead resets the game
-            if((!keys.c[0].L && !keys.c[0].R) && isDead && !isReset)
+            if((!(keys.c[0].L || keys.c[0].Z) && !keys.c[0].R) && isDead && !isReset)
             {
                 reset();
             }
 
-            holdingLeft = keys.c[0].L;
+            holdingLeft = (keys.c[0].L || keys.c[0].Z);
             if( holdingLeft && !isDead)
             {
-                leftHand.body->SetLinearVelocity(b2Vec2(
-                    static_cast<float>(keys.c[0].left) * -2.0f + static_cast<float>(keys.c[0].right) * 2.0f,
-                    static_cast<float>(keys.c[0].up)* -2.0f + static_cast<float>(keys.c[0].down) * 2.0f
-                ));
+                if(keys.c[0].left || keys.c[0].right || keys.c[0].up || keys.c[0].down) {
+                    leftHand.body->SetLinearVelocity(b2Vec2(
+                        static_cast<float>(keys.c[0].left) * -2.0f + static_cast<float>(keys.c[0].right) * 2.0f,
+                        static_cast<float>(keys.c[0].up)* -2.0f + static_cast<float>(keys.c[0].down) * 2.0f
+                    ));
+                } else {
+                    leftHand.body->SetLinearVelocity(b2Vec2(
+                        static_cast<float>(keys.c[0].x) / 20.0f,
+                        -static_cast<float>(keys.c[0].y) / 20.0f
+                    ));
+                }
             }
 
             holdingRight = keys.c[0].R;
