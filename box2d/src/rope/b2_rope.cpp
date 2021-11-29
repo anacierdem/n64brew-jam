@@ -26,11 +26,6 @@
 #include <stdio.h>
 
 
-extern "C" {
-    #include <libdragon.h>
-}
-
-
 struct b2RopeStretch
 {
 	int32 i1, i2;
