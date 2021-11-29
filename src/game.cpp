@@ -138,6 +138,7 @@ extern "C" {
 
             if (bits & CollisionCategory::blade) {
                 if (hand->takeDamage(rdl)) {
+                    startedShowingDamage = timer_ticks();
                     lives -= 1;
                 }
             } 
@@ -184,8 +185,8 @@ extern "C" {
 
         int64_t animationTime = timer_ticks() - startedShowingDamage;
 
-        // Full screen flash
-        if (animationTime > 0 && animationTime < TICKS_FROM_MS(25)) {
+        // Full screen flash & shake
+        if ((animationTime > 0 && animationTime < TICKS_FROM_MS(25))) {
             rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
             cameraPos = b2Vec3(10.f, 5.f, 10.0f);
         } else if (animationTime > 0 && animationTime < TICKS_FROM_MS(50)) {
@@ -195,7 +196,12 @@ extern "C" {
             rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
             cameraPos = b2Vec3(10.f, 5.f, 10.0f);
         } else {
-            rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(0,0,0,255)));
+            if (isDead && !isReset) {
+                rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
+            } else {
+                rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(0,0,0,255)));
+            }
+
             cameraPos = b2Vec3(0.f, 0.f, 0.f);
         }
 
