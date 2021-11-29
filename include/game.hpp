@@ -99,9 +99,6 @@ class Game : public b2ContactListener, Box
 
         // Audio
         wav64_t collectHealth, gameover, pickup, jump, ambient[2];
-        int64_t nextCallback = 0;
-        int loop1Callback();
-        int loop2Callback();
 
 #ifndef NDEBUG
         int64_t lastUpdate = std::numeric_limits<int64_t>::min();
@@ -126,6 +123,7 @@ class Game : public b2ContactListener, Box
         void reset();
         void gameOver();
         int addScore(int points);
+        int loopCallback(int id);
 };
 
 #else

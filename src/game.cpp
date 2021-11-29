@@ -19,6 +19,16 @@ Blade bladeE(&world);
 Rope gameRope(19, leftHandInitialPos, rightHandInitialPos);
 
 extern "C" {
+    int loop_cb1_Game(Game* self)
+    {
+        return self->loopCallback(0);
+    }
+
+    int loop_cb2_Game(Game* self)
+    {
+        return self->loopCallback(1);
+    }
+
     Game::Game(RdpDisplayList* rdlParam) : Box()
     {
         world.SetContactListener(this);
@@ -64,26 +74,17 @@ extern "C" {
         mixer_ch_play(constants::musicChannel2, &(ambient[1]).wave);
         mixer_ch_set_vol(constants::musicChannel2, 0.6f, 0.8f);
 
-        mixer_add_event(ambient[0].wave.len, (int (*)(void*))&Game::loop1Callback, this);
-        mixer_add_event(ambient[1].wave.len, (int (*)(void*))&Game::loop2Callback, this);
+        mixer_add_event(ambient[0].wave.len, (int (*)(void*))loop_cb1_Game, this);
+        mixer_add_event(ambient[1].wave.len, (int (*)(void*))loop_cb2_Game, this);
     };
 
     // A quick hack for an unnerving feel
-    int Game::loop1Callback() {
+    int Game::loopCallback(int id) {
         float r = 6000.0f * static_cast<float>(rand()) / RAND_MAX;
         int newFreq = 44100.0f - 3000.0f + r;
-        int newLength = (static_cast<float>(ambient[0].wave.len) / 44100.0f) * newFreq;
-        mixer_ch_play(constants::musicChannel1, &(ambient[0]).wave);
+        int newLength = (static_cast<float>(ambient[id].wave.len) / 44100.0f) * newFreq;
+        mixer_ch_play(constants::musicChannel1, &(ambient[id]).wave);
         mixer_ch_set_freq(constants::musicChannel1, newFreq);
-        return static_cast<int>(newLength);
-    }
-
-    int Game::loop2Callback() {
-        float r = 6000.0f * static_cast<float>(rand()) / RAND_MAX;
-        int newFreq = 44100.0f - 3000.0f + r;
-        int newLength = (static_cast<float>(ambient[1].wave.len) / 44100.0f) * newFreq;
-        mixer_ch_play(constants::musicChannel2, &(ambient[1]).wave);
-        mixer_ch_set_freq(constants::musicChannel2, newFreq);
         return static_cast<int>(newLength);
     }
 
