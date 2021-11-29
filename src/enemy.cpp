@@ -78,14 +78,11 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
         float rx = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
         float rx2 = static_cast<float>(rand()) / RAND_MAX;
         body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius -2.0f * rx2), rx);
-        float multiplier = static_cast<float>(shouldResetWith - 1) * 0.2f;
+        float multiplier = static_cast<float>(shouldResetWith - 1) * constants::speedPerLevel;
         b2Vec2 newVelocity(
             multiplier * (rx2 - 0.5f),
             multiplier
         );
-        // Cap speeds
-        newVelocity.x = newVelocity.x > 10.0f ? 10.0f : newVelocity.x;
-        newVelocity.y = newVelocity.y > 20.0f ? 20.0f : newVelocity.y;
         body->SetLinearVelocity(newVelocity);
         body->SetAngularVelocity((rx2 - 0.5f) * (3.0f * (1.0f + multiplier)));
         shouldResetWith = 0;

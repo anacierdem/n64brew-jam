@@ -27,12 +27,20 @@ namespace constants {
     constexpr float to16_16 = 65536.f;
     constexpr float gameAreaWidth = 8.f;
     constexpr float gameAreaHeight = 6.f;
-    constexpr int startIncreasingSpeedAtLevel = 20;
     constexpr float swawnSafeRadius = 0.45f; // Must be larget than enemy size
     constexpr float scale = 80.0f;
     constexpr float allowedDistance = 5.0f;
     constexpr int gracePeriodMs = 300;
     constexpr float healthRate = 0.02;
+    constexpr int startCount = 5;
+
+    // Gameplay - original value commented
+    constexpr int startIncreasingSpeedAtLevel = 15; // 15
+    constexpr float speedPerLevel = 0.3f; // 0.3f
+    constexpr int maxLevel = 30; // 30
+    constexpr int startLevel = 0; // 0
+    constexpr int maxCount = 15; // 15
+    constexpr int maxLives = 3; // 3
 }
 
 enum CollisionCategory: uint16
@@ -59,7 +67,7 @@ class Game : public b2ContactListener, Box
 
         // TODO: move to stack - how to keep the original pointer
         // created when the array is static?
-        static const int box_count = 20;
+        static const int box_count = constants::maxCount;
         Enemy* enemies[box_count];
 
         // Controller data
@@ -84,14 +92,25 @@ class Game : public b2ContactListener, Box
         int64_t lastUpdate = std::numeric_limits<int64_t>::min();
 #endif
 
+        // We increase difficulty after this many seconds are elapsed
+        // lvl 15 is reached in 10 + 15 + 15 + 20 + 11*30 < 6 minutes
+        int64_t levelSwitch[13] = {
+            10, 15, 15, 20, 25, // lvl 5 in ~1.5 min
+            30, 30, 45, 45, 60, // lvl 10 in ~5min
+            60, 60, 75, // lvl 20 in ~11min
+            // then 5 lvls in 6min
+        };
+        int currentIndex = 0;
+        int64_t lastLevelIncreaseAt = std::numeric_limits<int64_t>::min();
     public:
         Game(RdpDisplayList* rdlParam);
         void updateBG();
         void update();
         void updateUI(display_context_t disp);
+        void start();
         void reset();
-        void addScore(int points);
         void gameOver();
+        void addScore(int points);
 };
 
 #else

@@ -64,12 +64,12 @@ extern "C" {
 
         // Reset game
         score = 0;
-        lives = 3;
-        level = 0;
+        lives = constants::maxLives;
+        level = constants::startLevel;
         isReset = true;
         isDead = true;
 
-        int activeCount = 5 + level;
+        int activeCount = constants::startCount + level;
         for (int i = 0; i < box_count; i ++) {
             // Disable if not active
             enemies[i]->body->SetEnabled(i < activeCount);
@@ -77,6 +77,20 @@ extern "C" {
         }
 
         gameRope.reset();
+    }
+
+    void Game::start() {
+        lastLevelIncreaseAt = timer_ticks();
+        currentIndex = 0;
+        isDead = false;
+        isReset = false;
+    }
+
+    void Game::addScore(int points)
+    {
+        if (isDead) return;
+        score += points;
+        highScore = std::max(score, highScore);
     }
 
     void Game::gameOver() {
@@ -164,14 +178,6 @@ extern "C" {
         }
     }
 
-    void Game::addScore(int points)
-    {
-        if (isDead) return;
-        score += points;
-        highScore = std::max(score, highScore);
-        level = score / 50;
-    }
-
     // Full screen quad proved to be costly
     void Game::updateBG() {
         rdl_push(rdl,RdpSetOtherModes(SOM_CYCLE_FILL));
@@ -210,6 +216,25 @@ extern "C" {
     }
 
     void Game::update() {
+        // Calculate level (difficulty)
+        if (!isDead) {
+            if ((timer_ticks() - lastLevelIncreaseAt) > (static_cast<int64_t>(levelSwitch[currentIndex]) * static_cast<int64_t>(TICKS_PER_SECOND))) {
+                debugf("increase level %d, %lld\n", currentIndex, levelSwitch[currentIndex]);
+                lastLevelIncreaseAt = timer_ticks();
+
+                currentIndex++;
+                int count = sizeof(levelSwitch)/sizeof(levelSwitch[0]);
+                if (currentIndex >= count) {
+                    currentIndex = count - 1;
+                }
+
+                level++;
+
+                // Cap level
+                if (level > constants::maxLevel) level = constants::maxLevel;
+            }
+        }
+
         // Do pre conditions
         b2Vec2 posL = leftHand.body->GetPosition();
         b2Vec2 posR = rightHand.body->GetPosition();
@@ -253,9 +278,7 @@ extern "C" {
             // Dual controller mode
             if( ((keys.c[0].Z && keysDown.c[1].Z) || (keysDown.c[0].Z && keys.c[1].Z)) && isDead && isReset)
             {
-                // TODO: implement start
-                isDead = false;
-                isReset = false;
+                start();
             }
 
             // Releasing both triggers while dead resets the game
@@ -285,9 +308,7 @@ extern "C" {
             // Single controller mode
             if( ((keys.c[0].L && keysDown.c[0].R) || (keysDown.c[0].L && keys.c[0].R)) && isDead && isReset)
             {
-                // TODO: implement start
-                isDead = false;
-                isReset = false;
+                start();
             }
 
             // Releasing both triggers while dead resets the game
@@ -327,7 +348,7 @@ extern "C" {
         Box::update(rdl, mainM);
 
         // Update and re-spawn enemies if necessary
-        int activeCount = 5 + level;
+        int activeCount = constants::startCount + level;
         for (int i = 0; i < box_count; i++) {
             if (i >= activeCount) {
                 break;
@@ -335,16 +356,10 @@ extern "C" {
 
             enemies[i]->update(rdl, mainM);
 
-            if (enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius ||
-                enemies[i]->body->GetPosition().x > constants::gameAreaWidth + constants::swawnSafeRadius) {
+            if ((enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius) ||
+                (enemies[i]->body->GetPosition().x > (constants::gameAreaWidth + constants::swawnSafeRadius)) ||
+                (enemies[i]->body->GetPosition().y > (constants::gameAreaHeight + constants::swawnSafeRadius))) {
                 enemies[i]->die(level, 0, isDead && !isReset);
-                continue;
-            }
-
-            if (enemies[i]->body->GetPosition().y > constants::gameAreaHeight + constants::swawnSafeRadius) {
-                // Minor scoring condition
-                addScore(1);
-                enemies[i]->die(level, 1, isDead && !isReset);
                 continue;
             }
         }
@@ -445,7 +460,7 @@ extern "C" {
         // while(TIMER_MICROS_LL(timer_ticks() - lastUpdate) < (timeStep * 1000.0f * 990.0f));
 
 #ifndef NDEBUG
-        sprintf(sbuf, "LEVEL: %d", score, level);
+        sprintf(sbuf, "LEVEL: %d", level);
         graphics_draw_text(disp, 60, 32, sbuf);
 
         sprintf(sbuf, "F: %0.1f", TIMER_MICROS_LL(timer_ticks() - lastUpdate) / 1000.0f);
