@@ -86,11 +86,13 @@ extern "C" {
         isReset = false;
     }
 
-    void Game::addScore(int points)
+    int Game::addScore(int points)
     {
-        if (isDead) return;
-        score += points;
+        if (isDead) return 0;
+        int scored = points * (level + 1);
+        score += scored;
         highScore = std::max(score, highScore);
+        return scored;
     }
 
     void Game::gameOver() {
@@ -149,8 +151,7 @@ extern "C" {
 
                 enemyDamageType dmg = enemy->getDamageType();
                 if (dmg == health) {
-                    addScore(15);
-                    enemy->die(level, 15, false);
+                    enemy->die(level, addScore(2), false);
                     lives += dmg;
                 } else if (hand->takeDamage(rdl)) {
                     startedShowingDamage = timer_ticks();
@@ -172,9 +173,8 @@ extern "C" {
             Enemy* enemy = reinterpret_cast<Enemy*> (fixtureA->GetUserData().pointer);
             if (enemy == nullptr) enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
             assert(enemy != nullptr);
-            int scoreToAdd = enemy->getDamageType() != health ? 10 : 0;
-            addScore(scoreToAdd);
-            enemy->die(level, scoreToAdd, isDead && !isReset);
+            int scoreToAdd = enemy->getDamageType() != health ? 1 : 0;
+            enemy->die(level, addScore(scoreToAdd), isDead && !isReset);
         }
     }
 
@@ -446,23 +446,20 @@ extern "C" {
             if (enemies[i]->showingScore) {
                 sprintf(sbuf, "+%d", enemies[i]->score);
                 graphics_draw_text(disp,
-                    enemies[i]->scorePosition.x,
-                    enemies[i]->scorePosition.y
+                    enemies[i]->scorePosition.x - strlen(sbuf)*4,
+                    enemies[i]->scorePosition.y - 4
                 , sbuf);
             }
         }
 
         graphics_set_color(0xFFFFFFFF, 0x00000000);
-        sprintf(sbuf, "SCORE: %d", score);
+        sprintf(sbuf, "SCORE: %d LEVEL: %d", score, level);
         graphics_draw_text(disp, 60, 20, sbuf);
 
         // Frame limiter
         // while(TIMER_MICROS_LL(timer_ticks() - lastUpdate) < (timeStep * 1000.0f * 990.0f));
 
 #ifndef NDEBUG
-        sprintf(sbuf, "LEVEL: %d", level);
-        graphics_draw_text(disp, 60, 32, sbuf);
-
         sprintf(sbuf, "F: %0.1f", TIMER_MICROS_LL(timer_ticks() - lastUpdate) / 1000.0f);
         graphics_draw_text(disp, 60, 44, sbuf);
         lastUpdate = timer_ticks();

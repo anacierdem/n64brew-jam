@@ -110,7 +110,7 @@ class Game : public b2ContactListener, Box
         void start();
         void reset();
         void gameOver();
-        void addScore(int points);
+        int addScore(int points);
 };
 
 #else
