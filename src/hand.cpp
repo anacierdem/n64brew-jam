@@ -33,6 +33,10 @@ Hand::Hand(b2World* world) : Box() {
     fixtureDef.userData = userData;
 
     body->CreateFixture(&fixtureDef);
+
+    wav64_open(&hitTaken[0], "hit1.wav64");
+    wav64_open(&hitTaken[1], "hit2.wav64");
+    wav64_open(&hitTaken[2], "hit3.wav64");
 }
 
 void Hand::update(RdpDisplayList* rdl, b2Mat33& matrix, bool held) {
@@ -89,6 +93,11 @@ bool Hand::takeDamage(RdpDisplayList* rdl) {
     int64_t gracePeriod = timer_ticks() - startedShowingDamage;
     if (gracePeriod < 0 || gracePeriod > TICKS_FROM_MS(constants::gracePeriodMs)) {
         startedShowingDamage = timer_ticks();
+
+        float normalized = rand() / std::nextafter(float(RAND_MAX), FLT_MAX);
+        int id = int(normalized * 3);
+
+        mixer_ch_play(constants::hitTakenChannel, &hitTaken[id].wave);
         return true;
     };
     return false;

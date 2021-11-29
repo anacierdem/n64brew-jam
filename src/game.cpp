@@ -48,6 +48,11 @@ extern "C" {
         }
 
         reset();
+
+        wav64_open(&collectHealth, "health.wav64");
+        wav64_open(&gameover, "gameover.wav64");
+        wav64_open(&pickup, "pickup.wav64");
+        wav64_open(&jump, "jump.wav64");
     };
 
     void Game::reset() {
@@ -97,6 +102,7 @@ extern "C" {
 
     void Game::gameOver() {
         if(!isDead) {
+            mixer_ch_play(constants::gameoverChannel, &gameover.wave);
             isDead = true;
         }
     }
@@ -109,6 +115,16 @@ extern "C" {
         b2Filter filterB = fixtureB->GetFilterData();
 
         uint16 bits = filterA.categoryBits | filterB.categoryBits;
+
+        // Just for fun
+        if (!isReset && isDead && (
+            bits == (CollisionCategory::enemy) ||
+            bits == (CollisionCategory::enemy | CollisionCategory::environment) ||
+            bits == (CollisionCategory::hand | CollisionCategory::enemy) ||
+            bits == (CollisionCategory::hand | CollisionCategory::environment)
+        )) {
+            mixer_ch_play(constants::jumpChannel, &jump.wave);
+        }
 
         // We don't care about enemy-enemy contacts
         if (bits == CollisionCategory::enemy) {
@@ -141,7 +157,7 @@ extern "C" {
                     startedShowingDamage = timer_ticks();
                     lives -= 1;
                 }
-            } 
+            }
 
             if (bits & CollisionCategory::enemy) {
                 if (filterA.categoryBits == CollisionCategory::enemy)
@@ -152,6 +168,7 @@ extern "C" {
 
                 enemyDamageType dmg = enemy->getDamageType();
                 if (dmg == health) {
+                    mixer_ch_play(constants::healthChannel, &collectHealth.wave);
                     enemy->die(level, addScore(2), false);
                     lives += dmg;
                 } else if (hand->takeDamage(rdl)) {
@@ -175,6 +192,9 @@ extern "C" {
             if (enemy == nullptr) enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
             assert(enemy != nullptr);
             int scoreToAdd = enemy->getDamageType() != health ? 1 : 0;
+            if (scoreToAdd) {
+                mixer_ch_play(constants::pickupChannel, &pickup.wave);
+            }
             enemy->die(level, addScore(scoreToAdd), isDead && !isReset);
         }
     }

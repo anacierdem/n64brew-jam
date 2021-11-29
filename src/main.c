@@ -7,6 +7,12 @@
 #include "geometry.h"
 #include "game.hpp"
 
+// Init DFS first as global C++ object use DFS
+__attribute__((constructor)) void __init_dfs()
+{
+    dfs_init(DFS_DEFAULT_LOCATION);
+}
+
 int main(void)
 {
     int seed = TICKS_READ();
@@ -19,6 +25,9 @@ int main(void)
     rdp_init();
     timer_init();
     controller_init();
+    audio_init(44100, 4);
+    mixer_init(16);
+
     debugf("init seed: %u\n", seed);
 
     static display_context_t disp = 0;
@@ -61,5 +70,10 @@ int main(void)
 
         // Present
         display_show(disp);
+        if (audio_can_write()) {
+            short *buf = audio_write_begin();
+            mixer_poll(buf, audio_get_buffer_length());
+            audio_write_end();
+        }
     }
 }

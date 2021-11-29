@@ -8,7 +8,6 @@
 #include <stdlib.h>
 
 #include "box2d/box2d.h"
-#include "rdl.h"
 
 #include "hand.hpp"
 #include "rope.hpp"
@@ -18,6 +17,7 @@
 
 extern "C" {
     #include <libdragon.h>
+    #include "rdl.h"
     #include "geometry.h"
 }
 
@@ -41,6 +41,13 @@ namespace constants {
     constexpr int startLevel = 0; // 0
     constexpr int maxCount = 15; // 15
     constexpr int maxLives = 3; // 3
+
+    // Channels
+    constexpr int hitTakenChannel = 0;
+    constexpr int jumpChannel = 0;
+    constexpr int pickupChannel = 1;
+    constexpr int healthChannel = 2;
+    constexpr int gameoverChannel = 2;
 }
 
 enum CollisionCategory: uint16
@@ -87,6 +94,9 @@ class Game : public b2ContactListener, Box
 
         // Animation
         int64_t startedShowingDamage = std::numeric_limits<int64_t>::min();
+
+        // Audio
+        wav64_t collectHealth, gameover, pickup, jump;
 
 #ifndef NDEBUG
         int64_t lastUpdate = std::numeric_limits<int64_t>::min();

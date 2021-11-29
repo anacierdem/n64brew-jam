@@ -16,6 +16,8 @@ class Hand : public Box
 {
     private:
         int64_t startedShowingDamage = std::numeric_limits<int64_t>::min();
+        // Audio
+        wav64_t hitTaken[3];
     public:
         Hand(b2World* world);
         void update(RdpDisplayList* rdl, b2Mat33& matrix, bool held);

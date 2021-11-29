@@ -5,6 +5,7 @@ SOURCE_DIR=src
 BUILD_DIR=build
 include $(N64_INST)/include/n64.mk
 
+# TODO: simplify these
 $(BUILD_DIR)/box2d/src/collision/%.o: box2d/src/collision/%.cpp
 	@mkdir -p $(dir $@)
 	@echo "    [CXX] $<"
@@ -27,8 +28,13 @@ $(BUILD_DIR)/box2d/src/rope/%.o: box2d/src/rope/%.cpp
 
 SRC = main.c rdl.c geometry.c
 CXX_SRC = game.cpp rope.cpp box.cpp enemy.cpp hand.cpp blade.cpp $(wildcard box2d/src/collision/*.cpp) $(wildcard box2d/src/common/*.cpp) $(wildcard box2d/src/dynamics/*.cpp) $(wildcard box2d/src/rope/*.cpp)
-OBJS = $(SRC:%.c=$(BUILD_DIR)/%.o) $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.o)
+OBJS = $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.o) $(SRC:%.c=$(BUILD_DIR)/%.o) # order is important to init dfs
 DEPS = $(SRC:%.c=$(BUILD_DIR)/%.d) $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.d)
+
+# Audio
+assets = $(wildcard assets/*.wav)
+assets_conv = $(addprefix filesystem/,$(notdir $(assets:%.wav=%.wav64)))
+$(BUILD_DIR)/jam.dfs: $(assets_conv)
 
 libdragon:
 	$(MAKE) -C ./libdragon install
@@ -37,11 +43,17 @@ jam.z64: libdragon
 jam.z64: N64_ROM_TITLE="Jam"
 jam.z64: CFLAGS+=-Wno-error -Iinclude #-DNDEBUG
 jam.z64: CXXFLAGS+=-Wno-error -Iinclude -Ibox2d/include -Ibox2d/src #-DNDEBUG
+jam.z64: $(BUILD_DIR)/jam.dfs
+
+filesystem/%.wav64: assets/%.wav
+	@mkdir -p $(dir $@)
+	@echo "    [AUDIO] $@"
+	@$(N64_AUDIOCONV) -o filesystem $<
 
 $(BUILD_DIR)/jam.elf: $(OBJS)
 
 clean:
-	rm -rf $(BUILD_DIR)/* jam.z64
+	rm -rf $(BUILD_DIR)/* jam.z64 $(assets_conv)
 
 -include $(DEPS)
 
