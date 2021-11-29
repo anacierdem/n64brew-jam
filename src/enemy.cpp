@@ -39,8 +39,13 @@ Enemy::Enemy(b2World* world) : Box(){
     fixtureDef.userData = userData;
 
     body->CreateFixture(&fixtureDef);
+
+    // Make sure out of sreen
+    body->SetTransform(b2Vec2(-constants::swawnSafeRadius, -constants::swawnSafeRadius), 0.0f);
+    body->SetEnabled(false);
 }
 
+// Kill the enemy and enqueue for a delayed reset
 void Enemy::die(int level, int s, bool gameOver) {
     score = s;
     showingScore = s > 0;
@@ -70,25 +75,34 @@ void Enemy::die(int level, int s, bool gameOver) {
     shouldResetWith = level < constants::startIncreasingSpeedAtLevel ?
         1 :
         (level - constants::startIncreasingSpeedAtLevel + 2);
+
+    // Wait before respawning
+    delay = timer_ticks() + (TICKS_FROM_MS(1500) * (static_cast<float>(rand()) / RAND_MAX));
 }
 
 void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     if (shouldResetWith) {
-        body->SetEnabled(true);
-        float rx = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
-        float rx2 = static_cast<float>(rand()) / RAND_MAX;
-        body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius - (constants::gameAreaHeight / 3.0f) * rx2), rx);
-        float multiplier = static_cast<float>(shouldResetWith - 1) * constants::speedPerLevel;
-        b2Vec2 newVelocity(
-            multiplier * (rx2 - 0.5f),
-            multiplier
-        );
-        body->SetLinearVelocity(newVelocity);
-        body->SetAngularVelocity((rx2 - 0.5f) * (3.0f * (1.0f + multiplier)));
-        shouldResetWith = 0;
+        // Disable once dead but wait before respan
+        body->SetEnabled(false);
 
-        type = rx2 < constants::healthRate ? health : regularEnemy;
+        if (timer_ticks() > delay) {
+            body->SetEnabled(true);
+            float rx = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
+            float rx2 = static_cast<float>(rand()) / RAND_MAX;
+            body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius - (constants::gameAreaHeight / 6.0f) * rx2), rx);
+            float multiplier = static_cast<float>(shouldResetWith - 1) * constants::speedPerLevel;
+            b2Vec2 newVelocity(
+                multiplier * (rx2 - 0.5f),
+                multiplier
+            );
+            body->SetLinearVelocity(newVelocity);
+            body->SetAngularVelocity((rx2 - 0.5f) * (3.0f * (1.0f + multiplier)));
+            shouldResetWith = 0;
+
+            type = rx2 < constants::healthRate ? health : regularEnemy;
+        }
     }
+
 
     if (timer_ticks() > startedShowingScore + TICKS_FROM_MS(constants::gracePeriodMs)) {
         showingScore = false;
@@ -99,7 +113,9 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     } else {
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(150, 68, 201, 180)));
     }
-    Box::update(rdl, matrix);
+    if (body->IsEnabled()) {
+        Box::update(rdl, matrix);
+    }
 }
 
 enemyDamageType Enemy::getDamageType() const {

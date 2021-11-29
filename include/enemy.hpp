@@ -23,6 +23,7 @@ class Enemy : public Box
     private:
         int shouldResetWith = 0;
         int64_t startedShowingScore = 0;
+        int64_t delay = 0;
 
         enemyDamageType type = regularEnemy;
 
