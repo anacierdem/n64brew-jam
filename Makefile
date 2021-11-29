@@ -5,6 +5,8 @@ SOURCE_DIR=src
 BUILD_DIR=build
 include $(N64_INST)/include/n64.mk
 
+# DEBUG_FLAGS = -DNDEBUG
+
 # TODO: simplify these
 $(BUILD_DIR)/box2d/src/collision/%.o: box2d/src/collision/%.cpp
 	@mkdir -p $(dir $@)
@@ -41,8 +43,8 @@ libdragon:
 
 jam.z64: libdragon
 jam.z64: N64_ROM_TITLE="Jam"
-jam.z64: CFLAGS+=-Wno-error -Iinclude #-DNDEBUG
-jam.z64: CXXFLAGS+=-Wno-error -Iinclude -Ibox2d/include -Ibox2d/src #-DNDEBUG
+jam.z64: CFLAGS+=-Wno-error -Iinclude $(DEBUG_FLAGS)
+jam.z64: CXXFLAGS+=-Wno-error -Iinclude -Ibox2d/include -Ibox2d/src $(DEBUG_FLAGS)
 jam.z64: $(BUILD_DIR)/jam.dfs
 
 filesystem/%.wav64: assets/%.wav

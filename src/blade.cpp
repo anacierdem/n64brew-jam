@@ -43,7 +43,7 @@ void Blade::update(RdpDisplayList* rdl, b2Mat33& matrix, bool active) {
             b2Fixture* fixture = body->GetFixtureList();
             fixture->SetFilterData(fixtureDef.filter);
         }
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(80, 80, 80, 160)));
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(80, 80, 80, 180)));
     }
 
     Box::update(rdl, matrix);

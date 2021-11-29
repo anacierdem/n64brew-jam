@@ -13,8 +13,19 @@ __attribute__((constructor)) void __init_dfs()
     dfs_init(DFS_DEFAULT_LOCATION);
 }
 
+#ifdef NDEBUG
+    void ex_handler(exception_t* ex) {
+        debugf("DEAD\n");
+        _start();
+    }
+#endif
+
 int main(void)
 {
+#ifdef NDEBUG
+    register_exception_handler(ex_handler);
+#endif
+
     int seed = TICKS_READ();
     srand(seed);
     // Default scene width: 8m, heigth: 6m

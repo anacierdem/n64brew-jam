@@ -453,8 +453,8 @@ extern "C" {
         gameRope.draw(rdl, mainM, (holdingLeft && holdingRight) ? (tension + 1.0) : 0.0 );
 
         // Draw ground
-        if (!isDead) {
-            // Draw noise if not dead
+        // Draw noise if it is letting through
+        if (!isDead || isReset) {
             rdl_push(rdl, RdpSetOtherModes(
                 SOM_CYCLE_1 |
                 SOM_BLENDING |
