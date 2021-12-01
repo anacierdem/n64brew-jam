@@ -5,9 +5,10 @@ Enemy::Enemy(b2World* world) : Box(){
     bodyDef.type = b2_dynamicBody;
     body = world->CreateBody(&bodyDef);
 
+#ifdef SQUARE_ENEMIES
     // float rx = 0.3f - static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
-    float size = 0.2f; //  * (0.8f + rx)
+    float size = 0.18f; //  * (0.8f + rx)
 
     float r1 = 0.03f * static_cast<float>(rand()) / RAND_MAX;
     float r2 = 0.03f * static_cast<float>(rand()) / RAND_MAX;
@@ -22,6 +23,23 @@ Enemy::Enemy(b2World* world) : Box(){
     };
     polygonShape.Set(vertices, 4);
     // polygonShape.SetAsBox(0.2f * (0.8f + rx), 0.2f * (0.8f + rx));
+#else
+    float size = 0.25f;
+
+    float r1 = 0.05f * static_cast<float>(rand()) / RAND_MAX;
+    float r2 = 0.05f * static_cast<float>(rand()) / RAND_MAX;
+    float r3 = 0.05f * static_cast<float>(rand()) / RAND_MAX;
+    float r4 = 0.05f * static_cast<float>(rand()) / RAND_MAX;
+
+    b2Vec2 vertices[5] = {
+        {1.00000f* (size + r1), 0.00000f},
+        {0.30902f* (size + r2), 0.95106f* (size + r2)},
+        {-0.80902f* (size + r3), 0.58779f* (size + r3)},
+        {-0.80902f* (size + r4), -0.58779f* (size + r4)},
+        {0.30902f* (size), -0.95106f* (size)},
+    };
+    polygonShape.Set(vertices, 5);
+#endif
 
     fixtureDef.shape = &polygonShape;
     fixtureDef.density = 1.0f;
@@ -112,6 +130,21 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     }
     if (body->IsEnabled()) {
         Box::update(rdl, matrix);
+
+#ifndef SQUARE_ENEMIES
+        b2Vec2 min = b2Vec2(0., 0.);
+        b2Vec2 max = b2Vec2(
+            constants::gameAreaWidth * constants::scale * constants::to16_16,
+            constants::gameAreaHeight * (constants::scale/2.0f) * constants::to16_16
+        );
+
+        b2Vec2 vertex1 = body->GetWorldPoint(polygonShape.m_vertices[4]);
+
+        b2Vec3 v1 = b2Mul(matrix, b2Vec3(vertex1.x, vertex1.y, 1.));
+        vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);
+
+        render_tri_strip_next(rdl, vertex1.x, vertex1.y);
+#endif
     }
 }
 
