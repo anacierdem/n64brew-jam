@@ -27,20 +27,24 @@ namespace constants {
     constexpr float to16_16 = 65536.f;
     constexpr float gameAreaWidth = 8.f;
     constexpr float gameAreaHeight = 6.f;
-    constexpr float swawnSafeRadius = 0.45f; // Must be larget than enemy size
+    constexpr float spawnSafeRadius = 0.15f; // Must be larget than enemy size
     constexpr float scale = 80.0f;
     constexpr float allowedDistance = 5.0f;
     constexpr int gracePeriodMs = 600;
     constexpr float healthRate = 0.02;
-    constexpr int startCount = 8;
 
     // Gameplay - original value commented
-    constexpr float speedPerLevel = 0.3f; // 0.3f
-    constexpr int maxLevel = 30; // 30
+    constexpr float gravity = 1.0f; // 1.0f
+    constexpr int startCount = 5; // 5
+    constexpr int maxLevel = 50; // 30
     constexpr int startLevel = 0; // 0
-    constexpr int maxCount = 20; // 20
+    constexpr int maxCount = 15; // 15
     constexpr int maxLives = 3; // 3
-    constexpr int startIncreasingSpeedAtLevel = constants::maxCount - constants::startCount; // constants::maxCount - constants::startCount
+    constexpr int startIncreasingSpeedAtLevel = constants::maxCount - constants::startCount + 2; // constants::maxCount - constants::startCount
+    constexpr float speedPerLevel = 0.2f; // 0.2f
+
+    constexpr int startIncreasingGravityAtLevel = 5; // 5
+    constexpr float gravityPerLevel = 0.1f; // 0.1f
 
     // Audio channels
     constexpr int hitTakenChannel = 0;

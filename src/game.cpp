@@ -1,7 +1,6 @@
 #include "game.hpp"
 
-b2Vec2 gravity(0.0f, 1.0f);
-b2World world(gravity);
+b2World world(b2Vec2(0.0f, constants::gravity));
 
 // Start positions
 // TODO: move to constants
@@ -104,6 +103,7 @@ extern "C" {
         score = 0;
         lives = constants::maxLives;
         level = constants::startLevel;
+        world.SetGravity(b2Vec2(0.0f, constants::gravity));
         isReset = true;
         isDead = true;
 
@@ -111,7 +111,9 @@ extern "C" {
         for (int i = 0; i < box_count; i ++) {
             // Disable if not active
             enemies[i]->body->SetEnabled(i < activeCount);
-            enemies[i]->die(level, 0, false);
+            // max delay of screen fall time for initial gravity
+            float rt = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
+            enemies[i]->die(level, 0, false, rt * std::sqrt((2.0f * constants::gameAreaHeight / constants::gravity)));
         }
 
         gameRope.reset();
@@ -205,7 +207,7 @@ extern "C" {
                 if (dmg == health) {
                     mixer_ch_stop(constants::healthChannel);
                     mixer_ch_play(constants::healthChannel, &collectHealth.wave);
-                    enemy->die(level, addScore(2), false);
+                    enemy->die(level, addScore(2), false, 0.0f);
                     lives += dmg;
                 } else if (hand->takeDamage(rdl)) {
                     startedShowingDamage = timer_ticks();
@@ -230,7 +232,9 @@ extern "C" {
             int scoreToAdd = enemy->getDamageType() != health ? 1 : 0;
             mixer_ch_stop(constants::pickupChannel);
             mixer_ch_play(constants::pickupChannel, &pickup.wave);
-            enemy->die(level, addScore(scoreToAdd), isDead && !isReset);
+            // Add a random delay, this will skew the spawn timing a little but that's ok
+            float rt = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
+            enemy->die(level, addScore(scoreToAdd), isDead && !isReset, rt);
         }
     }
 
@@ -293,6 +297,10 @@ extern "C" {
 
                 // Cap level
                 if (level > constants::maxLevel) level = constants::maxLevel;
+
+                if (level >= constants::startIncreasingGravityAtLevel) {
+                    world.SetGravity(b2Vec2(0.0f, constants::gravity + constants::gravityPerLevel * (level - constants::startIncreasingGravityAtLevel)));
+                }
             }
         }
 
@@ -414,6 +422,8 @@ extern "C" {
 
         // Update and re-spawn enemies if necessary
         int activeCount = constants::startCount + level;
+        // Kill the enemy at a random location in approx next screen height such that we spawn them "apparently" at random
+        float ry = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
         for (int i = 0; i < box_count; i++) {
             if (i >= activeCount) {
                 break;
@@ -421,10 +431,10 @@ extern "C" {
 
             enemies[i]->update(rdl, mainM);
 
-            if ((enemies[i]->body->GetPosition().x < -constants::swawnSafeRadius) ||
-                (enemies[i]->body->GetPosition().x > (constants::gameAreaWidth + constants::swawnSafeRadius)) ||
-                (enemies[i]->body->GetPosition().y > (constants::gameAreaHeight + constants::swawnSafeRadius))) {
-                enemies[i]->die(level, 0, isDead && !isReset);
+            if ((enemies[i]->body->GetPosition().x < -constants::spawnSafeRadius) ||
+                (enemies[i]->body->GetPosition().x > (constants::gameAreaWidth + constants::spawnSafeRadius)) ||
+                (enemies[i]->body->GetPosition().y > ((constants::gameAreaHeight * (1.0f + ry)) + constants::spawnSafeRadius))) {
+                enemies[i]->die(level, 0, isDead && !isReset, 0.0f);
                 continue;
             }
         }

@@ -41,12 +41,12 @@ Enemy::Enemy(b2World* world) : Box(){
     body->CreateFixture(&fixtureDef);
 
     // Make sure out of sreen
-    body->SetTransform(b2Vec2(-constants::swawnSafeRadius, -constants::swawnSafeRadius), 0.0f);
+    body->SetTransform(b2Vec2(-constants::spawnSafeRadius, -constants::spawnSafeRadius), 0.0f);
     body->SetEnabled(false);
 }
 
 // Kill the enemy and enqueue for a delayed reset
-void Enemy::die(int level, int s, bool gameOver) {
+void Enemy::die(int level, int s, bool gameOver, float maxDelay) {
     score = s;
     showingScore = s > 0;
 
@@ -62,10 +62,7 @@ void Enemy::die(int level, int s, bool gameOver) {
         scorePosition = body->GetPosition();
         scorePosition = b2Vec2(
             constants::scale * scorePosition.x,
-            scorePosition.y >
-                (constants::gameAreaHeight - constants::swawnSafeRadius) ?
-                ((constants::scale/2.0f) * constants::gameAreaHeight - 12) :
-                (constants::scale/2.0f) * scorePosition.y
+            (constants::scale / 2.0f) * scorePosition.y
         );
 
         startedShowingScore = timer_ticks();
@@ -74,10 +71,10 @@ void Enemy::die(int level, int s, bool gameOver) {
     // Not possible to SetTransform in a contact callback, defer to next update
     shouldResetWith = level < constants::startIncreasingSpeedAtLevel ?
         1 :
-        (level - constants::startIncreasingSpeedAtLevel + 2);
+        (level - constants::startIncreasingSpeedAtLevel + 1);
 
     // Wait before respawning
-    delay = timer_ticks() + (TICKS_FROM_MS(1500) * (static_cast<float>(rand()) / RAND_MAX));
+    delay = timer_ticks() + (TICKS_FROM_MS(maxDelay * 1000.0f * (static_cast<float>(rand()) / RAND_MAX)));
 }
 
 void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
@@ -89,7 +86,7 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
             body->SetEnabled(true);
             float rx = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
             float rx2 = static_cast<float>(rand()) / RAND_MAX;
-            body->SetTransform(b2Vec2(rx, -constants::swawnSafeRadius - (constants::gameAreaHeight / 6.0f) * rx2), rx);
+            body->SetTransform(b2Vec2(rx, -constants::spawnSafeRadius - (constants::gameAreaHeight / 6.0f) * rx2), rx);
             float multiplier = static_cast<float>(shouldResetWith - 1) * constants::speedPerLevel;
             b2Vec2 newVelocity(
                 multiplier * (rx2 - 0.5f),

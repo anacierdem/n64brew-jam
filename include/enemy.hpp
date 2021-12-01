@@ -2,6 +2,7 @@
 #define __ENEMY_H
 
 #include <stdlib.h>
+#include <cmath>
 
 #include "box2d/box2d.h"
 
@@ -29,7 +30,7 @@ class Enemy : public Box
 
     public:
         Enemy(b2World* world);
-        void die(int multiplier, int score, bool isDead);
+        void die(int multiplier, int score, bool isDead, float maxDelay);
         void update(RdpDisplayList* rdl, b2Mat33& matrix);
         enemyDamageType getDamageType() const;
 
