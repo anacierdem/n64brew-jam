@@ -55,6 +55,7 @@ filesystem/%.wav64: assets/%.wav
 $(BUILD_DIR)/jam.elf: $(OBJS)
 
 clean:
+	$(MAKE) -C ./libdragon clean
 	rm -rf $(BUILD_DIR)/* jam.z64 $(assets_conv)
 
 -include $(DEPS)
