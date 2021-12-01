@@ -66,24 +66,22 @@ extern "C" {
         mixer_ch_set_vol(constants::pickupChannel, 0.4f, 0.4f);
 
         wav64_open(&(ambient[0]), "ambient1.wav64");
-        mixer_ch_play(constants::musicChannel1, &(ambient[0]).wave);
         mixer_ch_set_vol(constants::musicChannel1, 0.8f, 0.6f);
 
         wav64_open(&(ambient[1]), "ambient2.wav64");
-        mixer_ch_play(constants::musicChannel2, &(ambient[1]).wave);
         mixer_ch_set_vol(constants::musicChannel2, 0.6f, 0.8f);
 
-        mixer_add_event(ambient[0].wave.len, (int (*)(void*))loop_cb1_Game, this);
-        mixer_add_event(ambient[1].wave.len, (int (*)(void*))loop_cb2_Game, this);
+        mixer_add_event(0, (int (*)(void*))loop_cb1_Game, this);
+        mixer_add_event(0, (int (*)(void*))loop_cb2_Game, this);
     };
 
     // A quick hack for an unnerving feel
     int Game::loopCallback(int id) {
         float r = 6000.0f * static_cast<float>(rand()) / RAND_MAX;
-        int newFreq = 44100.0f - 3000.0f + r;
-        int newLength = (static_cast<float>(ambient[id].wave.len) / 44100.0f) * newFreq;
-        mixer_ch_play(constants::musicChannel1, &(ambient[id]).wave);
-        mixer_ch_set_freq(constants::musicChannel1, newFreq);
+        int newFreq = 44100 - 3000 + static_cast<int>(r);
+        int newLength = static_cast<int>((static_cast<float>(ambient[id].wave.len) / static_cast<float>(newFreq)) * 44100.0f);
+        mixer_ch_play(id*2, &(ambient[id]).wave);
+        mixer_ch_set_freq(id*2, newFreq);
         return static_cast<int>(newLength);
     }
 

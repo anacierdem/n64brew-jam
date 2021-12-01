@@ -47,13 +47,14 @@ namespace constants {
     constexpr float gravityPerLevel = 0.1f; // 0.1f
 
     // Audio channels
-    constexpr int hitTakenChannel = 0;
-    constexpr int jumpChannel = 0;
-    constexpr int pickupChannel = 1;
-    constexpr int healthChannel = 2;
-    constexpr int gameoverChannel = 2;
-    constexpr int musicChannel1 = 3;
-    constexpr int musicChannel2 = 5;
+    constexpr int musicChannel1 = 0;
+    constexpr int musicChannel2 = 2;
+
+    constexpr int hitTakenChannel = 4;
+    constexpr int jumpChannel = 4;
+    constexpr int pickupChannel = 5;
+    constexpr int healthChannel = 6;
+    constexpr int gameoverChannel = 6;
 }
 
 enum CollisionCategory: uint16
