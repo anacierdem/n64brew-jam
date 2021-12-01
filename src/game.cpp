@@ -461,7 +461,7 @@ extern "C" {
         }
 
         // Draw everything except enemies below
-        bladeE.update(rdl, mainM, !isDead);
+        bladeE.update(rdl, mainM, !isDead && (holdingLeft && holdingRight));
 
         // Draw hands
         leftHand.update(rdl, mainM, holdingLeft && (!isDead || isReset));
