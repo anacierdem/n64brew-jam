@@ -35,7 +35,7 @@ namespace constants {
 
     // Gameplay - original value commented
     constexpr float gravity = 1.0f; // 1.0f
-    constexpr int startCount = 5; // 5
+    constexpr int startCount = 6; // 5
     constexpr int maxLevel = 50; // 30
     constexpr int startLevel = 0; // 0
     constexpr int maxCount = 15; // 15
