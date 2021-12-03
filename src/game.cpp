@@ -422,8 +422,6 @@ extern "C" {
 
         // Update and re-spawn enemies if necessary
         int activeCount = constants::startCount + level;
-        // Kill the enemy at a random location in approx next screen height such that we spawn them "apparently" at random
-        float ry = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
         for (int i = 0; i < box_count; i++) {
             if (i >= activeCount) {
                 break;
@@ -431,6 +429,8 @@ extern "C" {
 
             enemies[i]->update(rdl, mainM);
 
+            // Kill the enemy at a random location in approx next screen height such that we spawn them "apparently" at random
+            float ry = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
             if ((enemies[i]->body->GetPosition().x < -constants::spawnSafeRadius) ||
                 (enemies[i]->body->GetPosition().x > (constants::gameAreaWidth + constants::spawnSafeRadius)) ||
                 (enemies[i]->body->GetPosition().y > ((constants::gameAreaHeight * (1.0f + ry)) + constants::spawnSafeRadius))) {
