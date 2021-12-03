@@ -35,7 +35,7 @@ namespace constants {
 
     // Gameplay - original value commented
     constexpr float gravity = 1.0f; // 1.0f
-    constexpr int startCount = 6; // 5
+    constexpr int startCount = 5; // 5
     constexpr int maxLevel = 50; // 30
     constexpr int startLevel = 0; // 0
     constexpr int maxCount = 15; // 15
@@ -110,7 +110,6 @@ class Game : public b2ContactListener, Box
 #endif
 
         // We increase difficulty after this many seconds are elapsed
-        // lvl 15 is reached in 10 + 15 + 15 + 20 + 11*30 < 6 minutes
         int64_t levelSwitch[13] = {
             10, 15, 15, 20, 25, // lvl 5 in ~1.5 min
             30, 30, 45, 45, 60, // lvl 10 in ~5min
