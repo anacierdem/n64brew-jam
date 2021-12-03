@@ -62,8 +62,8 @@ extern "C" {
         wav64_open(&gameover, "gameover.wav64");
         wav64_open(&pickup, "pickup.wav64");
         wav64_open(&jump, "jump.wav64");
-        mixer_ch_set_vol(constants::gameoverChannel, 0.8f, 0.8f);
-        mixer_ch_set_vol(constants::pickupChannel, 0.4f, 0.4f);
+        mixer_ch_set_vol(constants::gameoverChannel, 0.7f, 0.7f);
+        mixer_ch_set_vol(constants::pickupChannel, 0.3f, 0.3f);
 
         wav64_open(&(ambient[0]), "ambient1.wav64");
         mixer_ch_set_vol(constants::musicChannel1, 0.8f, 0.6f);
