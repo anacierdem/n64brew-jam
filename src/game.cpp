@@ -6,8 +6,6 @@ b2World world(b2Vec2(0.0f, constants::gravity));
 // TODO: move to constants
 b2Vec2 leftHandInitialPos = {2.0f, 2.0f};
 b2Vec2 rightHandInitialPos = {constants::gameAreaWidth - 2.0f, 2.0f};
-float leftHandInitialAngle = 0.1;
-float rightHandInitialAngle = -0.1;
 
 Hand leftHand(&world);
 Hand rightHand(&world);
@@ -86,9 +84,10 @@ extern "C" {
     }
 
     void Game::reset() {
-        leftHand.body->SetTransform(leftHandInitialPos, leftHandInitialAngle);
+        float r = static_cast<float>(rand()) / RAND_MAX;
+        leftHand.body->SetTransform(leftHandInitialPos, r);
         leftHand.body->SetAwake(true);
-        rightHand.body->SetTransform(rightHandInitialPos, rightHandInitialAngle);
+        rightHand.body->SetTransform(rightHandInitialPos, -r);
         rightHand.body->SetAwake(true);
         leftHand.body->SetLinearVelocity(b2Vec2_zero);
         leftHand.body->SetAngularVelocity(0.0f);
@@ -328,8 +327,8 @@ extern "C" {
         if (isReset) {
             leftHand.body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
             rightHand.body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-            leftHand.body->SetTransform(leftHandInitialPos, leftHandInitialAngle);
-            rightHand.body->SetTransform(rightHandInitialPos, rightHandInitialAngle);
+            leftHand.body->SetTransform(leftHandInitialPos, leftHand.body->GetAngle());
+            rightHand.body->SetTransform(rightHandInitialPos, rightHand.body->GetAngle());
         }
 
         // Step simulation!
@@ -410,6 +409,9 @@ extern "C" {
                 ));
             }
         }
+
+        leftHand.body->ApplyTorque(leftHand.body->GetLinearVelocity().x / 300.0f, true);
+        rightHand.body->ApplyTorque(rightHand.body->GetLinearVelocity().x / 300.0f, true);
 
         // Main transformation matrix
         b2Mat33 mainM(
