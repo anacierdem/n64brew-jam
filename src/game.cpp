@@ -41,7 +41,7 @@ extern "C" {
         bodyDef.type = b2_staticBody;
         bodyDef.position.Set(0.0f, constants::gameAreaHeight);
         body = world.CreateBody(&bodyDef);
-        polygonShape.SetAsBox(50.0f, 0.1f);
+        polygonShape.SetAsBox(50.0f, 0.15f);
 
         fixtureDef.shape = &polygonShape;
         fixtureDef.density = 0.0f;
