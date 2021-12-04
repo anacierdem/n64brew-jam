@@ -37,7 +37,7 @@ int main(void)
     timer_init();
     controller_init();
     audio_init(44100, 6);
-    mixer_init(7);
+    mixer_init(8);
 
     debugf("init seed: %u\n", seed);
 

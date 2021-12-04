@@ -56,6 +56,11 @@ extern "C" {
 
         reset();
 
+        wav64_open(&noise, "noise.wav64");
+        mixer_ch_set_vol(constants::noiseChannel, 0.0f, 0.0f);
+        wav64_set_loop(&noise, true);
+        mixer_ch_play(constants::noiseChannel, &noise.wave);
+
         wav64_open(&collectHealth, "health.wav64");
         wav64_open(&gameover, "gameover.wav64");
         wav64_open(&pickup, "pickup.wav64");
@@ -470,7 +475,9 @@ extern "C" {
         // Draw rope
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
         tension = tension > 0.0f ? 0.0f : tension;
-        gameRope.draw(rdl, mainM, (holdingLeft && holdingRight) ? (tension + 1.0) : 0.0 );
+        float positiveTension = (holdingLeft && holdingRight && !isDead) ? (tension + 1.0) : 0.0;
+        mixer_ch_set_vol(constants::noiseChannel, positiveTension * 0.5, positiveTension * 0.5);
+        gameRope.draw(rdl, mainM, positiveTension );
 
         // Draw ground
         // Draw noise if it is letting through
