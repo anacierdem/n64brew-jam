@@ -138,7 +138,6 @@ extern "C" {
 
     void Game::gameOver() {
         if(!isDead) {
-            mixer_ch_stop(constants::gameoverChannel);
             mixer_ch_play(constants::gameoverChannel, &gameover.wave);
             isDead = true;
         }
@@ -160,7 +159,6 @@ extern "C" {
             bits == (CollisionCategory::hand | CollisionCategory::enemy) ||
             bits == (CollisionCategory::hand | CollisionCategory::environment)
         )) {
-            mixer_ch_stop(constants::jumpChannel);
             mixer_ch_play(constants::jumpChannel, &jump.wave);
         }
 
@@ -206,7 +204,6 @@ extern "C" {
 
                 enemyDamageType dmg = enemy->getDamageType();
                 if (dmg == health) {
-                    mixer_ch_stop(constants::healthChannel);
                     mixer_ch_play(constants::healthChannel, &collectHealth.wave);
                     enemy->die(level, addScore(2), false, 0.0f);
                     lives += dmg;
@@ -231,7 +228,6 @@ extern "C" {
             if (enemy == nullptr) enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
             assert(enemy != nullptr);
             int scoreToAdd = enemy->getDamageType() != health ? 1 : 0;
-            mixer_ch_stop(constants::pickupChannel);
             mixer_ch_play(constants::pickupChannel, &pickup.wave);
             // Add a random delay, this will skew the spawn timing a little but that's ok
             float rt = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
