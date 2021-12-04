@@ -100,7 +100,11 @@ extern "C" {
         score = 0;
         lives = constants::maxLives;
         level = constants::startLevel;
-        world.SetGravity(b2Vec2(0.0f, constants::gravity + constants::gravityPerLevel * (level - constants::startIncreasingGravityAtLevel)));
+        if (level >= constants::startIncreasingGravityAtLevel) {
+            world.SetGravity(b2Vec2(0.0f, constants::gravity + constants::gravityPerLevel * (level - constants::startIncreasingGravityAtLevel)));
+        } else {
+            world.SetGravity(b2Vec2(0.0f, constants::gravity));
+        }
         isReset = true;
         isDead = true;
 
