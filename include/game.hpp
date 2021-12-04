@@ -27,16 +27,16 @@ namespace constants {
     constexpr float to16_16 = 65536.f;
     constexpr float gameAreaWidth = 8.f;
     constexpr float gameAreaHeight = 6.f;
-    constexpr float spawnSafeRadius = 0.15f; // Must be larget than enemy size
+    constexpr float spawnSafeRadius = 0.15f; // Must be larger than enemy size
     constexpr float scale = 80.0f;
     constexpr float allowedDistance = 5.0f;
     constexpr int gracePeriodMs = 600;
-    constexpr float healthRate = 0.02;
 
     // Gameplay - original value commented
+    constexpr float healthRate = 0.02; // 0.02
     constexpr float gravity = 1.0f; // 1.0f
     constexpr int startCount = 5; // 5
-    constexpr int maxLevel = 50; // 30
+    constexpr int maxLevel = 50; // 50
     constexpr int startLevel = 0; // 0
     constexpr int maxCount = 15; // 15
     constexpr int maxLives = 3; // 3
