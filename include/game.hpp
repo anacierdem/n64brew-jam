@@ -9,7 +9,20 @@
 
 #include "box2d/box2d.h"
 
-// TODO: move to another header
+#include "hand.hpp"
+#include "rope.hpp"
+#include "blade.hpp"
+#include "enemy.hpp"
+#include "box.hpp"
+
+extern "C" {
+    #include <libdragon.h>
+    #include "rdl.h"
+    #include "geometry.h"
+}
+
+class Enemy;
+
 namespace constants {
     constexpr float to16_16 = 65536.f;
     constexpr float gameAreaWidth = 8.f;
@@ -44,20 +57,6 @@ namespace constants {
     constexpr int gameoverChannel = 6;
     constexpr int noiseChannel = 7;
 }
-
-#include "hand.hpp"
-#include "rope.hpp"
-#include "blade.hpp"
-#include "enemy.hpp"
-#include "box.hpp"
-
-extern "C" {
-    #include <libdragon.h>
-    #include "rdl.h"
-    #include "geometry.h"
-}
-
-class Enemy;
 
 enum CollisionCategory: uint16
 {

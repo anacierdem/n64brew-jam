@@ -435,10 +435,12 @@ extern "C" {
             enemies[i]->update(rdl, mainM);
 
             // Kill the enemy at a random location in approx next screen height such that we spawn them "apparently" at random
+            float ry = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
             if ((enemies[i]->body->GetPosition().x < -constants::spawnSafeRadius) ||
                 (enemies[i]->body->GetPosition().x > (constants::gameAreaWidth + constants::spawnSafeRadius)) ||
-                (enemies[i]->body->GetPosition().y > ((constants::gameAreaHeight * (1.0f + enemies[i]->randomY)) + constants::spawnSafeRadius))) {
+                (enemies[i]->body->GetPosition().y > ((constants::gameAreaHeight * (1.0f + ry)) + constants::spawnSafeRadius))) {
                 enemies[i]->die(level, 0, isDead && !isReset, 0.0f);
+                continue;
             }
         }
 

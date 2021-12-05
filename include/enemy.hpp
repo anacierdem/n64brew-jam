@@ -38,8 +38,6 @@ class Enemy : public Box
         int score;
         b2Vec2 scorePosition;
         bool showingScore = false;
-
-        float randomY = constants::gameAreaHeight;
 };
 
 

@@ -1,9 +1,6 @@
 #include "enemy.hpp"
 
 Enemy::Enemy(b2World* world) : Box(){
-    // Where to reset to top? pre-calculate for a little perf. gain
-    randomY = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
-
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
     body = world->CreateBody(&bodyDef);
