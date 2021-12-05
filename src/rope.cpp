@@ -51,9 +51,15 @@ b2Vec2 Rope::update(b2Vec2 pos1, b2Vec2 pos2) {
 }
 
 void Rope::draw(RdpDisplayList* rdl, b2Mat33& matrix, float tension) {
-    int amount = 255 -tension * 255;
-
-    rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, amount, amount, 100)));
+    if (tension == 0.0f) {
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 100)));
+    } else {
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(
+            255 -static_cast<int>(tension * (255 - 150)),
+            255 -static_cast<int>(tension * (255 - 68)),
+            255 -static_cast<int>(tension * (255 - 201))
+        , 100 -static_cast<int>(tension * (100 - 255)))));
+    }
     for (int i = 0; i < ropeDef.count - 1; i++)
     {
         b2Vec2 vertex1 = rope.m_ps[i];
