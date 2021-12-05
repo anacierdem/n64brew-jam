@@ -474,7 +474,7 @@ extern "C" {
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
         tension = tension > 0.0f ? 0.0f : tension;
         float positiveTension = (holdingLeft && holdingRight && !isDead) ? (tension + 1.0) : 0.0;
-        mixer_ch_set_vol(constants::noiseChannel, positiveTension * 0.5, positiveTension * 0.5);
+        mixer_ch_set_vol(constants::noiseChannel, positiveTension * 0.4, positiveTension * 0.4);
         gameRope.draw(rdl, mainM, positiveTension );
 
         // Draw ground
