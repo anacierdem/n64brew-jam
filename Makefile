@@ -5,7 +5,7 @@ SOURCE_DIR=src
 BUILD_DIR=build
 include $(N64_INST)/include/n64.mk
 
-# DEBUG_FLAGS = -DNDEBUG
+DEBUG_FLAGS = -DNDEBUG
 
 # TODO: simplify these
 $(BUILD_DIR)/box2d/src/collision/%.o: box2d/src/collision/%.cpp
