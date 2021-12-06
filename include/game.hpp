@@ -38,7 +38,7 @@ namespace constants {
     constexpr int startCount = 5; // 5
     constexpr int maxLevel = 50; // 50
     constexpr int startLevel = 0; // 0
-    constexpr int maxCount = 15; // 15
+    constexpr int maxCount = 16; // 15
     constexpr int maxLives = 3; // 3
     constexpr int startIncreasingSpeedAtLevel = constants::maxCount - constants::startCount + 2; // constants::maxCount - constants::startCount
     constexpr float speedPerLevel = 0.2f; // 0.2f
