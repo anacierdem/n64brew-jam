@@ -341,7 +341,11 @@ extern "C" {
 
         // Read input
         controller_scan();
-        controllers = get_controllers_present();
+        if (frameCount % 60 == 0) {
+            controllers = get_controllers_present();
+            frameCount = 0;
+        }
+        frameCount++;
         keys = get_keys_pressed();
         keysDown = get_keys_down();
 

@@ -73,6 +73,8 @@ class Game : public b2ContactListener, Box
 
         RdpDisplayList* rdl;
 
+        int frameCount = 0;
+
         // Simulation params
         int32 velocityIterations = 6;
         int32 positionIterations = 2;
