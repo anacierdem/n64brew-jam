@@ -10,9 +10,15 @@ extern "C" {
     #include "geometry.h"
 }
 
-// TODO: move things into a PlayerContraption classs
+// TODO: move things into a PlayerContraption class
 Rope::Rope(int count, b2Vec2 pos1, b2Vec2 pos2) {
     ropeDef.count = count;
+
+    if (get_tv_type() != TV_PAL) {
+        // I mistakenly used 1/60 for PAL and adjusted everything based on that,
+        // correct for that when it is actually at a higher frame rate :)
+        timeStep = (1.0 / 60.0) * 0.83333f;
+    }
 
     b2Vec2 vertices[ropeDef.count];
     float masses[ropeDef.count];
