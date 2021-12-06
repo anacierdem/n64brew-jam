@@ -52,13 +52,13 @@ b2Vec2 Rope::update(b2Vec2 pos1, b2Vec2 pos2) {
 
 void Rope::draw(RdpDisplayList* rdl, b2Mat33& matrix, float tension) {
     if (tension == 0.0f) {
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 100)));
+        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 80)));
     } else {
         rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(
-            255 -static_cast<int>(tension * (255 - 150)),
-            255 -static_cast<int>(tension * (255 - 68)),
-            255 -static_cast<int>(tension * (255 - 201))
-        , 100 -static_cast<int>(tension * (100 - 255)))));
+            255 -static_cast<int>(tension * (255 - 160)),
+            255 -static_cast<int>(tension * (255 - 78)),
+            255 -static_cast<int>(tension * (255 - 221))
+        , 80 -static_cast<int>(tension * (80 - 250)))));
     }
     for (int i = 0; i < ropeDef.count - 1; i++)
     {
