@@ -453,7 +453,7 @@ extern "C" {
         b2Vec2 pos2 = rightHand.body->GetPosition();
 
         bladeE.body->SetTransform(gameRope.update(pos1, pos2), bladeE.body->GetAngle());
-        bladeE.body->SetAngularVelocity(1500.0f * timeStep);
+        bladeE.body->SetAngularVelocity(1000.0f * timeStep);
 
         b2Vec2 distanceVector = (pos2 - pos1);
         float distanceOverflow = distanceVector.Length() - constants::allowedDistance;
