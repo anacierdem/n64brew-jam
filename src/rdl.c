@@ -24,7 +24,6 @@
 
 #include <malloc.h>
 #include <stdio.h>
-#include "rdp_commands.h"
 
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
