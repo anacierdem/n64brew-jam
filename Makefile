@@ -34,9 +34,9 @@ OBJS = $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.o) $(SRC:%.c=$(BUILD_DIR)/%.o) # order is 
 DEPS = $(SRC:%.c=$(BUILD_DIR)/%.d) $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.d)
 
 # Audio
-assets = $(wildcard assets/*.wav)
-assets_conv = $(addprefix filesystem/,$(notdir $(assets:%.wav=%.wav64)))
-$(BUILD_DIR)/jam.dfs: $(assets_conv)
+# assets = $(wildcard assets/*.wav)
+# assets_conv = $(addprefix filesystem/,$(notdir $(assets:%.wav=%.wav64)))
+# $(BUILD_DIR)/jam.dfs: $(assets_conv)
 
 libdragon:
 	$(MAKE) -C ./libdragon install
@@ -45,12 +45,12 @@ jam.z64: libdragon
 jam.z64: N64_ROM_TITLE="Jam"
 jam.z64: CFLAGS+=-Wno-error -Iinclude $(DEBUG_FLAGS)
 jam.z64: CXXFLAGS+=-Wno-error -Iinclude -Ibox2d/include -Ibox2d/src $(DEBUG_FLAGS)
-jam.z64: $(BUILD_DIR)/jam.dfs
+# jam.z64: $(BUILD_DIR)/jam.dfs
 
-filesystem/%.wav64: assets/%.wav
-	@mkdir -p $(dir $@)
-	@echo "    [AUDIO] $@"
-	@$(N64_AUDIOCONV) -o filesystem $<
+# filesystem/%.wav64: assets/%.wav
+# 	@mkdir -p $(dir $@)
+# 	@echo "    [AUDIO] $@"
+# 	@$(N64_AUDIOCONV) -o filesystem $<
 
 $(BUILD_DIR)/jam.elf: $(OBJS)
 

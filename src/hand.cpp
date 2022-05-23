@@ -34,9 +34,9 @@ Hand::Hand(b2World* world) : Box() {
 
     body->CreateFixture(&fixtureDef);
 
-    wav64_open(&hitTaken[0], "hit1.wav64");
-    wav64_open(&hitTaken[1], "hit2.wav64");
-    wav64_open(&hitTaken[2], "hit3.wav64");
+    // wav64_open(&hitTaken[0], "hit1.wav64");
+    // wav64_open(&hitTaken[1], "hit2.wav64");
+    // wav64_open(&hitTaken[2], "hit3.wav64");
 }
 
 void Hand::update(RdpDisplayList* rdl, b2Mat33& matrix, bool held) {

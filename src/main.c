@@ -81,10 +81,10 @@ int main(void)
 
         // Present
         display_show(disp);
-        if (audio_can_write()) {
-            short *buf = audio_write_begin();
-            mixer_poll(buf, audio_get_buffer_length());
-            audio_write_end();
-        }
+        // if (audio_can_write()) {
+        //     short *buf = audio_write_begin();
+        //     mixer_poll(buf, audio_get_buffer_length());
+        //     audio_write_end();
+        // }
     }
 }

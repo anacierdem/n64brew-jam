@@ -18,12 +18,12 @@ Rope gameRope(19, leftHandInitialPos, rightHandInitialPos);
 extern "C" {
     int loop_cb1_Game(Game* self)
     {
-        return self->loopCallback(0);
+        // return self->loopCallback(0);
     }
 
     int loop_cb2_Game(Game* self)
     {
-        return self->loopCallback(1);
+        // return self->loopCallback(1);
     }
 
     Game::Game(RdpDisplayList* rdlParam) : Box()
@@ -56,26 +56,26 @@ extern "C" {
 
         reset();
 
-        wav64_open(&noise, "noise.wav64");
-        mixer_ch_set_vol(constants::noiseChannel, 0.0f, 0.0f);
-        wav64_set_loop(&noise, true);
-        mixer_ch_play(constants::noiseChannel, &noise.wave);
+        // wav64_open(&noise, "noise.wav64");
+        // mixer_ch_set_vol(constants::noiseChannel, 0.0f, 0.0f);
+        // wav64_set_loop(&noise, true);
+        // mixer_ch_play(constants::noiseChannel, &noise.wave);
 
-        wav64_open(&collectHealth, "health.wav64");
-        wav64_open(&gameover, "gameover.wav64");
-        wav64_open(&pickup, "pickup.wav64");
-        wav64_open(&jump, "jump.wav64");
-        mixer_ch_set_vol(constants::gameoverChannel, 0.7f, 0.7f);
-        mixer_ch_set_vol(constants::pickupChannel, 0.3f, 0.3f);
+        // wav64_open(&collectHealth, "health.wav64");
+        // wav64_open(&gameover, "gameover.wav64");
+        // wav64_open(&pickup, "pickup.wav64");
+        // wav64_open(&jump, "jump.wav64");
+        // mixer_ch_set_vol(constants::gameoverChannel, 0.7f, 0.7f);
+        // mixer_ch_set_vol(constants::pickupChannel, 0.3f, 0.3f);
 
-        wav64_open(&(ambient[0]), "ambient1.wav64");
-        mixer_ch_set_vol(constants::musicChannel1, 0.8f, 0.6f);
+        // wav64_open(&(ambient[0]), "ambient1.wav64");
+        // mixer_ch_set_vol(constants::musicChannel1, 0.8f, 0.6f);
 
-        wav64_open(&(ambient[1]), "ambient2.wav64");
-        mixer_ch_set_vol(constants::musicChannel2, 0.6f, 0.8f);
+        // wav64_open(&(ambient[1]), "ambient2.wav64");
+        // mixer_ch_set_vol(constants::musicChannel2, 0.6f, 0.8f);
 
-        mixer_add_event(0, (int (*)(void*))loop_cb1_Game, this);
-        mixer_add_event(0, (int (*)(void*))loop_cb2_Game, this);
+        // mixer_add_event(0, (int (*)(void*))loop_cb1_Game, this);
+        // mixer_add_event(0, (int (*)(void*))loop_cb2_Game, this);
     };
 
     // A quick hack for an unnerving feel
@@ -143,7 +143,7 @@ extern "C" {
 
     void Game::gameOver() {
         if(!isDead) {
-            mixer_ch_play(constants::gameoverChannel, &gameover.wave);
+            // mixer_ch_play(constants::gameoverChannel, &gameover.wave);
             isDead = true;
         }
     }
@@ -164,7 +164,7 @@ extern "C" {
             bits == (CollisionCategory::hand | CollisionCategory::enemy) ||
             bits == (CollisionCategory::hand | CollisionCategory::environment)
         )) {
-            mixer_ch_play(constants::jumpChannel, &jump.wave);
+            // mixer_ch_play(constants::jumpChannel, &jump.wave);
         }
 
         // We don't care about enemy-enemy contacts
@@ -209,7 +209,7 @@ extern "C" {
 
                 enemyDamageType dmg = enemy->getDamageType();
                 if (dmg == health) {
-                    mixer_ch_play(constants::healthChannel, &collectHealth.wave);
+                    // mixer_ch_play(constants::healthChannel, &collectHealth.wave);
                     enemy->die(level, addScore(2), false, 0.0f);
                     lives += dmg;
                 } else if (hand->takeDamage(rdl)) {
@@ -233,7 +233,7 @@ extern "C" {
             if (enemy == nullptr) enemy = reinterpret_cast<Enemy*> (fixtureB->GetUserData().pointer);
             assert(enemy != nullptr);
             int scoreToAdd = enemy->getDamageType() != health ? 1 : 0;
-            mixer_ch_play(constants::pickupChannel, &pickup.wave);
+            // mixer_ch_play(constants::pickupChannel, &pickup.wave);
             // Add a random delay, this will skew the spawn timing a little but that's ok
             float rt = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
             enemy->die(level, addScore(scoreToAdd), isDead && !isReset, rt);
@@ -480,7 +480,7 @@ extern "C" {
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
         tension = tension > 0.0f ? 0.0f : tension;
         float positiveTension = (holdingLeft && holdingRight && !isDead) ? (tension + 1.0) : 0.0;
-        mixer_ch_set_vol(constants::noiseChannel, positiveTension * 0.4, positiveTension * 0.4);
+        // mixer_ch_set_vol(constants::noiseChannel, positiveTension * 0.4, positiveTension * 0.4);
         gameRope.draw(rdl, mainM, positiveTension );
 
         // Draw ground
