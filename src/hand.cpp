@@ -39,28 +39,28 @@ Hand::Hand(b2World* world) : Box() {
     // wav64_open(&hitTaken[2], "hit3.wav64");
 }
 
-void Hand::update(RdpDisplayList* rdl, b2Mat33& matrix, bool held) {
+void Hand::update(b2Mat33& matrix, bool held) {
     b2Fixture* fixture = body->GetFixtureList();
     int64_t animationTime = timer_ticks() - startedShowingDamage;
 
     if (animationTime < 0 || animationTime > TICKS_FROM_MS(800)) {
         if (held) {
-            rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 128)));
+            rdpq_set_fill_color(RGBA32(255, 255, 255, 128));
             fixtureDef.filter.maskBits = CollisionCategory::enemy | CollisionCategory::environment | CollisionCategory::blade;
             fixture->SetFilterData(fixtureDef.filter);
         } else {
-            rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 50)));
+            rdpq_set_fill_color(RGBA32(255, 255, 255, 50));
             fixtureDef.filter.maskBits = CollisionCategory::environment;
             fixture->SetFilterData(fixtureDef.filter);
         }
     } else if (animationTime < TICKS_FROM_MS(200)) {
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 0, 0, 255)));
+        rdpq_set_fill_color(RGBA32(255, 0, 0, 255));
     } else if (animationTime < TICKS_FROM_MS(400)){
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 255)));
+        rdpq_set_fill_color(RGBA32(255, 255, 255, 255));
     } else if (animationTime < TICKS_FROM_MS(600)){
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 0, 0, 255)));
+        rdpq_set_fill_color(RGBA32(255, 0, 0, 255));
     } else {
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 255)));
+        rdpq_set_fill_color(RGBA32(255, 255, 255, 50));
     }
 
     // TODO: use common logic
@@ -82,14 +82,14 @@ void Hand::update(RdpDisplayList* rdl, b2Mat33& matrix, bool held) {
     vertex2 = b2Clamp(b2Vec2(v2.x, v2.y), min, max);
     vertex3 = b2Clamp(b2Vec2(v3.x, v3.y), min, max);
 
-    render_tri_strip(rdl,
+    render_tri_strip(
         vertex1.x, vertex1.y,
         vertex2.x, vertex2.y,
         vertex3.x, vertex3.y
     );
 }
 
-bool Hand::takeDamage(RdpDisplayList* rdl) {
+bool Hand::takeDamage() {
     int64_t gracePeriod = timer_ticks() - startedShowingDamage;
     if (gracePeriod < 0 || gracePeriod > TICKS_FROM_MS(constants::gracePeriodMs)) {
         startedShowingDamage = timer_ticks();

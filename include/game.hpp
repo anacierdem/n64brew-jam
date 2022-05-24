@@ -17,7 +17,6 @@
 
 extern "C" {
     #include <libdragon.h>
-    #include "rdl.h"
     #include "geometry.h"
 }
 
@@ -71,8 +70,6 @@ class Game : public b2ContactListener, Box
     private:
         void BeginContact(b2Contact* contact);
 
-        RdpDisplayList* rdl;
-
         int frameCount = 0;
 
         // Simulation params
@@ -122,7 +119,7 @@ class Game : public b2ContactListener, Box
         int currentIndex = 0;
         int64_t lastLevelIncreaseAt = std::numeric_limits<int64_t>::min();
     public:
-        Game(RdpDisplayList* rdlParam);
+        Game();
         void updateBG();
         void update();
         void updateUI(display_context_t disp);
@@ -145,7 +142,7 @@ typedef struct Game Game;
     #define EXPORT_C
 #endif
 
-EXPORT_C Game* new_Game(RdpDisplayList*);
+EXPORT_C Game* new_Game();
 // TODO: implement cleanup routines
 EXPORT_C void delete_Game(Game*);
 

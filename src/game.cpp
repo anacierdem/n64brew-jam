@@ -26,14 +26,12 @@ extern "C" {
         // return self->loopCallback(1);
     }
 
-    Game::Game(RdpDisplayList* rdlParam) : Box()
+    Game::Game() : Box()
     {
         world.SetContactListener(this);
         if (get_tv_type() == TV_PAL) {
             timeStep = 1.0 / 50.0;
         }
-
-        rdl = rdlParam;
 
         b2BodyDef bodyDef;
         bodyDef.type = b2_staticBody;
@@ -188,13 +186,13 @@ extern "C" {
             assert(hand != nullptr);
 
             if (bits & CollisionCategory::environment) {
-                hand->takeDamage(rdl);
+                hand->takeDamage();
                 // Touching ground is always deadly
                 gameOver();
             }
 
             if (bits & CollisionCategory::blade) {
-                if (hand->takeDamage(rdl)) {
+                if (hand->takeDamage()) {
                     startedShowingDamage = timer_ticks();
                     lives -= 1;
                 }
@@ -212,7 +210,7 @@ extern "C" {
                     // mixer_ch_play(constants::healthChannel, &collectHealth.wave);
                     enemy->die(level, addScore(2), false, 0.0f);
                     lives += dmg;
-                } else if (hand->takeDamage(rdl)) {
+                } else if (hand->takeDamage()) {
                     startedShowingDamage = timer_ticks();
                     lives += dmg;
                 }
@@ -242,35 +240,35 @@ extern "C" {
 
     // Full screen quad proved to be costly
     void Game::updateBG() {
-        rdl_push(rdl,RdpSetOtherModes(SOM_CYCLE_FILL));
+        rdpq_set_other_modes(SOM_CYCLE_FILL);
 
         int64_t animationTime = timer_ticks() - startedShowingDamage;
 
         // Full screen flash & shake
         if ((animationTime > 0 && animationTime < TICKS_FROM_MS(25))) {
-            rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
+            rdpq_set_fill_color(RGBA32(30,10,10,255));
             cameraPos = b2Vec3(10.f, 5.f, 10.0f);
         } else if (animationTime > 0 && animationTime < TICKS_FROM_MS(50)) {
-            rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
+            rdpq_set_fill_color(RGBA32(30,10,10,255));
             cameraPos = b2Vec3(-10.f, 5.f, 10.0f);
         } else if (animationTime > 0 && animationTime < TICKS_FROM_MS(75)) {
-            rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
+            rdpq_set_fill_color(RGBA32(30,10,10,255));
             cameraPos = b2Vec3(10.f, 5.f, 10.0f);
         } else {
             if (isDead && !isReset) {
-                rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(30,10,10,255)));
+                rdpq_set_fill_color(RGBA32(30,10,10,255));
             } else {
-                rdl_push(rdl,RdpSetFillColor(RDP_COLOR32(0,0,0,255)));
+                rdpq_set_fill_color(RGBA32(0,0,0,255));
             }
 
             cameraPos = b2Vec3(0.f, 0.f, 0.f);
         }
 
         // Clear
-        rdl_push(rdl,RdpFillRectangleI(0, 0, 640, 240));
+        rdpq_fill_rectangle(0, 0, 640, 240);
 
         // Set other modes
-        rdl_push(rdl, RdpSetOtherModes(
+        rdpq_set_other_modes(
             SOM_CYCLE_1 |
             SOM_BLENDING |
             SOM_READ_ENABLE |
@@ -279,7 +277,7 @@ extern "C" {
             SOM_COVERAGE_DEST_WRAP |
             // (P*A + M*B)
             (cast64(0x0) << 30) | (cast64(0x0) << 28) | (cast64(0x0) << 26) | (cast64(0x0) << 24) |
-            (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) );
+            (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) );
     }
 
     void Game::update() {
@@ -436,7 +434,7 @@ extern "C" {
                 break;
             }
 
-            enemies[i]->update(rdl, mainM);
+            enemies[i]->update(mainM);
 
             // Kill the enemy at a random location in approx next screen height such that we spawn them "apparently" at random
             float ry = constants::gameAreaWidth * static_cast<float>(rand()) / RAND_MAX;
@@ -470,38 +468,38 @@ extern "C" {
         }
 
         // Draw everything except enemies below
-        bladeE.update(rdl, mainM, !isDead && (holdingLeft && holdingRight));
+        bladeE.update(mainM, !isDead && (holdingLeft && holdingRight));
 
         // Draw hands
-        leftHand.update(rdl, mainM, holdingLeft && (!isDead || isReset));
-        rightHand.update(rdl, mainM, holdingRight && (!isDead || isReset));
+        leftHand.update(mainM, holdingLeft && (!isDead || isReset));
+        rightHand.update(mainM, holdingRight && (!isDead || isReset));
 
         // Draw rope
         float tension = distanceOverflow < -1.0f ? -1.0f : distanceOverflow;
         tension = tension > 0.0f ? 0.0f : tension;
         float positiveTension = (holdingLeft && holdingRight && !isDead) ? (tension + 1.0) : 0.0;
         // mixer_ch_set_vol(constants::noiseChannel, positiveTension * 0.4, positiveTension * 0.4);
-        gameRope.draw(rdl, mainM, positiveTension );
+        gameRope.draw(mainM, positiveTension );
 
         // Draw ground
         // Draw noise if it is letting through
         if (!isDead || isReset) {
-            rdl_push(rdl, RdpSetOtherModes(
+            rdpq_set_other_modes(
                 SOM_CYCLE_1 |
                 SOM_BLENDING |
                 SOM_READ_ENABLE |
                 SOM_AA_ENABLE |
                 SOM_COLOR_ON_COVERAGE |
                 SOM_COVERAGE_DEST_WRAP |
-                SOM_ENABLE_DITHER_ALPHA |
-                SOM_ENABLE_ALPHA_COMPARE |
+                SOM_ALPHADITHER_ENABLE |
+                SOM_ALPHA_COMPARE |
                 // (P*A + M*B)
                 (cast64(0x0) << 30) | (cast64(0x0) << 28) | (cast64(0x0) << 26) | (cast64(0x0) << 24) |
-                (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) ) );
+                (cast64(0x1) << 22) | (cast64(0x0) << 20) | (cast64(0x0) << 18) | (cast64(0x0) << 16) );
         }
 
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(150, 68, 201, 180)));
-        Box::update(rdl, mainM);
+        rdpq_set_fill_color(RGBA32(150, 68, 201, 180));
+        Box::update(mainM);
     }
 
     void Game::updateUI(display_context_t disp) {
@@ -575,9 +573,9 @@ extern "C" {
 #endif
     }
 
-    Game* new_Game(RdpDisplayList* rdl)
+    Game* new_Game()
     {
-        return new Game(rdl);
+        return new Game();
     }
 
     void delete_Game(Game* self)

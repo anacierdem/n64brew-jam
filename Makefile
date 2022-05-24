@@ -5,7 +5,7 @@ SOURCE_DIR=src
 BUILD_DIR=build
 include $(N64_INST)/include/n64.mk
 
-DEBUG_FLAGS = -DNDEBUG
+# DEBUG_FLAGS = -DNDEBUG
 
 # TODO: simplify these
 $(BUILD_DIR)/box2d/src/collision/%.o: box2d/src/collision/%.cpp
@@ -28,7 +28,7 @@ $(BUILD_DIR)/box2d/src/rope/%.o: box2d/src/rope/%.cpp
 	@echo "    [CXX] $<"
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-SRC = main.c rdl.c geometry.c
+SRC = main.c geometry.c
 CXX_SRC = game.cpp rope.cpp box.cpp enemy.cpp hand.cpp blade.cpp $(wildcard box2d/src/collision/*.cpp) $(wildcard box2d/src/common/*.cpp) $(wildcard box2d/src/dynamics/*.cpp) $(wildcard box2d/src/rope/*.cpp)
 OBJS = $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.o) $(SRC:%.c=$(BUILD_DIR)/%.o) # order is important to init dfs
 DEPS = $(SRC:%.c=$(BUILD_DIR)/%.d) $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.d)

@@ -29,22 +29,22 @@ Blade::Blade(b2World* world) : Box() {
     body->CreateFixture(&fixtureDef);
 }
 
-void Blade::update(RdpDisplayList* rdl, b2Mat33& matrix, bool active) {
+void Blade::update(b2Mat33& matrix, bool active) {
     if (active) {
         if (fixtureDef.filter.maskBits != (CollisionCategory::enemy | CollisionCategory::hand)) {
             fixtureDef.filter.maskBits = CollisionCategory::enemy | CollisionCategory::hand;
             b2Fixture* fixture = body->GetFixtureList();
             fixture->SetFilterData(fixtureDef.filter);
         }
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(80, 80, 80, 240)));
+        rdpq_set_fill_color(RGBA32(80, 80, 80, 240));
     } else {
         if (fixtureDef.filter.maskBits != CollisionCategory::hand) {
             fixtureDef.filter.maskBits = CollisionCategory::hand;
             b2Fixture* fixture = body->GetFixtureList();
             fixture->SetFilterData(fixtureDef.filter);
         }
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(80, 80, 80, 180)));
+        rdpq_set_fill_color(RGBA32(80, 80, 80, 180));
     }
 
-    Box::update(rdl, matrix);
+    Box::update(matrix);
 }

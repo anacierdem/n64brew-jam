@@ -31,7 +31,7 @@ class Enemy : public Box
     public:
         Enemy(b2World* world);
         void die(int multiplier, int score, bool isDead, float maxDelay);
-        void update(RdpDisplayList* rdl, b2Mat33& matrix);
+        void update(b2Mat33& matrix);
         enemyDamageType getDamageType() const;
 
         // Scoring

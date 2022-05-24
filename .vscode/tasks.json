@@ -12,7 +12,7 @@
     {
       "label": "build",
       "type": "shell",
-      "command": "npx libdragon make -j16",
+      "command": "npx libdragon make -j",
       "group": {
         "kind": "build",
         "isDefault": true

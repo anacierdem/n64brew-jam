@@ -20,8 +20,8 @@ class Hand : public Box
         wav64_t hitTaken[3];
     public:
         Hand(b2World* world);
-        void update(RdpDisplayList* rdl, b2Mat33& matrix, bool held);
-        bool takeDamage(RdpDisplayList* rdl);
+        void update(b2Mat33& matrix, bool held);
+        bool takeDamage();
 };
 
 

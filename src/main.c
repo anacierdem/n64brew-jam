@@ -3,7 +3,6 @@
 
 #include <libdragon.h>
 
-#include "rdl.h"
 #include "geometry.h"
 #include "game.hpp"
 
@@ -33,7 +32,7 @@ int main(void)
 
     debug_init_usblog();
 
-    rdp_init();
+    rdpq_init();
     timer_init();
     controller_init();
     audio_init(44100, 6);
@@ -43,38 +42,23 @@ int main(void)
 
     static display_context_t disp = 0;
 
-    RdpDisplayList *rdl = rdl_stack_alloc(1000);
-
     // TODO: move to stack
-    Game* testGame = new_Game(rdl);
+    Game* testGame = new_Game();
 
     // Set scissor
-    rdl_push(rdl,RdpSetClippingI(0, 0, 640, 240));
+    rdpq_set_scissor(0, 0, 640, 240);
 
-    rdl_push(rdl,
-        RdpSetCombine(
-            // We need to enable same flags for both cycles in 1 cycle mode.
-            Comb0_Rgb(ZERO, ZERO, ZERO, PRIM) | Comb0_Alpha(ZERO, ZERO, ZERO, PRIM) |
-            Comb1_Rgb(ZERO, ZERO, ZERO, PRIM) | Comb1_Alpha(ZERO, ZERO, ZERO, PRIM)
-        )
+    rdpq_set_combine_mode(
+        Comb0_Rgb(ZERO, ZERO, ZERO, PRIM) | Comb0_Alpha(ZERO, ZERO, ZERO, PRIM) |
+        Comb1_Rgb(ZERO, ZERO, ZERO, PRIM) | Comb1_Alpha(ZERO, ZERO, ZERO, PRIM)
     );
-
-    rdl_flush(rdl);
-    rdl_exec(rdl);
 
     while(1) {
         while( !(disp = display_lock()) );
         rdp_attach_display( disp );
 
-        rdl_reset(rdl);
-
-        rdl_push(rdl,RdpSyncPipe());
-
         update_BG(testGame);
         update_Game(testGame);
-
-        rdl_flush(rdl);
-        rdl_exec(rdl);
 
         rdp_detach_display();
         update_UI(testGame, disp);

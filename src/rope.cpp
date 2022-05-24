@@ -56,15 +56,15 @@ b2Vec2 Rope::update(b2Vec2 pos1, b2Vec2 pos2) {
     return rope.m_ps[ropeDef.count / 2];
 }
 
-void Rope::draw(RdpDisplayList* rdl, b2Mat33& matrix, float tension) {
+void Rope::draw(b2Mat33& matrix, float tension) {
     if (tension == 0.0f) {
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(255, 255, 255, 80)));
+        rdpq_set_fill_color(RGBA32(255, 255, 255, 80));
     } else {
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(
+        rdpq_set_fill_color(RGBA32(
             255 -static_cast<int>(tension * (255 - 160)),
             255 -static_cast<int>(tension * (255 - 78)),
             255 -static_cast<int>(tension * (255 - 221))
-        , 80 -static_cast<int>(tension * (80 - 250)))));
+        , 80 -static_cast<int>(tension * (80 - 250))));
     }
     for (int i = 0; i < ropeDef.count - 1; i++)
     {
@@ -81,7 +81,7 @@ void Rope::draw(RdpDisplayList* rdl, b2Mat33& matrix, float tension) {
         b2Vec3 v2 = b2Mul(matrix, b2Vec3(vertex2.x, vertex2.y, 1.));
         b2Vec3 v3 = b2Mul(matrix, b2Vec3(vertex3.x, vertex3.y, 1.));
 
-        render_tri_strip(rdl,
+        render_tri_strip(
             v1.x, v1.y,
             v2.x, v2.y,
             v3.x, v3.y
@@ -89,7 +89,7 @@ void Rope::draw(RdpDisplayList* rdl, b2Mat33& matrix, float tension) {
 
         vertex1 = rope.m_ps[i+1] + offset;
         v1 = b2Mul(matrix, b2Vec3(vertex1.x, vertex1.y, 1.));
-        render_tri_strip_next(rdl, v1.x, v1.y);
+        render_tri_strip_next(v1.x, v1.y);
     }
 }
 
