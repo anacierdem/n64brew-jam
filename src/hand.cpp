@@ -97,7 +97,7 @@ bool Hand::takeDamage() {
         float normalized = rand() / std::nextafter(float(RAND_MAX), FLT_MAX);
         int id = int(normalized * 3);
 
-        mixer_ch_play(constants::hitTakenChannel, &hitTaken[id].wave);
+        // mixer_ch_play(constants::hitTakenChannel, &hitTaken[id].wave);
         return true;
     };
     return false;
