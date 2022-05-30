@@ -1,4 +1,5 @@
-all: jam.z64
+all: libdragon jam.z64
+.NOTPARALLEL: all
 
 V=1
 SOURCE_DIR=src
@@ -41,7 +42,6 @@ DEPS = $(SRC:%.c=$(BUILD_DIR)/%.d) $(CXX_SRC:%.cpp=$(BUILD_DIR)/%.d)
 libdragon:
 	$(MAKE) -C ./libdragon install
 
-jam.z64: libdragon
 jam.z64: N64_ROM_TITLE="Jam"
 jam.z64: CFLAGS+=-Wno-error -Iinclude $(DEBUG_FLAGS)
 jam.z64: CXXFLAGS+=-Wno-error -Iinclude -Ibox2d/include -Ibox2d/src $(DEBUG_FLAGS)
