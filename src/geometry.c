@@ -51,6 +51,34 @@ static inline void __render_tri(int32_t x1, int32_t y1, int32_t x2, int32_t y2, 
         XL, DxLDy,
         XH, DxHDy,
         XM, DxMDy);
+
+    rdpq_fill_triangle(dir,
+        from_16d16_to_11d2(YL),
+        from_16d16_to_11d2(YM),
+        from_16d16_to_11d2(YH),
+        XL, DxLDy,
+        XH, DxHDy,
+        XM, DxMDy);
+
+    rdpq_fill_triangle(dir,
+        from_16d16_to_11d2(YL),
+        from_16d16_to_11d2(YM),
+        from_16d16_to_11d2(YH),
+        XL, DxLDy,
+        XH, DxHDy,
+        XM, DxMDy);
+
+    // rdpq_fill_triangle(1,
+    //     100 << 2,
+    //     0,
+    //     0,
+    //     100 << 2, -4,
+    //     0, 0,
+    //     0, 0);
+
+    rspq_wait();
+    rsp_crash();
+
 }
 
 

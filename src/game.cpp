@@ -281,6 +281,12 @@ extern "C" {
     }
 
     void Game::update() {
+        render_tri_strip(
+            0.0f, 0.0f,
+            50.f * constants::to16_16, 0.0f,
+            0.0f, 50.f * constants::to16_16
+        );
+
         // Calculate level (difficulty)
         if (!isDead) {
             if ((timer_ticks() - lastLevelIncreaseAt) > (static_cast<int64_t>(levelSwitch[currentIndex]) * static_cast<int64_t>(TICKS_PER_SECOND))) {
