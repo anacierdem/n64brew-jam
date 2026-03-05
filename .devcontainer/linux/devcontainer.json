@@ -1,0 +1,21 @@
+{
+    "build": { "dockerfile": "../Dockerfile", "context": "../" },
+    "runArgs": [
+        "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
+        "-v", "${localEnv:XAUTHORITY:/tmp/dummy}:${localEnv:XAUTHORITY:/tmp/dummy}:ro",
+        "-v", "${localEnv:XDG_RUNTIME_DIR}/pulse/native:${localEnv:XDG_RUNTIME_DIR}/pulse/native",
+        "--device=/dev/bus/usb"
+    ],
+    "containerEnv": {
+        "WS": "${workspaceFolder}",
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "PULSE_SERVER": "${localEnv:XDG_RUNTIME_DIR}/pulse/native",
+        "XAUTHORITY": "${localEnv:XAUTHORITY}"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": ["ms-vscode.cpptools", "lici.libdragon-vscode"]
+        }
+    },
+    "postAttachCommand": "git submodule init && make -C libdragon install tools-install -j $(getconf _NPROCESSORS_ONLN) && make -C tiny3d install tools/gltf_importer tools/gltf_importer install -j $(getconf _NPROCESSORS_ONLN)"
+}

@@ -6,29 +6,33 @@
     {
       "label": "clean",
       "type": "shell",
-      "command": "npx libdragon make clean",
+      "command": "make clean",
       "group": "none"
     },
+
     {
       "label": "build",
       "type": "shell",
-      "command": "npx libdragon make -j16",
+      "command": "make",
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": {
-        "owner": "c",
-        "fileLocation": ["relative", "${workspaceFolder}"],
-        "pattern": {
-          "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "severity": 4,
-          "message": 5
+      "problemMatcher": [
+        {
+          "owner": "cpp",
+          "fileLocation": ["relative", "${workspaceFolder}/libdragon"],
+          "pattern": {
+            "regexp": "^\\/workspaces\\/libdragon-template\\/libdragon(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+          }
         }
-      }
-    }
+      ]
+    },
+
   ]
 }
