@@ -3,10 +3,13 @@
         {
             "name": "N64 Generic",
             "includePath": [
-                "${workspaceFolder}/libdragon/include"
+                "${workspaceFolder}/libdragon/include",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/box2d/include"
             ],
             "defines": [
-                "N64"
+                "N64",
+                "__cplusplus"
             ],
             "cStandard": "gnu99",
             "cppStandard": "gnu++14",
