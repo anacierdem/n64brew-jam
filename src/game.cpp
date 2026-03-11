@@ -81,7 +81,7 @@ extern "C" {
     // A quick hack for an unnerving feel
     int Game::loopCallback(int id) {
         float r = 6000.0f * static_cast<float>(rand()) / RAND_MAX;
-        int newFreq = 44100 - 3000 + static_cast<int>(r);
+        int newFreq = 44000 - 3000 + static_cast<int>(r);
         int newLength = static_cast<int>((static_cast<float>(ambient[id].wave.len) / static_cast<float>(newFreq)) * 44100.0f);
         mixer_ch_play(id*2, &(ambient[id]).wave);
         mixer_ch_set_freq(id*2, newFreq);

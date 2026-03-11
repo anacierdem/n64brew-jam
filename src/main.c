@@ -24,7 +24,7 @@ int main(void)
     rdp_init();
     timer_init();
     controller_init();
-    audio_init(44100, 6);
+    audio_init(48000, 6);
     mixer_init(8);
 
     debugf("init seed: %u\n", seed);
@@ -47,7 +47,6 @@ int main(void)
 
         update_BG(testGame);
         update_Game(testGame);
-
 
         rdpq_detach_wait();
         update_UI(testGame, disp);
