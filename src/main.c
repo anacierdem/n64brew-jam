@@ -3,8 +3,6 @@
 
 #include <libdragon.h>
 
-#include "rdl.h"
-#include "geometry.h"
 #include "game.hpp"
 
 // Init DFS first as global C++ object use DFS
@@ -13,24 +11,14 @@ __attribute__((constructor)) void __init_dfs()
     dfs_init(DFS_DEFAULT_LOCATION);
 }
 
-#ifdef NDEBUG
-    void ex_handler(exception_t* ex) {
-        debugf("DEAD\n");
-        _start();
-    }
-#endif
-
 int main(void)
 {
-#ifdef NDEBUG
-    register_exception_handler(ex_handler);
-#endif
-
     int seed = TICKS_READ();
     srand(seed);
     // Default scene width: 8m, heigth: 6m
     display_init(RESOLUTION_640x240, DEPTH_32_BPP, 2, GAMMA_NONE, ANTIALIAS_OFF);
 
+    debug_init_isviewer();
     debug_init_usblog();
 
     rdp_init();
@@ -43,40 +31,25 @@ int main(void)
 
     static display_context_t disp = 0;
 
-    RdpDisplayList *rdl = rdl_stack_alloc(1000);
-
     // TODO: move to stack
-    Game* testGame = new_Game(rdl);
+    Game* testGame = new_Game();
 
     // Set scissor
-    rdl_push(rdl,RdpSetClippingI(0, 0, 640, 240));
+    rdpq_set_scissor(0, 0, 640, 240);
 
-    rdl_push(rdl,
-        RdpSetCombine(
-            // We need to enable same flags for both cycles in 1 cycle mode.
-            Comb0_Rgb(ZERO, ZERO, ZERO, PRIM) | Comb0_Alpha(ZERO, ZERO, ZERO, PRIM) |
-            Comb1_Rgb(ZERO, ZERO, ZERO, PRIM) | Comb1_Alpha(ZERO, ZERO, ZERO, PRIM)
-        )
+    rdpq_set_combiner_raw(
+        RDPQ_COMBINER1((ZERO, ZERO, ZERO, PRIM), (ZERO, ZERO, ZERO, PRIM))
     );
 
-    rdl_flush(rdl);
-    rdl_exec(rdl);
-
     while(1) {
-        while( !(disp = display_lock()) );
-        rdp_attach_display( disp );
-
-        rdl_reset(rdl);
-
-        rdl_push(rdl,RdpSyncPipe());
+        surface_t *disp = display_get();
+        rdpq_attach(disp, NULL);
 
         update_BG(testGame);
         update_Game(testGame);
 
-        rdl_flush(rdl);
-        rdl_exec(rdl);
 
-        rdp_detach_display();
+        rdpq_detach_wait();
         update_UI(testGame, disp);
 
         // Present

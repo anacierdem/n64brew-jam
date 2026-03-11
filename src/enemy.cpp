@@ -95,7 +95,7 @@ void Enemy::die(int level, int s, bool gameOver, float maxDelay) {
     delay = timer_ticks() + (TICKS_FROM_MS(maxDelay * 1000.0f * (static_cast<float>(rand()) / RAND_MAX)));
 }
 
-void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
+void Enemy::update(b2Mat33& matrix) {
     if (shouldResetWith) {
         // Disable once dead but wait before respan
         body->SetEnabled(false);
@@ -124,18 +124,18 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
     }
 
     if (type == health) {
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(100, 255, 100, 100)));
+        rdpq_set_prim_color(RGBA32(100, 255, 100, 100));
     } else {
-        rdl_push(rdl,RdpSetPrimColor(RDP_COLOR32(150, 68, 201, 180)));
+        rdpq_set_prim_color(RGBA32(150, 68, 201, 180));
     }
     if (body->IsEnabled()) {
-        Box::update(rdl, matrix);
+        Edge lastEdge = Box::update(matrix);
 
 #ifndef SQUARE_ENEMIES
         b2Vec2 min = b2Vec2(0., 0.);
         b2Vec2 max = b2Vec2(
-            constants::gameAreaWidth * constants::scale * constants::to16_16,
-            constants::gameAreaHeight * (constants::scale/2.0f) * constants::to16_16
+            constants::gameAreaWidth * constants::scale,
+            constants::gameAreaHeight * (constants::scale/2.0f)
         );
 
         b2Vec2 vertex1 = body->GetWorldPoint(polygonShape.m_vertices[4]);
@@ -143,7 +143,10 @@ void Enemy::update(RdpDisplayList* rdl, b2Mat33& matrix) {
         b2Vec3 v1 = b2Mul(matrix, b2Vec3(vertex1.x, vertex1.y, 1.));
         vertex1 = b2Clamp(b2Vec2(v1.x, v1.y), min, max);
 
-        render_tri_strip_next(rdl, vertex1.x, vertex1.y);
+        rdpq_triangle(&TRIFMT_FILL,
+            &lastEdge.v1.x,
+            &lastEdge.v2.x,
+            &vertex1.x);
 #endif
     }
 }

@@ -7,14 +7,13 @@
 
 extern "C" {
     #include <libdragon.h>
-    #include "geometry.h"
 }
 
 class Blade : public Box
 {
     public:
         Blade(b2World* world);
-        void update(RdpDisplayList* rdl, b2Mat33& matrix, bool holding);
+        void update(b2Mat33& matrix, bool holding);
 };
 
 

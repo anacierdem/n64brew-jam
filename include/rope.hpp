@@ -4,10 +4,8 @@
 #include "box2d/box2d.h"
 #include "box2d/b2_rope.h"
 
-
 extern "C" {
     #include <libdragon.h>
-    #include "geometry.h"
 }
 
 class Rope
@@ -26,7 +24,7 @@ class Rope
     public:
         Rope(int count, b2Vec2 pos1, b2Vec2 pos2);
         b2Vec2 update(b2Vec2 pos1, b2Vec2 pos2);
-        void draw(RdpDisplayList* rdl, b2Mat33& matrix, float tension);
+        void draw(b2Mat33& matrix, float tension);
         void reset();
 };
 

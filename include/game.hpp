@@ -17,14 +17,11 @@
 
 extern "C" {
     #include <libdragon.h>
-    #include "rdl.h"
-    #include "geometry.h"
 }
 
 class Enemy;
 
 namespace constants {
-    constexpr float to16_16 = 65536.f;
     constexpr float gameAreaWidth = 8.f;
     constexpr float gameAreaHeight = 6.f;
     constexpr float spawnSafeRadius = 0.15f; // Must be larger than enemy size
@@ -70,8 +67,6 @@ class Game : public b2ContactListener, Box
 {
     private:
         void BeginContact(b2Contact* contact);
-
-        RdpDisplayList* rdl;
 
         int frameCount = 0;
 
@@ -122,7 +117,7 @@ class Game : public b2ContactListener, Box
         int currentIndex = 0;
         int64_t lastLevelIncreaseAt = std::numeric_limits<int64_t>::min();
     public:
-        Game(RdpDisplayList* rdlParam);
+        Game();
         void updateBG();
         void update();
         void updateUI(display_context_t disp);
@@ -145,7 +140,7 @@ typedef struct Game Game;
     #define EXPORT_C
 #endif
 
-EXPORT_C Game* new_Game(RdpDisplayList*);
+EXPORT_C Game* new_Game();
 // TODO: implement cleanup routines
 EXPORT_C void delete_Game(Game*);
 

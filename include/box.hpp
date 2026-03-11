@@ -5,8 +5,12 @@
 
 extern "C" {
     #include <libdragon.h>
-    #include "geometry.h"
 }
+
+struct Edge {
+    b2Vec2 v1;
+    b2Vec2 v2;
+};
 
 class Box
 {
@@ -17,7 +21,7 @@ class Box
     public:
         b2Body* body;
         Box() {};
-        void update(RdpDisplayList* rdl, b2Mat33& matrix);
+        Edge update(b2Mat33& matrix);
 };
 
 
